@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(251, 247, 239, 0.98), rgba(244, 237, 224, 0.92)),
+    radial-gradient(circle at 12% 12%, rgba(196, 154, 63, 0.16), transparent 34%),
+    radial-gradient(circle at 82% 2%, rgba(15, 118, 110, 0.13), transparent 30%);
+  color: #121722;
+  font-family: Aptos, "Segoe UI Variable", "Segoe UI", sans-serif;
+}
+
+.dark body {
+  background:
+    linear-gradient(135deg, rgba(12, 20, 36, 0.98), rgba(18, 23, 34, 0.96)),
+    radial-gradient(circle at 14% 8%, rgba(196, 154, 63, 0.14), transparent 34%),
+    radial-gradient(circle at 82% 4%, rgba(20, 184, 166, 0.13), transparent 30%);
+  color: #fbf7ef;
+}
+
+a {
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+::selection {
+  background: rgba(196, 154, 63, 0.34);
+}
+
+.archive-grid {
+  background-image:
+    linear-gradient(rgba(18, 23, 34, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 23, 34, 0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+.dark .archive-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
