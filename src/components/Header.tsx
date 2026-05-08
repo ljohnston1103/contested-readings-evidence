@@ -8,8 +8,7 @@ const navItems = [
   { href: "/manuscripts", label: "Manuscripts" },
   { href: "/fathers", label: "Fathers" },
   { href: "/versions", label: "Versions" },
-  { href: "/methodology", label: "Methodology" },
-  { href: "/about", label: "About" },
+  { href: "/methodology", label: "Oldest & Best" },
 ];
 
 export function Header() {

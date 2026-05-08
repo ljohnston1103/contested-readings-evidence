@@ -29,8 +29,7 @@ export function Footer() {
             Approach
           </p>
           <div className="mt-3 grid gap-2 text-sm">
-            <Link href="/methodology">Methodology</Link>
-            <Link href="/about">About</Link>
+            <Link href="/methodology">Oldest & Best Examination</Link>
           </div>
         </div>
       </div>

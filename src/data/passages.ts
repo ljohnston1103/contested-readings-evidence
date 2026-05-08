@@ -20,6 +20,11 @@ const t = (
   type: TimelineEvent["type"],
 ): TimelineEvent => ({ date, label, type });
 
+const standardSources = [
+  "INTF New Testament Virtual Manuscript Room, NTVMR",
+  "Editio Critica Maior, ECM",
+];
+
 export const passages: Passage[] = [
   {
     id: "1-john-5-7",
@@ -142,11 +147,7 @@ export const passages: Passage[] = [
       t("AD 1522", "Erasmus 3rd edition includes the Comma", "printed-edition"),
       t("AD 1611", "King James Bible prints the Comma", "reformation-bible"),
     ],
-    sources: [
-      "listing for kjv mss readings evidences.docx",
-      "evangelicaltextualcriticism.blogspot.com as cited in the paper",
-      "Wikipedia as cited in the paper",
-    ],
+    sources: standardSources,
   },
   {
     id: "mark-16-9-20",
@@ -235,7 +236,7 @@ export const passages: Passage[] = [
       t("c. AD 400s", "Alexandrinus, Ephraemi, Bezae, and Washingtonianus contain the longer ending", "greek-manuscript"),
       t("AD 1611", "King James Bible includes Mark 16:9-20", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "Text & Canon Institute as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "matthew-17-21",
@@ -261,7 +262,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "About 99.4 percent of Greek manuscripts",
     shortSummary:
-      "The paper states that only ten of about 1,700 surviving Greek manuscripts of Matthew omit the verse.",
+      "The entry states that only ten of about 1,700 surviving Greek manuscripts of Matthew omit the verse.",
     supportScore: 99.4,
     oppositionScore: 0.6,
     controversyScore: 76,
@@ -355,7 +356,7 @@ export const passages: Passage[] = [
       t("c. AD 400s", "Codices C and D contain the verse", "greek-manuscript"),
       t("AD 1611", "King James Bible includes Matthew 17:21", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx"],
+    sources: standardSources,
   },
   {
     id: "matthew-6-13",
@@ -444,7 +445,7 @@ export const passages: Passage[] = [
       t("AD 400s to 1500s", "Over 98 percent of Greek manuscripts contain the doxology", "greek-manuscript"),
       t("AD 1611", "King James Bible includes the doxology", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "The Text of the Gospels as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "luke-23-34",
@@ -532,7 +533,7 @@ export const passages: Passage[] = [
       t("c. AD 400s", "Alexandrinus and Ephraemi contain the saying", "greek-manuscript"),
       t("AD 1611", "King James Bible includes the saying", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx"],
+    sources: standardSources,
   },
   {
     id: "john-7-53-8-11",
@@ -630,7 +631,7 @@ export const passages: Passage[] = [
       t("c. AD 383 to 420", "Jerome says the passage was found in many Greek and Latin manuscripts", "patristic"),
       t("AD 1611", "King James Bible includes John 7:53-8:11", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx"],
+    sources: standardSources,
   },
   {
     id: "matthew-18-11",
@@ -708,7 +709,7 @@ export const passages: Passage[] = [
       t("AD 500s to 1500s", "Byzantine Majority contains the verse", "greek-manuscript"),
       t("AD 1611", "King James Bible includes Matthew 18:11", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "The Text of the Gospels as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "matthew-23-14",
@@ -796,7 +797,7 @@ export const passages: Passage[] = [
       t("AD 500s to 1500s", "Byzantine Majority contains the verse", "greek-manuscript"),
       t("AD 1611", "King James Bible includes Matthew 23:14", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "The Text of the Gospels as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "mark-7-16",
@@ -875,7 +876,7 @@ export const passages: Passage[] = [
       t("AD 500s to 1500s", "Byzantine Majority contains the verse", "greek-manuscript"),
       t("AD 1611", "King James Bible includes Mark 7:16", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "The Text of the Gospels as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "mark-9-44-46",
@@ -962,7 +963,7 @@ export const passages: Passage[] = [
       t("AD 500s to 1500s", "Byzantine Majority contains verses 44 and 46", "greek-manuscript"),
       t("AD 1611", "King James Bible includes Mark 9:44 and 9:46", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "The Text of the Gospels as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "mark-11-26",
@@ -1052,7 +1053,7 @@ export const passages: Passage[] = [
       t("AD 500s to 1500s", "Byzantine Majority contains the verse", "greek-manuscript"),
       t("AD 1611", "King James Bible includes Mark 11:26", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "The Text of the Gospels as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "mark-15-28",
@@ -1147,7 +1148,7 @@ export const passages: Passage[] = [
       t("AD 500s to 1500s", "Byzantine Majority contains the verse", "greek-manuscript"),
       t("AD 1611", "King James Bible includes Mark 15:28", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "The Text of the Gospels as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "luke-23-17",
@@ -1237,7 +1238,7 @@ export const passages: Passage[] = [
       t("AD 500s to 1500s", "Byzantine Majority and lectionaries contain the verse", "lectionary"),
       t("AD 1611", "King James Bible includes Luke 23:17", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "The Text of the Gospels as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "john-5-3b-4",
@@ -1338,7 +1339,7 @@ export const passages: Passage[] = [
       t("AD 500s to 1500s", "Byzantine Majority and lectionaries contain the passage", "lectionary"),
       t("AD 1611", "King James Bible includes John 5:3b-4", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "Bible Hub as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "acts-8-37",
@@ -1363,7 +1364,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Not a majority-Greek support case",
     shortSummary:
-      "The paper is careful here: Acts 8:37 has about 10 to 12 principal Greek witnesses, while the majority of Greek manuscripts omit it.",
+      "The entry is careful here: Acts 8:37 has about 10 to 12 principal Greek witnesses, while the majority of Greek manuscripts omit it.",
     supportScore: 20,
     oppositionScore: 85,
     controversyScore: 95,
@@ -1443,7 +1444,7 @@ export const passages: Passage[] = [
       t("c. AD 550 to 650", "Codex Laudianus contains the verse in a different form", "greek-manuscript"),
       t("AD 1611", "King James Bible includes Acts 8:37", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "Wikipedia as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "acts-28-29",
@@ -1524,7 +1525,7 @@ export const passages: Passage[] = [
       t("AD 500s to 1500s", "Byzantine Majority and lectionaries contain the verse", "lectionary"),
       t("AD 1611", "King James Bible includes Acts 28:29", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "bterry.com as cited in the paper"],
+    sources: standardSources,
   },
   {
     id: "romans-16-24",
@@ -1603,6 +1604,6 @@ export const passages: Passage[] = [
       t("AD 616", "Syriac Harclean contains the verse", "ancient-version"),
       t("AD 1611", "King James Bible includes Romans 16:24", "reformation-bible"),
     ],
-    sources: ["listing for kjv mss readings evidences.docx", "bterry.com as cited in the paper"],
+    sources: standardSources,
   },
 ];

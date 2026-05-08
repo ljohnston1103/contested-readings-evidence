@@ -20,7 +20,7 @@ export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps)
             Manuscript Count Snapshot
           </p>
           <h2 className="mt-2 font-display text-3xl font-black text-ink-900 dark:text-white">
-            Count first, then witnesses.
+            Manuscript evidence at a glance.
           </h2>
         </div>
         {passage.manuscriptSnapshot.percentSupport && (
