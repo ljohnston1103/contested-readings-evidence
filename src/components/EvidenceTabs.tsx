@@ -39,6 +39,22 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
     () => [...passage.latinWitnesses, ...passage.versionalWitnesses],
     [passage],
   );
+  const patristicGroups = useMemo(() => {
+    const hasSupportGroups = passage.patristicWitnesses.some((witness) =>
+      witness.region?.startsWith("Supporting "),
+    );
+    if (!hasSupportGroups) {
+      return [{ title: "", witnesses: passage.patristicWitnesses }];
+    }
+
+    const groups = new Map<string, typeof passage.patristicWitnesses>();
+    for (const witness of passage.patristicWitnesses) {
+      const title = witness.region ?? "Other patristic witnesses";
+      groups.set(title, [...(groups.get(title) ?? []), witness]);
+    }
+
+    return Array.from(groups, ([title, witnesses]) => ({ title, witnesses }));
+  }, [passage.patristicWitnesses]);
   const syriac = earlyVersions.filter(isSyriac);
   const otherVersions = earlyVersions.filter((row) => !isLatin(row) && !isSyriac(row));
 
@@ -115,10 +131,21 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
       )}
 
       {activeTab === "Church Fathers" && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-5">
           {passage.patristicWitnesses.length ? (
-            passage.patristicWitnesses.map((witness) => (
-              <PatristicQuoteCard key={`${witness.source}-${witness.date}`} witness={witness} />
+            patristicGroups.map((group) => (
+              <div key={group.title || "patristic-witnesses"} className="grid gap-4">
+                {group.title && (
+                  <h3 className="font-display text-2xl font-black text-ink-900 dark:text-white">
+                    {group.title}
+                  </h3>
+                )}
+                <div className="grid gap-4 md:grid-cols-2">
+                  {group.witnesses.map((witness) => (
+                    <PatristicQuoteCard key={`${witness.source}-${witness.date}`} witness={witness} />
+                  ))}
+                </div>
+              </div>
             ))
           ) : (
             <p className="rounded-3xl border border-dashed border-ink-200 p-6 text-sm text-ink-600 dark:border-white/10 dark:text-ink-100/70">
