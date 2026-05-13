@@ -267,11 +267,8 @@ function ManuscriptImage({
         </div>
       </div>
       <div className="px-5 py-4">
-        <p className="font-display text-2xl font-black text-ink-900 dark:text-white">
-          {label}
-        </p>
-        <p className="mt-2 text-sm font-semibold leading-6 text-ink-600 dark:text-ink-100/70">
-        {caption}
+        <p className="text-sm font-semibold leading-6 text-ink-600 dark:text-ink-100/70">
+          {caption}
         </p>
       </div>
     </Link>
@@ -347,14 +344,14 @@ export default function MethodologyPage() {
           alt="Codex Vaticanus manuscript"
           href="#vaticanus"
           label="Codex Vaticanus"
-          caption="Codex Vaticanus, one of the two chief manuscripts usually meant by oldest and best."
+          caption="One of the two chief manuscripts usually meant by oldest and best."
         />
         <ManuscriptImage
           src="/images/sinaiticus.webp"
           alt="Codex Sinaiticus manuscript"
           href="#sinaiticus"
           label="Codex Sinaiticus"
-          caption="Codex Sinaiticus, the other major Alexandrian witness frequently paired with Vaticanus."
+          caption="The other major Alexandrian witness frequently paired with Vaticanus."
         />
       </div>
 

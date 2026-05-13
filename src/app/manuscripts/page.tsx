@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AmbientVideo } from "@/components/AmbientVideo";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { SearchBar } from "@/components/SearchBar";
-import { buildManuscriptIndex, allPassages } from "@/data/derived";
+import { buildManuscriptIndex, displayedPassages } from "@/data/derived";
 
 export const metadata: Metadata = {
   title: "Manuscript Witnesses",
@@ -32,60 +32,76 @@ export default function ManuscriptsPage() {
             See where each Greek witness appears in the evidence.
           </h1>
           <p className="mt-5 text-lg leading-8 text-ink-700 dark:text-ink-100/75">
-            This index is generated from the passage data, so additions to a passage automatically update the manuscript profiles.
+            This index summarizes the available passage evidence.
           </p>
         </div>
-        <SearchBar passages={allPassages} compact />
+        <SearchBar passages={displayedPassages} compact />
       </div>
       </AmbientVideo>
 
       <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {manuscripts.map((profile) => (
-          <article key={profile.name} className="rounded-[2rem] border border-ink-200 bg-white/76 p-5 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
-              {profile.category}
-            </p>
-            <h2 className="mt-2 font-display text-2xl font-black text-ink-900 dark:text-white">{profile.name}</h2>
-            <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-ink-500 dark:text-ink-100/60">
-              {profile.siglum && <span>Siglum: {profile.siglum}</span>}
-              <span>Date: {profile.date}</span>
-            </div>
-            <div className="mt-5 grid gap-4">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
-                  Supports KJV/TR in
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {profile.supports.length ? (
-                    profile.supports.map(({ passage }) => (
-                      <Link key={passage.id} href={`/passages/${passage.slug}`} className="rounded-full bg-archive-teal/10 px-3 py-1 text-xs font-bold text-archive-teal dark:text-teal-200">
-                        {passage.reference}
-                      </Link>
-                    ))
-                  ) : (
-                    <span className="text-sm text-ink-500 dark:text-ink-100/60">No support rows in current data</span>
-                  )}
+        {manuscripts.map((profile) => {
+          const dividedPassages = new Set(
+            profile.supports
+              .filter((support) => profile.opposes.some((oppose) => oppose.passage.id === support.passage.id))
+              .map((support) => support.passage.id),
+          );
+          const passageLabel = (item: (typeof profile.supports)[number]) => {
+            const labels = item.labels.length
+              ? item.labels
+              : dividedPassages.has(item.passage.id)
+                ? ["divided evidence"]
+                : [];
+            return labels.length ? `${item.passage.reference} (${labels.join(", ")})` : item.passage.reference;
+          };
+
+          return (
+            <article key={profile.name} className="rounded-[2rem] border border-ink-200 bg-white/76 p-5 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
+                {profile.category}
+              </p>
+              <h2 className="mt-2 font-display text-2xl font-black text-ink-900 dark:text-white">{profile.name}</h2>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-ink-500 dark:text-ink-100/60">
+                {profile.siglum && <span>Siglum: {profile.siglum}</span>}
+                <span>Date: {profile.date}</span>
+              </div>
+              <div className="mt-5 grid gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
+                    Supports KJV/TR in
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {profile.supports.length ? (
+                      profile.supports.map((item) => (
+                        <Link key={item.passage.id} href={`/passages/${item.passage.slug}`} className="rounded-full bg-archive-teal/10 px-3 py-1 text-xs font-bold text-archive-teal dark:text-teal-200">
+                          {passageLabel(item)}
+                        </Link>
+                      ))
+                    ) : (
+                      <span className="text-sm text-ink-500 dark:text-ink-100/60">No supporting examples listed yet.</span>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700 dark:text-archive-gold">
+                    Opposes KJV/TR in
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {profile.opposes.length ? (
+                      profile.opposes.map((item) => (
+                        <Link key={item.passage.id} href={`/passages/${item.passage.slug}`} className="rounded-full bg-amber-700/10 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-100">
+                          {passageLabel(item)}
+                        </Link>
+                      ))
+                    ) : (
+                      <span className="text-sm text-ink-500 dark:text-ink-100/60">No opposing examples listed yet.</span>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700 dark:text-archive-gold">
-                  Opposes KJV/TR in
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {profile.opposes.length ? (
-                    profile.opposes.map(({ passage }) => (
-                      <Link key={passage.id} href={`/passages/${passage.slug}`} className="rounded-full bg-amber-700/10 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-100">
-                        {passage.reference}
-                      </Link>
-                    ))
-                  ) : (
-                    <span className="text-sm text-ink-500 dark:text-ink-100/60">No opposition rows in current data</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
     </div>
   );

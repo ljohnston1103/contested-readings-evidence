@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { AmbientVideo } from "@/components/AmbientVideo";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PassageBrowser } from "@/components/PassageBrowser";
-import { allPassages } from "@/data/derived";
+import { displayedPassages } from "@/data/derived";
 
 export const metadata: Metadata = {
   title: "Passage Index",
@@ -41,7 +41,7 @@ export default async function PassagesPage({ searchParams }: PassagesPageProps) 
       </div>
       </AmbientVideo>
       <div className="mt-10">
-        <PassageBrowser passages={allPassages} initialSearch={initialSearch} />
+        <PassageBrowser passages={displayedPassages} initialSearch={initialSearch} />
       </div>
     </div>
   );

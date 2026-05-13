@@ -31,7 +31,7 @@ export default function FathersPage() {
           Patristic evidence, grouped by writer.
         </h1>
         <p className="mt-5 text-lg leading-8 text-ink-700 dark:text-ink-100/75">
-          Each card shows where the current passage data connects a writer to a contested reading, with the quote summary preserved from the paper.
+          Each card shows where the available passage evidence connects a writer to a contested reading.
         </p>
       </div>
       </AmbientVideo>

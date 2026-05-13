@@ -49,7 +49,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Limited Greek support, stronger Latin and patristic support",
     shortSummary:
-      "A complex Trinitarian variant with limited Greek support but substantial Latin, printed-text, and patristic evidence listed in the source paper.",
+      "A complex Trinitarian variant with limited Greek support but substantial Latin, printed-text, and patristic evidence.",
     supportScore: 18,
     oppositionScore: 90,
     controversyScore: 100,
@@ -173,7 +173,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "99.8 percent Greek manuscript support",
     shortSummary:
-      "The paper presents Mark 16:9-20 as a count-first case: 1,653 Greek manuscripts include it while three Greek manuscripts end at 16:8.",
+      "Mark 16:9-20 is a count-first case: 1,653 Greek manuscripts include it while three Greek manuscripts end at 16:8.",
     supportScore: 99.8,
     oppositionScore: 0.2,
     controversyScore: 96,
@@ -262,7 +262,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "About 99.4 percent of Greek manuscripts",
     shortSummary:
-      "The entry states that only ten of about 1,700 surviving Greek manuscripts of Matthew omit the verse.",
+      "Only ten of about 1,700 surviving Greek manuscripts of Matthew are listed as omitting the verse.",
     supportScore: 99.4,
     oppositionScore: 0.6,
     controversyScore: 76,
@@ -380,7 +380,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Over 98 percent of Greek manuscripts containing Matthew 6:13",
     shortSummary:
-      "The paper presents the doxology as overwhelmingly supported in Greek manuscripts, with notable early Greek, Latin, and Coptic omission witnesses.",
+      "The doxology is overwhelmingly supported in Greek manuscripts, with notable early Greek, Latin, and Coptic omission witnesses.",
     supportScore: 98,
     oppositionScore: 2,
     controversyScore: 70,
@@ -466,7 +466,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Strong and widespread support, with significant early evidence against",
     shortSummary:
-      "The paper explicitly labels Luke 23:34 as not a scant-evidence-against case: support is strong, but early omission evidence is substantial.",
+      "Luke 23:34 is not a scant-evidence-against case: support is strong, but early omission evidence is substantial.",
     supportScore: 82,
     oppositionScore: 35,
     controversyScore: 94,
@@ -558,7 +558,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Large Greek and lectionary support, with major early evidence against",
     shortSummary:
-      "The paper lists 1,495 Greek manuscripts and 495 lectionaries supporting the passage in whole or in part, while noting strong early Greek omission evidence.",
+      "1,495 Greek manuscripts and 495 lectionaries support the passage in whole or in part, while strong early Greek witnesses omit it.",
     supportScore: 85,
     oppositionScore: 40,
     controversyScore: 99,
@@ -655,7 +655,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Vast majority of Greek manuscripts",
     shortSummary:
-      "The paper presents Matthew 18:11 as a vast-majority case, supported by 1,500+ Greek manuscripts and opposed by fewer than 30 principal Greek witnesses.",
+      "Matthew 18:11 is a vast-majority case, supported by 1,500+ Greek manuscripts and opposed by fewer than 30 principal Greek witnesses.",
     supportScore: 95,
     oppositionScore: 5,
     controversyScore: 72,
@@ -735,7 +735,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Strong majority of Greek manuscripts",
     shortSummary:
-      "The paper describes Matthew 23:14 as supported by a strong Greek majority, Syriac support, and patristic support from Hilary and Chrysostom.",
+      "Matthew 23:14 has a strong Greek majority, Syriac support, and patristic support from Hilary and Chrysostom.",
     supportScore: 88,
     oppositionScore: 12,
     controversyScore: 68,
@@ -744,7 +744,7 @@ export const passages: Passage[] = [
       greekSupport: "1,000+ Greek manuscripts",
       greekAgainst: "Fewer than 30 principal Greek witnesses",
       supportCategory: "Strong majority of Greek manuscripts",
-      lectionarySupport: "Not specified in the paper entry",
+      lectionarySupport: "No specific lectionary support listed.",
       mainEvidenceAgainst: ["Sinaiticus", "Vaticanus", "Bezae", "L", "Theta", "family 1", "33", "892 text", "1344"],
     },
     greekSupportWitnesses: [
@@ -821,7 +821,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Vast majority of Greek manuscripts",
     shortSummary:
-      "The paper lists 1,500+ Greek manuscripts supporting Mark 7:16, with fewer than 20 principal Greek witnesses against.",
+      "1,500+ Greek manuscripts support Mark 7:16, with fewer than 20 principal Greek witnesses against.",
     supportScore: 95,
     oppositionScore: 5,
     controversyScore: 60,
@@ -830,7 +830,7 @@ export const passages: Passage[] = [
       greekSupport: "1,500+ Greek manuscripts",
       greekAgainst: "Fewer than 20 principal Greek witnesses",
       supportCategory: "Vast majority of Greek manuscripts",
-      lectionarySupport: "Not specified in the paper entry",
+      lectionarySupport: "No specific lectionary support listed.",
       mainEvidenceAgainst: ["Sinaiticus", "Vaticanus", "L", "Delta first hand", "0274", "28", "2427"],
     },
     greekSupportWitnesses: [
@@ -900,7 +900,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Vast majority of Greek manuscripts",
     shortSummary:
-      "The paper presents Mark 9:44 and 9:46 as supported by 1,500+ Greek manuscripts and opposed by fewer than 30 principal Greek witnesses.",
+      "Mark 9:44 and 9:46 are supported by 1,500+ Greek manuscripts and opposed by fewer than 30 principal Greek witnesses.",
     supportScore: 92,
     oppositionScore: 8,
     controversyScore: 65,
@@ -937,9 +937,7 @@ export const passages: Passage[] = [
       w("Syriac Peshitta", "c. AD 400s onward", "Contains verses 44 and 46", "syriac"),
       w("Syriac Harclean", "AD 616", "Contains verses 44 and 46", "syriac"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not listed in this entry", "Evidence here is primarily Greek, Latin, Gothic, Vulgate, and Syriac", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Codex Sinaiticus", "c. AD 340 to 360", "Omits verses 44 and 46", "greek-manuscript"),
       w("Codex Vaticanus, B", "c. AD 325 to 350", "Omits verses 44 and 46", "greek-manuscript"),
@@ -989,7 +987,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Over 95 percent of Greek manuscripts of Mark",
     shortSummary:
-      "The paper cites J. K. Elliott as maintaining that the TR and over 95 percent of Greek manuscripts of Mark have the original reading.",
+      "J. K. Elliott is cited as maintaining that the TR and over 95 percent of Greek manuscripts of Mark have the original reading.",
     supportScore: 95,
     oppositionScore: 5,
     controversyScore: 74,
@@ -998,7 +996,7 @@ export const passages: Passage[] = [
       greekSupport: "Over 95 percent of Greek manuscripts of Mark, approximately 1,585+ manuscripts",
       greekAgainst: "Under 5 percent of Greek manuscripts of Mark, fewer than 85 manuscripts",
       supportCategory: "Vast majority of Greek manuscripts",
-      lectionarySupport: "Not specified in the paper entry",
+      lectionarySupport: "No specific lectionary support listed.",
       mainEvidenceAgainst: ["Sinaiticus", "Vaticanus", "L", "W", "Delta", "Psi", "565", "700", "892"],
     },
     greekSupportWitnesses: [
@@ -1080,7 +1078,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Large majority of Greek manuscripts",
     shortSummary:
-      "The paper calls Mark 15:28 a large-majority case, with strong named early evidence against it.",
+      "Mark 15:28 is a large-majority case, with strong named early evidence against it.",
     supportScore: 82,
     oppositionScore: 18,
     controversyScore: 76,
@@ -1173,7 +1171,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Vast majority of Greek manuscripts",
     shortSummary:
-      "The paper lists Luke 23:17 as a vast-majority reading with 1,500+ Greek manuscripts supporting and fewer than 20 principal Greek witnesses against.",
+      "Luke 23:17 is a vast-majority reading with 1,500+ Greek manuscripts supporting and fewer than 20 principal Greek witnesses against.",
     supportScore: 93,
     oppositionScore: 7,
     controversyScore: 70,
@@ -1214,9 +1212,7 @@ export const passages: Passage[] = [
       w("Old Syriac Sinaitic", "c. AD 300s to 400s", "Contains the verse after verse 18", "syriac"),
       w("Old Syriac Curetonian", "c. AD 400s", "Contains the verse after verse 18", "syriac"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not listed in this entry", "Evidence here is primarily Greek, Latin, Syriac, Coptic, and lectionary", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Papyrus 75, P75", "c. AD 175 to 225", "Omits the verse", "greek-manuscript"),
       w("Codex Alexandrinus, A", "c. AD 400s", "Omits the verse", "greek-manuscript"),
@@ -1266,7 +1262,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "About 95 percent of extant Greek copies of John",
     shortSummary:
-      "The paper reports over 1,400 later Byzantine manuscripts, roughly 95 percent of extant Greek copies of John, supporting the longer reading.",
+      "Over 1,400 later Byzantine manuscripts, roughly 95 percent of extant Greek copies of John, support the longer reading.",
     supportScore: 95,
     oppositionScore: 5,
     controversyScore: 90,
@@ -1364,7 +1360,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Not a majority-Greek support case",
     shortSummary:
-      "The entry is careful here: Acts 8:37 has about 10 to 12 principal Greek witnesses, while the majority of Greek manuscripts omit it.",
+      "Acts 8:37 has about 10 to 12 principal Greek witnesses, while the majority of Greek manuscripts omit it.",
     supportScore: 20,
     oppositionScore: 85,
     controversyScore: 95,
@@ -1470,7 +1466,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Byzantine and lectionary support",
     shortSummary:
-      "The paper presents Acts 28:29 as supported by hundreds of Byzantine manuscripts and lectionaries but opposed by strong early Greek witnesses.",
+      "Acts 28:29 is supported by hundreds of Byzantine manuscripts and lectionaries but opposed by strong early Greek witnesses.",
     supportScore: 65,
     oppositionScore: 35,
     controversyScore: 78,
@@ -1498,9 +1494,7 @@ export const passages: Passage[] = [
     versionalWitnesses: [
       w("Harclean Syriac plus reading", "AD 616", "Contains the verse as an added reading", "syriac"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not listed in this entry", "Evidence here is primarily Greek, Latin, Syriac, and lectionary", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Papyrus 74, P74", "c. AD 600s", "Omits the verse", "greek-manuscript"),
       w("Codex Sinaiticus", "c. AD 340 to 360", "Omits the verse", "greek-manuscript"),
@@ -1549,7 +1543,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Byzantine and lectionary support",
     shortSummary:
-      "The paper presents Romans 16:24 as included by Byzantine and later witnesses, with strong early Greek support against the verse at this location.",
+      "Romans 16:24 is included by Byzantine and later witnesses, with strong early Greek support against the verse at this location.",
     supportScore: 62,
     oppositionScore: 38,
     controversyScore: 74,
@@ -1584,9 +1578,7 @@ export const passages: Passage[] = [
       w("Syriac Harclean", "AD 616", "Contains the verse", "syriac"),
       w("Syriac Peshitta", "c. AD 400s onward", "Places verse 24 after verse 27", "syriac"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not listed in this entry", "Evidence here is primarily Greek, Latin, Syriac, and lectionary", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Papyrus 46, P46", "c. AD 175 to 225", "Omits the verse", "greek-manuscript"),
       w("Codex Sinaiticus", "c. AD 340 to 360", "Omits the verse", "greek-manuscript"),
@@ -1676,9 +1668,7 @@ export const passages: Passage[] = [
       w("Sinaitic Syriac, Peshitta, Palestinian Syriac", "c. AD 300s onward", "Read 'fasting and prayer'", "syriac"),
       w("Coptic witnesses", "c. AD 300s onward", "Support the longer reading", "coptic"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not verified", "No source-checked patristic witness should be listed yet", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Codex Sinaiticus first hand", "c. AD 340 to 360", "Omits 'and fasting'", "greek-manuscript"),
       w("Codex Vaticanus, B", "c. AD 325 to 350", "Omits 'and fasting'", "greek-manuscript"),
@@ -1747,9 +1737,7 @@ export const passages: Passage[] = [
       w("Syriac Harclean", "AD 616", "Supports the longer wording", "syriac"),
       w("Some northern Coptic witnesses", "early to medieval", "Support the longer wording", "coptic"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not verified", "No source-checked patristic witness should be listed yet", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Papyrus 45, P45", "c. AD 200s", "Omits the longer wording", "greek-manuscript"),
       w("Papyrus 75, P75", "c. AD 175 to 225", "Omits the longer wording", "greek-manuscript"),
@@ -1849,8 +1837,7 @@ export const passages: Passage[] = [
       w("Some Coptic witnesses", "early to medieval", "Support fuller wording in parts", "coptic"),
     ],
     patristicWitnesses: [
-      p("Liturgical/ecclesiastical use", "early centuries onward", "Fuller Lord's Prayer wording is reflected in church/liturgical use, but do not list specific fathers until source-checked", "Church use"),
-      p("Patristic witnesses", "Not individually verified", "Do not add named fathers yet", "Not specified"),
+      p("Liturgical/ecclesiastical use", "early centuries onward", "Fuller Lord's Prayer wording is reflected in church and liturgical use.", "Church use"),
     ],
     evidenceAgainst: [
       w("Papyrus 75, P75", "c. AD 175 to 225", "Supports shorter form 'Father'", "greek-manuscript"),
@@ -2038,9 +2025,7 @@ export const passages: Passage[] = [
       w("Palestinian Syriac", "early medieval, older tradition", "Contains the verse", "syriac"),
       w("Coptic witnesses", "c. AD 300s onward", "Contain the verse", "coptic"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not verified", "No source-checked patristic witness should be listed yet", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Codex Bezae, D", "c. AD 400s", "Omits the verse", "greek-manuscript"),
       w("Some Old Latin witnesses", "c. AD 300s onward", "Omit the verse", "latin"),
@@ -2128,9 +2113,7 @@ export const passages: Passage[] = [
       w("Palestinian Syriac", "early medieval, older tradition", "Contains the phrase", "syriac"),
       w("Coptic witnesses", "c. AD 300s onward", "Contain the phrase", "coptic"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not verified", "No source-checked patristic witness should be listed yet", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Codex Sinaiticus first hand", "c. AD 340 to 360", "Omits 'and was carried up into heaven'", "greek-manuscript"),
       w("Codex Bezae, D", "c. AD 400s", "Omits the phrase", "greek-manuscript"),
@@ -2216,9 +2199,7 @@ export const passages: Passage[] = [
       w("Palestinian Syriac", "early medieval, older tradition", "Contains the phrase", "syriac"),
       w("Coptic witnesses", "c. AD 300s onward", "Contain the phrase", "coptic"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not verified", "No source-checked patristic witness should be listed yet", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Codex Bezae, D", "c. AD 400s", "Omits 'and they worshipped him'", "greek-manuscript"),
       w("Some Old Latin witnesses", "c. AD 300s onward", "Omit the phrase", "latin"),
@@ -2397,9 +2378,7 @@ export const passages: Passage[] = [
       w("Syriac Harclean", "AD 616", "Supports 'on me'", "syriac"),
       w("Coptic witnesses", "c. AD 300s onward", "Support 'on me' in apparatus summary", "coptic"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not verified", "No source-checked patristic witness should be listed yet", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Papyrus 66, P66", "c. AD 175 to 225", "Omits 'on me'", "greek-manuscript"),
       w("Papyrus 75 vid, P75", "c. AD 175 to 225", "Omits 'on me'", "greek-manuscript"),
@@ -2468,8 +2447,7 @@ export const passages: Passage[] = [
       w("Syriac Harclean margin / apparatus tradition", "AD 616 and later transmission", "Supports related expanded wording", "syriac"),
     ],
     patristicWitnesses: [
-      p("Related patristic references", "c. AD 300s to 400s", "Some writers know 'kick against the pricks' wording from Paul's conversion tradition, but this should not be listed as direct proof of the full KJV wording at Acts 9:5-6", "Related conversion tradition"),
-      p("Patristic witnesses for full KJV wording", "Not verified", "Do not claim direct patristic support for the full KJV/TR wording here", "Not specified"),
+      p("Related patristic references", "c. AD 300s to 400s", "Some writers know 'kick against the pricks' wording from Paul's conversion tradition. This is related conversion-tradition evidence rather than direct proof of the full KJV wording at Acts 9:5-6.", "Related conversion tradition"),
     ],
     evidenceAgainst: [
       w("Papyrus 45, P45", "c. AD 200s", "Shorter reading", "greek-manuscript"),
@@ -2551,9 +2529,7 @@ export const passages: Passage[] = [
     versionalWitnesses: [
       w("Syriac Harclean", "AD 616", "Contains the full clause", "syriac"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not verified", "No source-checked patristic witness should be listed yet", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Codex Sinaiticus first hand", "c. AD 340 to 360", "Omits the final clause", "greek-manuscript"),
       w("Codex Vaticanus, B", "c. AD 325 to 350", "Omits the final clause", "greek-manuscript"),
@@ -2620,9 +2596,7 @@ export const passages: Passage[] = [
     versionalWitnesses: [
       w("Syriac Harclean", "AD 616", "Contains 'through his blood'", "syriac"),
     ],
-    patristicWitnesses: [
-      p("Patristic witnesses", "Not verified", "No source-checked patristic witness should be listed yet", "Not specified"),
-    ],
+    patristicWitnesses: [],
     evidenceAgainst: [
       w("Codex Sinaiticus", "c. AD 340 to 360", "Omits 'through his blood'", "greek-manuscript"),
       w("Codex Alexandrinus, A", "c. AD 400s", "Omits 'through his blood'", "greek-manuscript"),
@@ -2695,7 +2669,6 @@ export const passages: Passage[] = [
       w("Later Byzantine and ecclesiastical tradition", "medieval period", "Supports 'God was manifest in the flesh'", "version"),
     ],
     patristicWitnesses: [
-      p("Patristic witnesses", "Needs source-by-source verification", "Do not list named fathers yet unless the quotation is source-checked", "Not specified"),
       p("Later ecclesiastical use", "medieval period", "The 'God' reading is dominant in the Byzantine ecclesiastical tradition", "Byzantine ecclesiastical tradition"),
     ],
     evidenceAgainst: [

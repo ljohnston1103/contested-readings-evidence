@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { formatEntryCount, publicPatristicWitnesses } from "@/data/derived";
 import type { Passage, Witness } from "@/data/types";
 
 import { EvidenceTable } from "./EvidenceTable";
@@ -39,22 +40,23 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
     () => [...passage.latinWitnesses, ...passage.versionalWitnesses],
     [passage],
   );
+  const visiblePatristicWitnesses = useMemo(() => publicPatristicWitnesses(passage), [passage]);
   const patristicGroups = useMemo(() => {
-    const hasSupportGroups = passage.patristicWitnesses.some((witness) =>
+    const hasSupportGroups = visiblePatristicWitnesses.some((witness) =>
       witness.region?.startsWith("Supporting "),
     );
     if (!hasSupportGroups) {
-      return [{ title: "", witnesses: passage.patristicWitnesses }];
+      return [{ title: "", witnesses: visiblePatristicWitnesses }];
     }
 
-    const groups = new Map<string, typeof passage.patristicWitnesses>();
-    for (const witness of passage.patristicWitnesses) {
+    const groups = new Map<string, typeof visiblePatristicWitnesses>();
+    for (const witness of visiblePatristicWitnesses) {
       const title = witness.region ?? "Other patristic witnesses";
       groups.set(title, [...(groups.get(title) ?? []), witness]);
     }
 
     return Array.from(groups, ([title, witnesses]) => ({ title, witnesses }));
-  }, [passage.patristicWitnesses]);
+  }, [visiblePatristicWitnesses]);
   const syriac = earlyVersions.filter(isSyriac);
   const otherVersions = earlyVersions.filter((row) => !isLatin(row) && !isSyriac(row));
 
@@ -101,7 +103,7 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
               <div className="rounded-3xl bg-ink-50 p-4 dark:bg-white/5">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400">Patristic</p>
                 <p className="mt-2 font-black text-ink-900 dark:text-white">
-                  {passage.patristicWitnesses.length ? `${passage.patristicWitnesses.length} entries` : "None listed"}
+                  {visiblePatristicWitnesses.length ? formatEntryCount(visiblePatristicWitnesses.length) : "None listed"}
                 </p>
               </div>
             </div>
@@ -132,7 +134,7 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
 
       {activeTab === "Church Fathers" && (
         <div className="grid gap-5">
-          {passage.patristicWitnesses.length ? (
+          {visiblePatristicWitnesses.length ? (
             patristicGroups.map((group) => (
               <div key={group.title || "patristic-witnesses"} className="grid gap-4">
                 {group.title && (

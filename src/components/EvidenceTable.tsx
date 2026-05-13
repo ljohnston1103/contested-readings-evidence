@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { dedupeWitnessRows } from "@/data/derived";
 import type { Witness } from "@/data/types";
 
 type EvidenceTableProps = {
@@ -18,15 +19,16 @@ export function EvidenceTable({
   searchable = true,
 }: EvidenceTableProps) {
   const [query, setQuery] = useState("");
+  const uniqueRows = useMemo(() => dedupeWitnessRows(rows), [rows]);
   const filteredRows = useMemo(() => {
     const needle = query.toLowerCase().trim();
-    if (!needle) return rows;
-    return rows.filter((row) =>
+    if (!needle) return uniqueRows;
+    return uniqueRows.filter((row) =>
       `${row.witness} ${row.date} ${row.note}`.toLowerCase().includes(needle),
     );
-  }, [query, rows]);
+  }, [query, uniqueRows]);
 
-  if (!rows.length) {
+  if (!uniqueRows.length) {
     return (
       <div className="rounded-3xl border border-dashed border-ink-200 p-6 text-sm text-ink-600 dark:border-white/10 dark:text-ink-100/70">
         No witnesses are listed in this section yet.
@@ -39,7 +41,7 @@ export function EvidenceTable({
       {(title || searchable) && (
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink-100 p-4 dark:border-white/10">
           {title && <h3 className="font-display text-2xl font-black text-ink-900 dark:text-white">{title}</h3>}
-          {searchable && rows.length > 5 && (
+          {searchable && uniqueRows.length > 5 && (
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}

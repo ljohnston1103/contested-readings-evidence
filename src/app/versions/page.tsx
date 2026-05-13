@@ -56,7 +56,7 @@ export default function VersionsPage() {
                       </Link>
                     ))
                   ) : (
-                    <span className="text-sm text-ink-500 dark:text-ink-100/60">No support rows listed</span>
+                    <span className="text-sm text-ink-500 dark:text-ink-100/60">No supporting examples listed yet.</span>
                   )}
                 </div>
               </div>
@@ -72,7 +72,7 @@ export default function VersionsPage() {
                       </Link>
                     ))
                   ) : (
-                    <span className="text-sm text-ink-500 dark:text-ink-100/60">No opposition rows listed</span>
+                    <span className="text-sm text-ink-500 dark:text-ink-100/60">No opposing examples listed yet.</span>
                   )}
                 </div>
               </div>

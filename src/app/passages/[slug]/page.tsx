@@ -7,14 +7,14 @@ import { EvidenceTabs } from "@/components/EvidenceTabs";
 import { ManuscriptSnapshotCard } from "@/components/ManuscriptSnapshotCard";
 import { NextPreviousPassageNav } from "@/components/NextPreviousPassageNav";
 import { TagBadge } from "@/components/TagBadge";
-import { adjacentPassages, allPassages, findPassage } from "@/data/derived";
+import { adjacentPassages, displayedPassages, findPassage } from "@/data/derived";
 
 type PassagePageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export function generateStaticParams() {
-  return allPassages.map((passage) => ({ slug: passage.slug }));
+  return displayedPassages.map((passage) => ({ slug: passage.slug }));
 }
 
 export async function generateMetadata({ params }: PassagePageProps): Promise<Metadata> {

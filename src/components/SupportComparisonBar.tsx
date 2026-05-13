@@ -25,7 +25,7 @@ export function SupportComparisonBar({ passage }: SupportComparisonBarProps) {
         </div>
         <p className="max-w-md text-sm leading-6 text-ink-600 dark:text-ink-100/70">
           Weighted from the Greek manuscript count plus the Latin, Syriac, Coptic,
-          patristic, lectionary, and printed evidence listed for this entry.
+          patristic, lectionary, and printed evidence listed for this passage.
         </p>
       </div>
       <div className="mt-5 h-5 overflow-hidden rounded-full bg-ink-100 dark:bg-white/10">

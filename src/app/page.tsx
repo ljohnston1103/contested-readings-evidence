@@ -4,7 +4,7 @@ import { AmbientVideo } from "@/components/AmbientVideo";
 import { PassageCard } from "@/components/PassageCard";
 import { SearchBar } from "@/components/SearchBar";
 import { TagBadge } from "@/components/TagBadge";
-import { allPassages } from "@/data/derived";
+import { displayedPassages } from "@/data/derived";
 import type { Passage } from "@/data/types";
 
 const featuredReferences = [
@@ -26,7 +26,7 @@ const categories = [
   ["Major Omitted Passages", "Long-form readings with major footnotes and large evidence profiles."],
   ["Oldest and Best Footnotes", "Readings commonly introduced by modern manuscript-footnote language."],
   ["Doctrinal Variants", "Places where the reading carries doctrinal or confessional weight."],
-  ["Majority Greek Support", "Readings where the paper lists broad Greek manuscript support."],
+  ["Majority Greek Support", "Readings with broad Greek manuscript support."],
   ["Patristic Evidence", "Passages connected to early Christian writers and quotations."],
   ["Latin and Versional Evidence", "Latin, Syriac, Coptic, Gothic, Armenian, Georgian, Ethiopic, and Slavonic witnesses."],
 ];
@@ -41,7 +41,7 @@ const steps = [
 
 export default function HomePage() {
   const featuredPassages = featuredReferences
-    .map((reference) => allPassages.find((passage) => passage.reference === reference))
+    .map((reference) => displayedPassages.find((passage) => passage.reference === reference))
     .filter((passage): passage is Passage => Boolean(passage))
     .slice(0, 12);
 
@@ -84,11 +84,11 @@ export default function HomePage() {
               Find evidence fast
             </p>
             <div className="mt-4">
-              <SearchBar passages={allPassages} />
+              <SearchBar passages={displayedPassages} />
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
               <div className="rounded-3xl bg-ink-900 p-4 text-white dark:bg-archive-gold dark:text-ink-900">
-                <p className="font-display text-4xl font-black">{allPassages.length}</p>
+                <p className="font-display text-4xl font-black">{displayedPassages.length}</p>
                 <p className="text-xs font-bold uppercase tracking-[0.18em] opacity-75">Passages</p>
               </div>
               <div className="rounded-3xl border border-ink-100 bg-white/75 p-4 dark:border-white/10 dark:bg-white/5">
