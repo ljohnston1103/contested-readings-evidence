@@ -3,6 +3,15 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { Reveal } from "@/components/motion/Reveal";
+import { TableOfContents } from "@/components/TableOfContents";
+
+const tocItems = [
+  { id: "overview", label: "Overview" },
+  { id: "vaticanus", label: "Codex Vaticanus" },
+  { id: "sinaiticus", label: "Codex Sinaiticus" },
+  { id: "comparison", label: "Side-by-Side" },
+];
 
 export const metadata: Metadata = {
   title: 'Examination of the "Oldest and Best"',
@@ -202,7 +211,8 @@ function SnapshotTable({
   threeColumn?: boolean;
 }) {
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-ink-200 bg-white/78 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
+    <Reveal>
+    <section className="overflow-hidden rounded-[2rem] border border-ink-200 bg-white/78 shadow-card transition hover:border-archive-gold/40 dark:border-white/10 dark:bg-white/[0.05]">
       <div className="border-b border-ink-100 bg-ink-50/80 px-5 py-4 dark:border-white/10 dark:bg-white/5">
         <h2 className="font-display text-2xl font-black text-ink-900 dark:text-white">
           {title}
@@ -212,7 +222,7 @@ function SnapshotTable({
         <table className="min-w-full text-left text-sm">
           <tbody className="divide-y divide-ink-100 dark:divide-white/10">
             {rows.map((row) => (
-              <tr key={row.join("-")} className="align-top">
+              <tr key={row.join("-")} className="align-top transition hover:bg-archive-gold/5">
                 <th className="w-64 px-5 py-3 font-black text-ink-900 dark:text-white">
                   {row[0]}
                 </th>
@@ -230,6 +240,7 @@ function SnapshotTable({
         </table>
       </div>
     </section>
+    </Reveal>
   );
 }
 
@@ -247,9 +258,10 @@ function ManuscriptImage({
   label: string;
 }) {
   return (
+    <Reveal>
     <Link
       href={href}
-      className="group overflow-hidden rounded-[2rem] border border-ink-200 bg-white/78 shadow-card transition hover:-translate-y-1 hover:border-archive-gold/60 hover:shadow-glow dark:border-white/10 dark:bg-white/[0.05]"
+      className="group block overflow-hidden rounded-[2rem] border border-ink-200 bg-white/78 shadow-card transition hover:-translate-y-1 hover:border-archive-gold/60 hover:shadow-glow dark:border-white/10 dark:bg-white/[0.05]"
     >
       <div className="relative aspect-[16/9]">
         <Image
@@ -272,6 +284,7 @@ function ManuscriptImage({
         </p>
       </div>
     </Link>
+    </Reveal>
   );
 }
 
@@ -291,21 +304,23 @@ function SectionDivider({
   return (
     <section
       id={id}
-      className={`scroll-mt-32 rounded-[2.5rem] border p-6 shadow-card ${
+      className={`scroll-mt-36 overflow-hidden rounded-[2.5rem] border p-6 shadow-card ${
         tone === "teal"
           ? "border-archive-teal/25 bg-archive-teal/10"
           : "border-archive-gold/30 bg-archive-gold/12"
       }`}
     >
-      <p className={`text-sm font-black uppercase tracking-[0.24em] ${tone === "teal" ? "text-archive-teal dark:text-teal-200" : "text-archive-gold"}`}>
-        {eyebrow}
-      </p>
-      <h2 className="mt-2 font-display text-4xl font-black text-ink-900 dark:text-white">
-        {title}
-      </h2>
-      <p className="mt-4 max-w-4xl text-lg leading-8 text-ink-700 dark:text-ink-100/75">
-        {description}
-      </p>
+      <Reveal>
+        <p className={`text-sm font-black uppercase tracking-[0.24em] ${tone === "teal" ? "text-archive-teal dark:text-teal-200" : "text-archive-gold"}`}>
+          {eyebrow}
+        </p>
+        <h2 className="mt-2 font-display text-4xl font-black text-ink-900 dark:text-white">
+          {title}
+        </h2>
+        <p className="mt-4 max-w-4xl text-lg leading-8 text-ink-700 dark:text-ink-100/75">
+          {description}
+        </p>
+      </Reveal>
     </section>
   );
 }
@@ -315,7 +330,12 @@ export default function MethodologyPage() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <Breadcrumbs items={[{ label: "Oldest & Best" }]} />
 
-      <section className="mt-8 rounded-[2.5rem] border border-archive-gold/25 bg-white/78 p-6 shadow-card dark:border-archive-gold/20 dark:bg-white/[0.05]">
+      <div className="mt-6">
+        <TableOfContents items={tocItems} />
+      </div>
+
+      <section id="overview" className="scroll-mt-36 mt-6 rounded-[2.5rem] border border-archive-gold/25 bg-white/78 p-6 shadow-card dark:border-archive-gold/20 dark:bg-white/[0.05]">
+        <Reveal>
         <p className="text-sm font-black uppercase tracking-[0.24em] text-archive-teal dark:text-teal-200">
           Examination
         </p>
@@ -336,6 +356,7 @@ export default function MethodologyPage() {
             These two manuscripts are certainly old, but age does not automatically mean faithful transmission, church reception, or textual reliability. The question is not only, &quot;What were the oldest manuscripts?&quot; but also, &quot;What text were the churches receiving, copying, preaching from, translating, and preserving?&quot;
           </p>
         </div>
+        </Reveal>
       </section>
 
       <div className="mt-8 grid gap-5 lg:grid-cols-2">
@@ -364,21 +385,27 @@ export default function MethodologyPage() {
           tone="teal"
         />
         <SnapshotTable title="Codex Vaticanus Snapshot: Basic Manuscript Information" rows={vaticanusBasic} />
+        <Reveal>
         <p className="rounded-[2rem] border border-ink-200 bg-white/78 p-5 leading-7 text-ink-700 shadow-card dark:border-white/10 dark:bg-white/[0.05] dark:text-ink-100/75">
           Codex Vaticanus is a fourth-century Greek Bible manuscript housed in the Vatican Library, where it has been known at least since the fifteenth century. It is written on 759 surviving leaves, with 617 Old Testament leaves and 142 New Testament leaves.
         </p>
+        </Reveal>
         <SnapshotTable title="Vaticanus: Missing Biblical Material" rows={vaticanusMissing} />
         <SnapshotTable title="Vaticanus: Apocryphal / Non-Canonical Material" rows={vaticanusCanon} />
+        <Reveal>
         <p className="rounded-[2rem] border border-ink-200 bg-white/78 p-5 leading-7 text-ink-700 shadow-card dark:border-white/10 dark:bg-white/[0.05] dark:text-ink-100/75">
           Vaticanus contains a Septuagint Old Testament arrangement that includes books such as Wisdom, Ecclesiasticus, Judith, Tobit, Baruch, and the Epistle of Jeremiah. In the Gospels, Traditional Text sources list Vaticanus as omitting 2,877 words, adding 536, substituting 935, transposing 2,098, and modifying 1,132, for a total of 7,578 differences from the Traditional Text.
         </p>
+        </Reveal>
         <SnapshotTable title="Vaticanus: Origin and Textual Environment" rows={vaticanusOrigin} />
         <SnapshotTable title="Egypt, Alexandria, and the Biblical Pattern" rows={egyptPattern} />
         <SnapshotTable title="Origen and Doctrinal Concerns" rows={origenConcerns} />
         <SnapshotTable title="Vaticanus: Church Use and Reception" rows={vaticanusReception} />
+        <Reveal>
         <p className="rounded-[2rem] border border-ink-200 bg-white/78 p-5 leading-7 text-ink-700 shadow-card dark:border-white/10 dark:bg-white/[0.05] dark:text-ink-100/75">
           Vaticanus has been housed in the Vatican Library for as long as it is historically known, possibly appearing in the 1475 catalog and definitely in the 1481 catalog.
         </p>
+        </Reveal>
         <SnapshotTable title="Vaticanus Summary Judgment" rows={vaticanusJudgment} />
       </div>
 
@@ -394,18 +421,25 @@ export default function MethodologyPage() {
         <SnapshotTable title="Sinaiticus: Books and Sections Present" rows={sinaiticusPresent} />
         <SnapshotTable title="Sinaiticus: Missing Biblical Material" rows={sinaiticusMissing} />
         <SnapshotTable title="Sinaiticus: Non-Canonical Books Included" rows={sinaiticusCanon} />
+        <Reveal>
         <p className="rounded-[2rem] border border-ink-200 bg-white/78 p-5 leading-7 text-ink-700 shadow-card dark:border-white/10 dark:bg-white/[0.05] dark:text-ink-100/75">
           The presence of Barnabas and Hermas is one of the most serious canonical concerns raised against Sinaiticus in the Traditional Text critique.
         </p>
+        </Reveal>
         <SnapshotTable title="Sinaiticus: Correction / Alteration Statistics" rows={sinaiticusCorrections} />
+        <Reveal>
         <p className="rounded-[2rem] border border-ink-200 bg-white/78 p-5 leading-7 text-ink-700 shadow-card dark:border-white/10 dark:bg-white/[0.05] dark:text-ink-100/75">
           Sources report that Sinaiticus was corrected by seven or more correctors between the fourth and twelfth centuries. Tischendorf counted 14,800 corrections in the Petersburg portion, while David C. Parker estimated about 23,000 corrections in the full codex.
         </p>
+        </Reveal>
         <SnapshotTable title="Sinaiticus: Burgon-Style Divergence Statistics" rows={sinaiticusBurgon} />
+        <Reveal>
         <p className="rounded-[2rem] border border-ink-200 bg-white/78 p-5 leading-7 text-ink-700 shadow-card dark:border-white/10 dark:bg-white/[0.05] dark:text-ink-100/75">
           Traditional Text sources cite Burgon's figures that Sinaiticus, in the Gospels, omits 3,455 words, adds 839, substitutes 1,114, transposes 2,299, and modifies 1,265, for a total of 8,972 differences from the Traditional Text.
         </p>
+        </Reveal>
         <SnapshotTable title="Sinaiticus: Origin and Textual Environment" rows={sinaiticusOrigin} />
+        <Reveal>
         <section className="rounded-[2rem] border border-ink-200 bg-white/78 p-5 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
           <h2 className="font-display text-2xl font-black text-ink-900 dark:text-white">
             J. F. Fenlon on the Origen/Pamphilus Connection
@@ -414,13 +448,14 @@ export default function MethodologyPage() {
             A note associated with Sinaiticus connects a source exemplar with Pamphilus and Origen's Hexapla, and Fenlon observes that the text of Codex Sinaiticus bears a close resemblance to Codex Vaticanus.
           </p>
         </section>
+        </Reveal>
         <SnapshotTable title="Sinaiticus: Discovery and Condition" rows={sinaiticusDiscovery} />
         <SnapshotTable title="Sinaiticus: Church Use and Reception" rows={sinaiticusReception} />
         <SnapshotTable title="Sinaiticus: Doctrinal and Canonical Concerns" rows={sinaiticusConcerns} />
         <SnapshotTable title="Sinaiticus Summary Judgment" rows={sinaiticusJudgment} />
       </div>
 
-      <div className="mt-12">
+      <div id="comparison" className="mt-12 scroll-mt-36">
         <SnapshotTable title="Side-by-Side Snapshot" rows={sideBySide} threeColumn />
       </div>
     </div>

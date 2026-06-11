@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { ScrollProgress } from "@/components/ScrollProgress";
 
 import "./globals.css";
 
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="archive-grid antialiased">
+        <ScrollProgress />
         <Header />
         <main>{children}</main>
         <Footer />

@@ -1,8 +1,14 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 import type { Passage } from "@/data/types";
 
 type SupportComparisonBarProps = {
   passage: Passage;
 };
+
+const easeOut = [0.21, 0.47, 0.32, 0.98] as const;
 
 export function SupportComparisonBar({ passage }: SupportComparisonBarProps) {
   const support = Math.max(0, Math.min(100, passage.supportScore));
@@ -29,9 +35,12 @@ export function SupportComparisonBar({ passage }: SupportComparisonBarProps) {
         </p>
       </div>
       <div className="mt-5 h-5 overflow-hidden rounded-full bg-ink-100 dark:bg-white/10">
-        <div
+        <motion.div
           className="h-full rounded-full bg-gradient-to-r from-archive-teal to-archive-gold"
-          style={{ width: supportWidth }}
+          initial={{ width: 0 }}
+          whileInView={{ width: supportWidth }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: easeOut }}
           aria-label={`Overall witness weight ${supportPercent} percent for the KJV/TR reading`}
         />
       </div>

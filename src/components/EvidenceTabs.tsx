@@ -1,5 +1,16 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  BookText,
+  Globe,
+  Globe2,
+  History,
+  LayoutGrid,
+  ScrollText,
+  ShieldAlert,
+  UserRound,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { formatEntryCount, publicPatristicWitnesses } from "@/data/derived";
@@ -15,16 +26,18 @@ type EvidenceTabsProps = {
 };
 
 const tabs = [
-  "Summary",
-  "Greek Manuscripts",
-  "Early Versions",
-  "Latin Witnesses",
-  "Syriac Witnesses",
-  "Other Versions",
-  "Church Fathers",
-  "Evidence Against",
-  "Timeline",
+  { label: "Summary", icon: LayoutGrid },
+  { label: "Greek Manuscripts", icon: ScrollText },
+  { label: "Early Versions", icon: Globe2 },
+  { label: "Latin Witnesses", icon: BookText },
+  { label: "Syriac Witnesses", icon: Globe },
+  { label: "Other Versions", icon: Globe2 },
+  { label: "Church Fathers", icon: UserRound },
+  { label: "Evidence Against", icon: ShieldAlert },
+  { label: "Timeline", icon: History },
 ] as const;
+
+const easeOut = [0.21, 0.47, 0.32, 0.98] as const;
 
 function isSyriac(row: Witness) {
   return row.kind === "syriac" || /syriac|peshitta|harclean|curetonian/i.test(row.witness);
@@ -35,7 +48,7 @@ function isLatin(row: Witness) {
 }
 
 export function EvidenceTabs({ passage }: EvidenceTabsProps) {
-  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("Summary");
+  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]["label"]>("Summary");
   const earlyVersions = useMemo(
     () => [...passage.latinWitnesses, ...passage.versionalWitnesses],
     [passage],
@@ -62,23 +75,43 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
 
   return (
     <section className="grid gap-5">
-      <div className="sticky top-[5.25rem] z-30 flex gap-2 overflow-x-auto rounded-full border border-ink-200 bg-white/85 p-2 shadow-card backdrop-blur dark:border-white/10 dark:bg-archive-navy/85">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition ${
-              activeTab === tab
-                ? "bg-ink-900 text-white dark:bg-archive-gold dark:text-ink-900"
-                : "text-ink-600 hover:bg-archive-gold/10 dark:text-ink-100/70 dark:hover:bg-white/10"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+      <div className="sticky top-16 z-30 flex gap-2 overflow-x-auto rounded-full border border-ink-200 bg-white/85 p-2 shadow-card backdrop-blur dark:border-white/10 dark:bg-archive-navy/85 sm:top-20">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const active = activeTab === tab.label;
+          return (
+            <button
+              key={tab.label}
+              type="button"
+              onClick={() => setActiveTab(tab.label)}
+              className={`relative flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition ${
+                active
+                  ? "text-white dark:text-ink-900"
+                  : "text-ink-600 hover:bg-archive-gold/10 dark:text-ink-100/70 dark:hover:bg-white/10"
+              }`}
+            >
+              {active && (
+                <motion.span
+                  layoutId="evidence-tab-pill"
+                  className="absolute inset-0 rounded-full bg-ink-900 dark:bg-archive-gold"
+                  transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
+                />
+              )}
+              <Icon className="relative h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span className="relative">{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.3, ease: easeOut }}
+        >
       {activeTab === "Summary" && (
         <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr]">
           <div className="rounded-[2rem] border border-ink-200 bg-white/80 p-6 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
@@ -162,6 +195,8 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
       )}
 
       {activeTab === "Timeline" && <Timeline events={passage.timeline} />}
+        </motion.div>
+      </AnimatePresence>
     </section>
   );
 }

@@ -1,8 +1,10 @@
+import { Globe2 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AmbientVideo } from "@/components/AmbientVideo";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { buildVersionIndex } from "@/data/derived";
 
 export const metadata: Metadata = {
@@ -22,7 +24,7 @@ export default function VersionsPage() {
         videoClassName="opacity-18 dark:opacity-14"
         overlayClassName="bg-gradient-to-br from-white/94 via-archive-paper/84 to-archive-teal/12 dark:from-archive-navy/94 dark:via-archive-navy/84 dark:to-archive-gold/10"
       >
-      <div className="max-w-4xl">
+      <Reveal className="max-w-4xl">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-archive-teal dark:text-teal-200">
           Ancient versions
         </p>
@@ -32,16 +34,22 @@ export default function VersionsPage() {
         <p className="mt-5 text-lg leading-8 text-ink-700 dark:text-ink-100/75">
           These cards make it easy to see whether Latin, Syriac, Coptic, Gothic, Armenian, Georgian, Ethiopic, or Slavonic evidence appears for a reading.
         </p>
-      </div>
+      </Reveal>
       </AmbientVideo>
 
-      <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <RevealGroup className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {versions.map((version) => (
-          <article key={version.name} className="rounded-[2rem] border border-ink-200 bg-white/76 p-5 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
-              {version.language}
-            </p>
-            <h2 className="mt-2 font-display text-3xl font-black text-ink-900 dark:text-white">{version.name}</h2>
+          <RevealItem key={version.name}>
+          <article className="group h-full rounded-[2rem] border border-ink-200 bg-white/76 p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:border-archive-teal/50 dark:border-white/10 dark:bg-white/[0.05]">
+            <div className="flex items-center gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-archive-teal/10 text-archive-teal transition group-hover:scale-110 dark:bg-teal-400/10 dark:text-teal-200">
+                <Globe2 className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
+                {version.language}
+              </p>
+            </div>
+            <h2 className="mt-3 font-display text-3xl font-black text-ink-900 dark:text-white">{version.name}</h2>
             <p className="mt-1 text-sm font-bold text-ink-500 dark:text-ink-100/60">{version.date}</p>
             <div className="mt-5 grid gap-4">
               <div>
@@ -78,8 +86,9 @@ export default function VersionsPage() {
               </div>
             </div>
           </article>
+          </RevealItem>
         ))}
-      </div>
+      </RevealGroup>
     </div>
   );
 }

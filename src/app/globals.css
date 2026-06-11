@@ -22,6 +22,7 @@ body {
     radial-gradient(circle at 82% 2%, rgba(15, 118, 110, 0.13), transparent 30%);
   color: #121722;
   font-family: Aptos, "Segoe UI Variable", "Segoe UI", sans-serif;
+  transition: background-color 300ms ease, color 300ms ease;
 }
 
 .dark body {
@@ -51,4 +52,67 @@ a {
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
+
+/* Focus visibility for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #c49a3f;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(196, 154, 63, 0.35);
+  border-radius: 999px;
+  border: 3px solid rgba(251, 247, 239, 0.98);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(196, 154, 63, 0.3);
+  border: 3px solid #0c1424;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(196, 154, 63, 0.55);
+}
+
+html {
+  scrollbar-color: rgba(196, 154, 63, 0.35) transparent;
+  scrollbar-width: thin;
+}
+
+/* Gradient heading text utility */
+.text-gradient {
+  background: linear-gradient(115deg, #c49a3f 0%, #b45309 45%, #0f766e 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Scroll progress bar */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  transform-origin: 0%;
+  background: linear-gradient(90deg, #0f766e, #c49a3f);
+  z-index: 60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

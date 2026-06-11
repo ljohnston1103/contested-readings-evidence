@@ -24,7 +24,7 @@ export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps)
           </h2>
         </div>
         {passage.manuscriptSnapshot.percentSupport && (
-          <div className="rounded-3xl bg-ink-900 px-5 py-4 text-right text-white dark:bg-archive-gold dark:text-ink-900">
+          <div className="rounded-3xl bg-ink-900 px-5 py-4 text-right text-white shadow-glow transition duration-300 hover:scale-[1.03] dark:bg-archive-gold dark:text-ink-900">
             <p className="text-xs font-bold uppercase tracking-[0.2em] opacity-70">Greek support</p>
             <p className="font-display text-4xl font-black">{passage.manuscriptSnapshot.percentSupport}</p>
           </div>
@@ -32,7 +32,7 @@ export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps)
       </div>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {stats.map(([label, value]) => (
-          <div key={label} className="rounded-3xl border border-ink-100 bg-white/80 p-4 dark:border-white/10 dark:bg-archive-navy/55">
+          <div key={label} className="rounded-3xl border border-ink-100 bg-white/80 p-4 transition duration-300 hover:-translate-y-1 hover:border-archive-gold/40 dark:border-white/10 dark:bg-archive-navy/55">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400 dark:text-ink-100/45">
               {label}
             </p>

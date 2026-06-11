@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import type { Passage } from "@/data/types";
@@ -25,10 +26,11 @@ export function PassageTable({ passages }: PassageTableProps) {
           </thead>
           <tbody className="divide-y divide-ink-100 dark:divide-white/10">
             {passages.map((passage) => (
-              <tr key={passage.id} className="transition hover:bg-archive-gold/10 dark:hover:bg-white/5">
+              <tr key={passage.id} className="group transition hover:bg-archive-gold/10 dark:hover:bg-white/5">
                 <td className="px-5 py-4 align-top">
-                  <Link href={`/passages/${passage.slug}`} className="font-black text-archive-blue hover:underline dark:text-teal-200">
+                  <Link href={`/passages/${passage.slug}`} className="inline-flex items-center gap-1.5 font-black text-archive-blue hover:underline dark:text-teal-200">
                     {passage.reference}
+                    <ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100" aria-hidden="true" />
                   </Link>
                   <p className="mt-1 text-xs text-ink-500 dark:text-ink-100/60">{passage.title}</p>
                 </td>

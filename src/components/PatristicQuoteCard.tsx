@@ -6,7 +6,7 @@ type PatristicQuoteCardProps = {
 
 export function PatristicQuoteCard({ witness }: PatristicQuoteCardProps) {
   return (
-    <article className="rounded-[1.75rem] border border-archive-gold/25 bg-gradient-to-br from-archive-gold/12 to-white/80 p-5 shadow-card dark:from-archive-gold/10 dark:to-white/[0.04]">
+    <article className="rounded-[1.75rem] border border-archive-gold/25 bg-gradient-to-br from-archive-gold/12 to-white/80 p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:border-archive-gold/50 hover:shadow-glow dark:from-archive-gold/10 dark:to-white/[0.04]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <h3 className="font-display text-2xl font-black text-ink-900 dark:text-white">
           {witness.source}

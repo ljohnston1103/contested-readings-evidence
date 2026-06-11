@@ -1,14 +1,24 @@
+import { BookOpen, Layers, PenLine, ScrollText } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AmbientVideo } from "@/components/AmbientVideo";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { SearchBar } from "@/components/SearchBar";
 import { buildManuscriptIndex, displayedPassages } from "@/data/derived";
 
 export const metadata: Metadata = {
   title: "Manuscript Witnesses",
   description: "Major Greek manuscript witnesses and where they support or oppose contested KJV/TR readings.",
+};
+
+const categoryIcons: Record<string, typeof ScrollText> = {
+  Papyrus: ScrollText,
+  "Major codex / uncial": BookOpen,
+  Uncial: BookOpen,
+  Minuscule: PenLine,
+  "Manuscript family": Layers,
 };
 
 export default function ManuscriptsPage() {
@@ -23,7 +33,7 @@ export default function ManuscriptsPage() {
         videoClassName="opacity-22 dark:opacity-18"
         overlayClassName="bg-gradient-to-br from-white/94 via-archive-paper/84 to-archive-teal/12 dark:from-archive-navy/94 dark:via-archive-navy/84 dark:to-archive-gold/10"
       >
-      <div className="grid gap-8 lg:grid-cols-[0.9fr_1fr] lg:items-end">
+      <Reveal className="grid gap-8 lg:grid-cols-[0.9fr_1fr] lg:items-end">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.24em] text-archive-teal dark:text-teal-200">
             Manuscript witnesses
@@ -36,10 +46,10 @@ export default function ManuscriptsPage() {
           </p>
         </div>
         <SearchBar passages={displayedPassages} compact />
-      </div>
+      </Reveal>
       </AmbientVideo>
 
-      <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <RevealGroup className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {manuscripts.map((profile) => {
           const dividedPassages = new Set(
             profile.supports
@@ -55,12 +65,20 @@ export default function ManuscriptsPage() {
             return labels.length ? `${item.passage.reference} (${labels.join(", ")})` : item.passage.reference;
           };
 
+          const Icon = categoryIcons[profile.category] ?? ScrollText;
+
           return (
-            <article key={profile.name} className="rounded-[2rem] border border-ink-200 bg-white/76 p-5 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
-                {profile.category}
-              </p>
-              <h2 className="mt-2 font-display text-2xl font-black text-ink-900 dark:text-white">{profile.name}</h2>
+            <RevealItem key={profile.name}>
+            <article className="group h-full rounded-[2rem] border border-ink-200 bg-white/76 p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:border-archive-teal/50 dark:border-white/10 dark:bg-white/[0.05]">
+              <div className="flex items-center gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-archive-teal/10 text-archive-teal transition group-hover:scale-110 dark:bg-teal-400/10 dark:text-teal-200">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
+                  {profile.category}
+                </p>
+              </div>
+              <h2 className="mt-3 font-display text-2xl font-black text-ink-900 dark:text-white">{profile.name}</h2>
               <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-ink-500 dark:text-ink-100/60">
                 {profile.siglum && <span>Siglum: {profile.siglum}</span>}
                 <span>Date: {profile.date}</span>
@@ -100,9 +118,10 @@ export default function ManuscriptsPage() {
                 </div>
               </div>
             </article>
+            </RevealItem>
           );
         })}
-      </div>
+      </RevealGroup>
     </div>
   );
 }

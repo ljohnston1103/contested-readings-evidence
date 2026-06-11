@@ -1,3 +1,4 @@
+import { BookOpenCheck, GitCompare } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -5,6 +6,7 @@ import { AmbientVideo } from "@/components/AmbientVideo";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { EvidenceTabs } from "@/components/EvidenceTabs";
 import { ManuscriptSnapshotCard } from "@/components/ManuscriptSnapshotCard";
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { NextPreviousPassageNav } from "@/components/NextPreviousPassageNav";
 import { TagBadge } from "@/components/TagBadge";
 import { adjacentPassages, displayedPassages, findPassage } from "@/data/derived";
@@ -42,8 +44,8 @@ export default async function PassagePage({ params }: PassagePageProps) {
         ]}
       />
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.78fr] lg:items-start">
-        <div className="rounded-[2.5rem] border border-ink-200 bg-white/78 p-6 shadow-card dark:border-white/10 dark:bg-white/[0.06]">
+      <RevealGroup className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.78fr] lg:items-start">
+        <RevealItem className="rounded-[2.5rem] border border-ink-200 bg-white/78 p-6 shadow-card dark:border-white/10 dark:bg-white/[0.06]">
           <p className="text-sm font-black uppercase tracking-[0.24em] text-archive-teal dark:text-teal-200">
             {passage.reference}
           </p>
@@ -51,16 +53,18 @@ export default async function PassagePage({ params }: PassagePageProps) {
             {passage.title}
           </h1>
           <div className="mt-6 grid gap-4">
-            <div className="rounded-3xl border border-archive-gold/25 bg-archive-gold/10 p-5">
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-ink-500 dark:text-ink-100/60">
+            <div className="rounded-3xl border border-archive-gold/25 bg-archive-gold/10 p-5 transition duration-300 hover:border-archive-gold/50 hover:bg-archive-gold/15">
+              <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em] text-ink-500 dark:text-ink-100/60">
+                <BookOpenCheck className="h-4 w-4 text-archive-gold" aria-hidden="true" />
                 Reading Supported
               </p>
               <p className="mt-2 font-display text-2xl font-black leading-9 text-ink-900 dark:text-white">
                 {passage.readingSupported}
               </p>
             </div>
-            <div className="rounded-3xl border border-ink-100 bg-ink-50/80 p-5 dark:border-white/10 dark:bg-white/5">
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-ink-500 dark:text-ink-100/60">
+            <div className="rounded-3xl border border-ink-100 bg-ink-50/80 p-5 transition duration-300 hover:border-archive-teal/40 hover:bg-archive-teal/5 dark:border-white/10 dark:bg-white/5">
+              <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em] text-ink-500 dark:text-ink-100/60">
+                <GitCompare className="h-4 w-4 text-archive-teal dark:text-teal-200" aria-hidden="true" />
                 Variant Issue
               </p>
               <p className="mt-2 text-base leading-7 text-ink-700 dark:text-ink-100/75">
@@ -75,10 +79,11 @@ export default async function PassagePage({ params }: PassagePageProps) {
               </TagBadge>
             ))}
           </div>
-        </div>
+        </RevealItem>
+        <RevealItem>
         <AmbientVideo
           src="/videos/ambient-manuscripts.mp4"
-          className="rounded-[2.5rem] border border-ink-200 bg-ink-900 text-white shadow-card dark:border-white/10 dark:bg-white/[0.06]"
+          className="h-full rounded-[2.5rem] border border-ink-200 bg-ink-900 text-white shadow-card dark:border-white/10 dark:bg-white/[0.06]"
           videoClassName="opacity-30 dark:opacity-20"
           overlayClassName="bg-gradient-to-br from-ink-900/94 via-ink-900/88 to-archive-teal/35 dark:from-archive-navy/94 dark:via-archive-navy/84 dark:to-archive-gold/14"
         >
@@ -90,30 +95,31 @@ export default async function PassagePage({ params }: PassagePageProps) {
             {passage.shortSummary}
           </p>
           <div className="mt-6 grid gap-3">
-            <div className="rounded-3xl bg-white/10 p-4">
+            <div className="rounded-3xl bg-white/10 p-4 transition duration-300 hover:bg-white/15">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/55">Support category</p>
               <p className="mt-2 font-black">{passage.supportCategory}</p>
             </div>
-            <div className="rounded-3xl bg-white/10 p-4">
+            <div className="rounded-3xl bg-white/10 p-4 transition duration-300 hover:bg-white/15">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/55">Sources used</p>
               <p className="mt-2 text-sm leading-6">{passage.sources.join("; ")}</p>
             </div>
           </div>
         </div>
         </AmbientVideo>
-      </section>
+        </RevealItem>
+      </RevealGroup>
 
-      <div className="mt-8">
+      <Reveal className="mt-8">
         <ManuscriptSnapshotCard passage={passage} />
-      </div>
+      </Reveal>
 
-      <div className="mt-8">
+      <Reveal className="mt-8" delay={0.05}>
         <EvidenceTabs passage={passage} />
-      </div>
+      </Reveal>
 
-      <div className="mt-10">
+      <Reveal className="mt-10" delay={0.05}>
         <NextPreviousPassageNav previous={adjacent.previous} next={adjacent.next} />
-      </div>
+      </Reveal>
     </div>
   );
 }
