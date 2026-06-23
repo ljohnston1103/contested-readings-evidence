@@ -315,7 +315,10 @@ export function buildVersionIndex(): VersionProfile[] {
     const profile: VersionProfile = { ...version, supports: [], opposes: [] };
     for (const passage of displayedPassages) {
       for (const witness of [...passage.versionalWitnesses, ...passage.latinWitnesses]) {
-        if (versionMatches(witness, version.name) && !/omit|no known|no strong/i.test(witness.note)) {
+        if (
+          versionMatches(witness, version.name) &&
+          !/omit|does not contain|no known|no strong|shorter|against/i.test(witness.note)
+        ) {
           addVersionEvidence(profile.supports, passage, witness.note);
         }
       }

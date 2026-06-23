@@ -21,8 +21,11 @@ const t = (
 ): TimelineEvent => ({ date, label, type });
 
 const standardSources = [
-  "INTF New Testament Virtual Manuscript Room, NTVMR",
-  "Editio Critica Maior, ECM",
+  "INTF NTVMR",
+  "ECM where published/available",
+  "NA/UBS apparatuses",
+  "Tyndale House Greek New Testament apparatus",
+  "passage-specific manuscript studies where applicable",
 ];
 
 export const passages: Passage[] = [
@@ -47,9 +50,9 @@ export const passages: Passage[] = [
       "Patristic support",
       "Limited Greek support",
     ],
-    supportCategory: "Limited Greek support, stronger Latin and patristic support",
+    supportCategory: "Limited Greek support, mixed Latin/Vulgate evidence, and debated patristic support",
     shortSummary:
-      "A complex Trinitarian variant with limited Greek support but substantial Latin, printed-text, and patristic evidence.",
+      "A complex Trinitarian variant with limited Greek support, mixed Latin/Vulgate evidence, later printed-text support, and debated early patristic evidence.",
     supportScore: 18,
     oppositionScore: 90,
     controversyScore: 100,
@@ -58,7 +61,7 @@ export const passages: Passage[] = [
       greekSupport: "5 main-text Greek manuscripts plus 5 marginal Greek witnesses",
       greekAgainst: "500+ Greek manuscripts containing 1 John omit the Comma",
       supportCategory:
-        "Limited Greek support, stronger Latin and patristic support",
+        "Limited Greek support, mixed Latin/Vulgate evidence, and debated patristic support",
       lectionarySupport: "Not presented as a lectionary-supported reading",
       mainEvidenceAgainst: [
         "Greek manuscript majority",
@@ -79,6 +82,8 @@ export const passages: Passage[] = [
       w("GA 636 margin", "manuscript 1400s, later marginal addition", "Contains the Comma in the margin", "greek-manuscript"),
     ],
     latinWitnesses: [
+      w("Old Latin tradition", "early to medieval Latin transmission", "Mixed/partial support: early Latin evidence is important for the Comma, especially through later Latin witnesses and Latin Fathers, but not every Old Latin witness contains the full form", "latin"),
+      w("Later medieval Vulgate / Clementine / Douay-Rheims tradition", "medieval to early modern", "Contains the Comma in the later Vulgate tradition, with the Clementine Vulgate and Douay-Rheims preserving the later form", "latin"),
       w("Codex Speculum, m", "5th century", "Contains the Comma in Latin Scripture quotations", "latin"),
       w("Frisingensia Fragmenta, r/q", "5th to 7th century", "Contains the Comma, earthly witnesses before heavenly witnesses", "latin"),
       w("Leon Palimpsest, l", "7th century", "Contains: the Father, and the Word, and the Holy Spirit, and these three are one in Christ Jesus", "latin"),
@@ -101,13 +106,13 @@ export const passages: Passage[] = [
       w("Early Syriac", "early centuries", "No known extant Syriac manuscript contains the Comma", "syriac"),
       w("Early Coptic", "early centuries", "No known early Coptic support", "coptic"),
       w("Early Georgian", "early centuries", "No known early Georgian support", "version"),
-      w("Early Armenian", "before 1100s", "No strong early Armenian support", "version"),
-      w("Later Armenian", "after 1100s", "Some later Armenian witnesses contain the Comma", "version"),
-      w("Slavonic", "later medieval / printed tradition", "Some late Slavonic witnesses contain the Comma", "version"),
+      w("Early Armenian", "before 1100s", "No strong early Armenian support; Armenian evidence for the Comma is later/secondary, not early Armenian support", "version"),
+      w("Later Armenian", "after 1100s", "Later/secondary support, not early Armenian support: some later Armenian witnesses contain the Comma", "version"),
+      w("Slavonic", "later medieval / printed tradition", "Later ecclesiastical support, not early Greek-line support: some late Slavonic witnesses contain the Comma", "version"),
     ],
     patristicWitnesses: [
       p("Tertullian, Against Praxeas", "c. AD 210", "The Father in the Son and the Son in the Paraclete makes three who cohere; these three are one substance.", "North Africa / Rome"),
-      p("Cyprian, On the Unity of the Church", "c. AD 250", "Of the Father, and of the Son, and of the Holy Spirit, with the citation these three are one.", "North Africa"),
+      p("Cyprian, On the Unity of the Church", "c. AD 250", "Possible allusion, debated: Cyprian's three-one language is important Latin evidence, but it is disputed whether he quotes the Comma itself or applies 1 John 5:8 theologically.", "North Africa"),
       p("Priscillian, Liber Apologeticus", "c. AD 380", "There are three which give testimony in heaven, the Father, the Word and the Spirit, and these three are one in Christ Jesus.", "Spain"),
       p("Expositio Fidei", "late 300s", "Father, Word, and Spirit; these three are one.", "Latin West"),
       p("Contra Varimadum", "c. AD 450", "There are three who afford testimony in heaven, the Father, the Word, and the Spirit, and these three are one.", "North Africa"),
@@ -125,6 +130,8 @@ export const passages: Passage[] = [
       w("Codex Vaticanus, B", "c. AD 325 to 350", "Omits the Comma", "greek-manuscript"),
       w("Early Syriac", "early centuries", "No known extant Syriac manuscript contains the Comma", "syriac"),
       w("Early Coptic", "early centuries", "No known early Coptic support", "coptic"),
+      w("Early/important Vulgate witnesses", "5th to 8th century", "Mixed Vulgate evidence: some early/important Vulgate witnesses omit the Comma, though later medieval, Clementine, and Douay-Rheims tradition includes it", "latin"),
+      w("Old Latin tradition", "early Latin transmission", "Mixed/partial evidence: early Latin support should not be treated as if every Old Latin witness uniformly contains the full Comma", "latin"),
       w("Codex Fuldensis", "AD 546", "Does not contain the Comma in 1 John, though it includes the Vulgate Prologue discussing the clause", "latin"),
       w("Codex Amiatinus", "c. AD 700", "Does not contain the Comma in the body text of 1 John", "latin"),
     ],
@@ -141,7 +148,7 @@ export const passages: Passage[] = [
     ],
     timeline: [
       t("c. AD 210", "Tertullian uses three-one language in Against Praxeas", "patristic"),
-      t("c. AD 250", "Cyprian cites Father, Son, and Holy Spirit with these three are one", "patristic"),
+      t("c. AD 250", "Cyprian uses debated three-one language connected with Latin evidence", "patristic"),
       t("AD 484", "Council of Carthage under Huneric uses the heavenly witnesses wording", "patristic"),
       t("AD 1362 to 1363", "GA 629 contains the Comma in the main Greek text", "greek-manuscript"),
       t("AD 1522", "Erasmus 3rd edition includes the Comma", "printed-edition"),
@@ -171,18 +178,18 @@ export const passages: Passage[] = [
       "Lectionary support",
       "Scant evidence against KJV",
     ],
-    supportCategory: "99.8 percent Greek manuscript support",
+    supportCategory: "Greek manuscript majority strongly supports, with small but important early opposition",
     shortSummary:
-      "Mark 16:9-20 is a count-first case: 1,653 Greek manuscripts include it while three Greek manuscripts end at 16:8.",
+      "Mark 16:9-20 has very strong Greek manuscript majority support, but a small number of early and important witnesses, including Sinaiticus and Vaticanus, end Mark at 16:8.",
     supportScore: 99.8,
     oppositionScore: 0.2,
     controversyScore: 96,
     earliestPatristicYear: 150,
     manuscriptSnapshot: {
       greekSupport: "1,653 Greek manuscripts",
-      greekAgainst: "3 Greek manuscripts",
+      greekAgainst: "3 Greek manuscripts, including Sinaiticus and Vaticanus",
       percentSupport: "99.8%",
-      supportCategory: "99.8 percent Greek manuscript support",
+      supportCategory: "Greek manuscript majority strongly supports, with small but important early opposition",
       lectionarySupport: "Over 1,000 Greek lectionaries",
       mainEvidenceAgainst: ["Codex Sinaiticus", "Codex Vaticanus", "GA 304"],
     },
@@ -262,21 +269,21 @@ export const passages: Passage[] = [
     ],
     supportCategory: "About 99.4 percent of Greek manuscripts",
     shortSummary:
-      "Only ten of about 1,700 surviving Greek manuscripts of Matthew are listed as omitting the verse.",
+      "Approximately ten of about 1,700 surviving Greek manuscripts of Matthew are listed as omitting the verse.",
     supportScore: 99.4,
     oppositionScore: 0.6,
     controversyScore: 76,
     earliestPatristicYear: 100,
     manuscriptSnapshot: {
       greekSupport: "About 99.4 percent of Greek manuscripts",
-      greekAgainst: "10 Greek manuscripts",
-      percentSupport: "99.4%",
+      greekAgainst: "Approximately 10 Greek manuscripts",
+      percentSupport: "approx. 99.4%",
       supportCategory: "Strong majority Greek support",
       lectionarySupport: "1 lectionary manuscript listed as omitting; lectionary system supports inclusion",
       mainEvidenceAgainst: ["Codex Sinaiticus", "Codex Vaticanus", "10 Greek manuscripts", "1 lectionary manuscript"],
     },
     greekSupportWitnesses: [
-      w("99.4 percent of Greek manuscripts", "AD 400s to 1500s", "Contain Matthew 17:21", "summary"),
+      w("Approximately 99.4 percent of Greek manuscripts", "AD 400s to 1500s", "Contain Matthew 17:21", "summary"),
       w("Codex C", "c. AD 400s", "Contains the verse", "greek-manuscript"),
       w("Codex D", "c. AD 400s", "Contains the verse", "greek-manuscript"),
       w("Codex W", "c. AD 400s to 500s", "Contains the verse", "greek-manuscript"),
@@ -378,23 +385,23 @@ export const passages: Passage[] = [
       "Lectionary support",
       "Complex evidence",
     ],
-    supportCategory: "Over 98 percent of Greek manuscripts containing Matthew 6:13",
+    supportCategory: "Approximately 98 percent or more of Greek manuscripts containing Matthew 6:13",
     shortSummary:
-      "The doxology is overwhelmingly supported in Greek manuscripts, with notable early Greek, Latin, and Coptic omission witnesses.",
+      "Approximate counts show the doxology is overwhelmingly supported in Greek manuscripts, with notable early Greek, Latin, and Coptic omission witnesses.",
     supportScore: 98,
     oppositionScore: 2,
     controversyScore: 70,
     earliestPatristicYear: 100,
     manuscriptSnapshot: {
-      greekSupport: "Over 98 percent of Greek manuscripts containing Matthew 6:13",
-      greekAgainst: "Under 2 percent of Greek manuscripts containing Matthew 6:13",
-      percentSupport: "98%+",
+      greekSupport: "Approximately 98%+ of Greek manuscripts containing Matthew 6:13",
+      greekAgainst: "Approximately under 2% of Greek manuscripts containing Matthew 6:13",
+      percentSupport: "approx. 98%+",
       supportCategory: "Strong majority Greek support",
       lectionarySupport: "Eastern liturgical tradition uses a doxology with the Lord's Prayer",
       mainEvidenceAgainst: ["Sinaiticus", "Vaticanus", "Bezae", "0171", "Codex Z", "family 1 core"],
     },
     greekSupportWitnesses: [
-      w("Over 98 percent of Greek manuscripts", "AD 400s to 1500s", "Contain the doxology", "summary"),
+      w("Approximately 98%+ of Greek manuscripts", "AD 400s to 1500s", "Contain the doxology", "summary"),
       w("Byzantine Majority", "c. AD 500s to 1500s", "Contains the doxology", "summary"),
       w("Codex Washingtonianus, W", "c. AD 400s to 500s", "Contains the doxology", "greek-manuscript"),
       w("Codex Theta", "c. AD 800s", "Contains the doxology", "greek-manuscript"),
@@ -723,7 +730,7 @@ export const passages: Passage[] = [
     kjvText:
       "Woe unto you, scribes and Pharisees, hypocrites! for ye devour widows' houses, and for a pretence make long prayer: therefore ye shall receive the greater damnation.",
     variantIssue:
-      "Modern editions often omit Matthew 23:14 or move the parallel material to Mark and Luke.",
+      "Modern editions often omit Matthew 23:14 or weigh the placement/order of the parallel material in Mark and Luke as part of the evidence.",
     variantType: ["short-omitted-verse", "woe-saying"],
     tags: [
       "Short omitted phrase",
@@ -735,7 +742,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Strong majority of Greek manuscripts",
     shortSummary:
-      "Matthew 23:14 has a strong Greek majority, Syriac support, and patristic support from Hilary and Chrysostom.",
+      "Matthew 23:14 has a strong Greek majority, Syriac support, and patristic support from Hilary and Chrysostom, while placement/order of the parallel material affects how the evidence is weighed.",
     supportScore: 88,
     oppositionScore: 12,
     controversyScore: 68,
@@ -1781,7 +1788,7 @@ export const passages: Passage[] = [
     kjvText:
       "Our Father which art in heaven... Thy will be done, as in heaven, so in earth... but deliver us from evil.",
     variantIssue:
-      "The KJV/TR preserves the fuller traditional form of the Lord's Prayer in Luke, while several early witnesses support a shorter form.",
+      "The KJV/TR preserves the fuller traditional form of the Lord's Prayer in Luke, while several early witnesses support shorter wording across multiple phrases rather than one simple omission.",
     variantType: ["short-omitted-phrase", "liturgical-reading", "complex-evidence"],
     tags: [
       "Short omitted phrase",
@@ -1794,7 +1801,7 @@ export const passages: Passage[] = [
     ],
     supportCategory: "Complex multi-phrase variant, fuller traditional form versus shorter critical form",
     shortSummary:
-      "The fuller KJV wording is supported by large later Greek, Byzantine, lectionary, Latin, Syriac, and some Coptic evidence, while early Alexandrian and related witnesses support shorter wording in parts.",
+      "This is a complex multi-phrase variant, not one simple omission: the fuller KJV wording is supported by large later Greek, Byzantine, lectionary, Latin, Syriac, and some Coptic evidence, while early Alexandrian and related witnesses support shorter wording in parts.",
     supportScore: 82,
     oppositionScore: 18,
     controversyScore: 88,

@@ -56,11 +56,14 @@ export default function VersionsPage() {
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
                   Supports KJV/TR
                 </p>
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="mt-2 grid gap-2">
                   {version.supports.length ? (
-                    version.supports.map(({ passage }) => (
-                      <Link key={`${version.name}-${passage.id}-support`} href={`/passages/${passage.slug}`} className="rounded-full bg-archive-teal/10 px-3 py-1 text-xs font-bold text-archive-teal dark:text-teal-200">
-                        {passage.reference}
+                    version.supports.map(({ passage, notes }) => (
+                      <Link key={`${version.name}-${passage.id}-support`} href={`/passages/${passage.slug}`} className="rounded-2xl bg-archive-teal/10 px-3 py-2 text-xs font-bold text-archive-teal transition hover:bg-archive-teal/15 dark:text-teal-200">
+                        <span className="block">{passage.reference}</span>
+                        <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                          {notes.join("; ")}
+                        </span>
                       </Link>
                     ))
                   ) : (
@@ -72,11 +75,14 @@ export default function VersionsPage() {
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700 dark:text-archive-gold">
                   Opposes KJV/TR
                 </p>
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="mt-2 grid gap-2">
                   {version.opposes.length ? (
-                    version.opposes.map(({ passage }) => (
-                      <Link key={`${version.name}-${passage.id}-oppose`} href={`/passages/${passage.slug}`} className="rounded-full bg-amber-700/10 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-100">
-                        {passage.reference}
+                    version.opposes.map(({ passage, notes }) => (
+                      <Link key={`${version.name}-${passage.id}-oppose`} href={`/passages/${passage.slug}`} className="rounded-2xl bg-amber-700/10 px-3 py-2 text-xs font-bold text-amber-800 transition hover:bg-amber-700/15 dark:text-amber-100">
+                        <span className="block">{passage.reference}</span>
+                        <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                          {notes.join("; ")}
+                        </span>
                       </Link>
                     ))
                   ) : (

@@ -131,6 +131,18 @@ export default function HomePage() {
     .map((reference) => displayedPassages.find((passage) => passage.reference === reference))
     .filter((passage): passage is Passage => Boolean(passage))
     .slice(0, 12);
+  const witnessRowCount = displayedPassages.reduce(
+    (total, passage) =>
+      total +
+      passage.greekSupportWitnesses.length +
+      passage.latinWitnesses.length +
+      passage.versionalWitnesses.length +
+      passage.patristicWitnesses.length +
+      passage.evidenceAgainst.length +
+      (passage.printedWitnesses?.length ?? 0),
+    0,
+  );
+  const sourceCount = new Set(displayedPassages.flatMap((passage) => passage.sources)).size;
 
   return (
     <div>
@@ -198,15 +210,15 @@ export default function HomePage() {
               </div>
               <div className="rounded-3xl border border-ink-100 bg-white/75 p-4 dark:border-white/10 dark:bg-white/5">
                 <p className="font-display text-4xl font-black text-ink-900 dark:text-white">
-                  <AnimatedCounter value={500} suffix="+" />
+                  <AnimatedCounter value={witnessRowCount} />
                 </p>
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Witness rows</p>
               </div>
               <div className="rounded-3xl border border-ink-100 bg-white/75 p-4 dark:border-white/10 dark:bg-white/5">
                 <p className="font-display text-4xl font-black text-ink-900 dark:text-white">
-                  <AnimatedCounter value={1} />
+                  <AnimatedCounter value={sourceCount} />
                 </p>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Data source</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Source groups</p>
               </div>
             </div>
           </RevealItem>
