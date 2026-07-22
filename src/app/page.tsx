@@ -2,6 +2,7 @@ import {
   ArrowRight,
   BarChart3,
   BookOpen,
+  FlaskConical,
   Globe2,
   Landmark,
   Microscope,
@@ -14,6 +15,7 @@ import Link from "next/link";
 
 import { AmbientVideo } from "@/components/AmbientVideo";
 import { AnimatedCounter } from "@/components/motion/AnimatedCounter";
+import { EvidenceAtlas } from "@/components/evidence-atlas/EvidenceAtlas";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { PassageCard } from "@/components/PassageCard";
 import { SearchBar } from "@/components/SearchBar";
@@ -72,6 +74,13 @@ const quickLinks = [
     icon: Microscope,
     tone: "teal" as const,
   },
+  {
+    href: "/research",
+    label: "Research Desk",
+    description: "Save passages, compare evidence records, and share a focused study set.",
+    icon: FlaskConical,
+    tone: "gold" as const,
+  },
 ];
 
 const categories = [
@@ -79,38 +88,44 @@ const categories = [
     title: "Major Omitted Passages",
     description: "Long-form readings with major footnotes and large evidence profiles.",
     icon: ScrollText,
+    href: "/passages?search=Major%20omitted%20passage",
   },
   {
     title: "Oldest and Best Footnotes",
     description: "Readings commonly introduced by modern manuscript-footnote language.",
     icon: Quote,
+    href: "/passages?search=omitted",
   },
   {
     title: "Doctrinal Variants",
     description: "Places where the reading carries doctrinal or confessional weight.",
     icon: Scale,
+    href: "/passages?search=Doctrinal%20variant",
   },
   {
     title: "Majority Greek Support",
     description: "Readings with broad Greek manuscript support.",
     icon: BarChart3,
+    href: "/passages?search=Majority%20Greek%20support",
   },
   {
     title: "Patristic Evidence",
     description: "Passages connected to early Christian writers and quotations.",
     icon: Landmark,
+    href: "/passages?search=Patristic%20support",
   },
   {
     title: "Latin and Versional Evidence",
     description: "Latin, Syriac, Coptic, Gothic, Armenian, Georgian, Ethiopic, and Slavonic witnesses.",
     icon: Globe2,
+    href: "/passages?search=versional",
   },
 ];
 
 const steps = [
   "Choose a passage",
   "View the KJV/TR reading",
-  "Compare manuscript counts",
+  "Compare evidence records",
   "Review witnesses for and against",
   "Read patristic quotes and versional evidence",
 ];
@@ -121,7 +136,7 @@ const toneStyles = {
     accent: "group-hover:border-archive-teal/50",
   },
   gold: {
-    icon: "bg-archive-gold/12 text-archive-gold",
+    icon: "bg-archive-gold/[0.12] text-archive-gold",
     accent: "group-hover:border-archive-gold/60",
   },
 };
@@ -131,7 +146,7 @@ export default function HomePage() {
     .map((reference) => displayedPassages.find((passage) => passage.reference === reference))
     .filter((passage): passage is Passage => Boolean(passage))
     .slice(0, 12);
-  const witnessRowCount = displayedPassages.reduce(
+  const evidenceRecordCount = displayedPassages.reduce(
     (total, passage) =>
       total +
       passage.greekSupportWitnesses.length +
@@ -150,7 +165,7 @@ export default function HomePage() {
         src="/videos/ambient-evidence.mp4"
         className="px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
         videoClassName="opacity-25 blur-[1px] dark:opacity-18"
-        overlayClassName="bg-gradient-to-br from-archive-paper/96 via-archive-paper/82 to-archive-teal/12 dark:from-archive-navy/96 dark:via-archive-navy/86 dark:to-archive-gold/10"
+        overlayClassName="bg-gradient-to-br from-archive-paper/[0.96] via-archive-paper/[0.82] to-archive-teal/[0.12] dark:from-archive-navy/[0.96] dark:via-archive-navy/[0.86] dark:to-archive-gold/10"
         playbackRate={0.5}
       >
         <RevealGroup className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
@@ -166,7 +181,7 @@ export default function HomePage() {
               </h1>
             </RevealItem>
             <RevealItem>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-ink-700 dark:text-ink-100/78">
+              <p className="mt-6 max-w-3xl text-lg leading-8 text-ink-700 dark:text-ink-100/[0.78]">
                 Search disputed New Testament readings and compare Greek manuscripts,
                 ancient versions, patristic quotations, and evidence for and against the KJV/TR reading.
               </p>
@@ -210,17 +225,20 @@ export default function HomePage() {
               </div>
               <div className="rounded-3xl border border-ink-100 bg-white/75 p-4 dark:border-white/10 dark:bg-white/5">
                 <p className="font-display text-4xl font-black text-ink-900 dark:text-white">
-                  <AnimatedCounter value={witnessRowCount} />
+                  <AnimatedCounter value={evidenceRecordCount} />
                 </p>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Witness rows</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Evidence records</p>
               </div>
               <div className="rounded-3xl border border-ink-100 bg-white/75 p-4 dark:border-white/10 dark:bg-white/5">
                 <p className="font-display text-4xl font-black text-ink-900 dark:text-white">
                   <AnimatedCounter value={sourceCount} />
                 </p>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Source groups</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Reference groups</p>
               </div>
             </div>
+            <p className="mt-3 text-xs leading-5 text-ink-500 dark:text-ink-100/55">
+              Evidence records are displayed database entries, not a count of unique physical manuscripts.
+            </p>
           </RevealItem>
         </RevealGroup>
       </AmbientVideo>
@@ -231,10 +249,10 @@ export default function HomePage() {
             Where to start
           </p>
           <h2 className="mt-2 font-display text-4xl font-black text-ink-900 dark:text-white">
-            Five ways into the evidence.
+            Six ways into the evidence.
           </h2>
         </Reveal>
-        <RevealGroup className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-5">
+        <RevealGroup className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {quickLinks.map((link) => {
             const Icon = link.icon;
             const tone = toneStyles[link.tone];
@@ -242,7 +260,7 @@ export default function HomePage() {
               <RevealItem key={link.href}>
                 <Link
                   href={link.href}
-                  className={`group flex h-full flex-col rounded-[1.75rem] border border-ink-200/80 bg-white/78 p-5 shadow-card backdrop-blur transition duration-300 hover:-translate-y-1.5 hover:shadow-glow dark:border-white/10 dark:bg-white/[0.06] ${tone.accent}`}
+                  className={`group flex h-full flex-col rounded-[1.75rem] border border-ink-200/80 bg-white/[0.78] p-5 shadow-card backdrop-blur transition duration-300 hover:-translate-y-1.5 hover:shadow-glow dark:border-white/10 dark:bg-white/[0.06] ${tone.accent}`}
                 >
                   <span className={`grid h-11 w-11 place-items-center rounded-2xl ${tone.icon}`}>
                     <Icon className="h-5 w-5" aria-hidden="true" />
@@ -262,6 +280,12 @@ export default function HomePage() {
             );
           })}
         </RevealGroup>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <Reveal>
+          <EvidenceAtlas initialPassageSlug="mark-16-9-20" />
+        </Reveal>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -298,15 +322,22 @@ export default function HomePage() {
           </h2>
         </Reveal>
         <RevealGroup className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {categories.map(({ title, description, icon: Icon }) => (
+          {categories.map(({ title, description, icon: Icon, href }) => (
             <RevealItem key={title}>
-              <div className="group h-full rounded-[2rem] border border-ink-200 bg-white/70 p-6 shadow-card transition duration-300 hover:-translate-y-1 hover:border-archive-gold/50 dark:border-white/10 dark:bg-white/[0.05]">
-                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-archive-gold/12 text-archive-gold transition group-hover:scale-110">
+              <Link
+                href={href}
+                className="group block h-full rounded-[2rem] border border-ink-200 bg-white/70 p-6 shadow-card transition duration-300 hover:-translate-y-1 hover:border-archive-gold/50 dark:border-white/10 dark:bg-white/[0.05]"
+              >
+                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-archive-gold/[0.12] text-archive-gold transition group-hover:scale-110">
                   <Icon className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <h3 className="mt-4 font-display text-2xl font-black text-ink-900 dark:text-white">{title}</h3>
                 <p className="mt-3 text-sm leading-6 text-ink-600 dark:text-ink-100/70">{description}</p>
-              </div>
+                <span className="mt-5 inline-flex items-center gap-1 text-sm font-black text-archive-blue dark:text-teal-200">
+                  Explore this lens
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                </span>
+              </Link>
             </RevealItem>
           ))}
         </RevealGroup>
@@ -321,7 +352,7 @@ export default function HomePage() {
           <RevealGroup className="relative mt-8 grid gap-4 md:grid-cols-5">
             <div className="absolute left-0 right-0 top-5 hidden h-px bg-white/15 md:block" aria-hidden="true" />
             {steps.map((step, index) => (
-              <RevealItem key={step} className="relative rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur transition hover:-translate-y-1 hover:bg-white/12">
+              <RevealItem key={step} className="relative rounded-3xl border border-white/10 bg-white/[0.08] p-4 backdrop-blur transition hover:-translate-y-1 hover:bg-white/[0.12]">
                 <span className="relative grid h-10 w-10 place-items-center rounded-full bg-archive-gold font-black text-ink-900">
                   {index + 1}
                 </span>

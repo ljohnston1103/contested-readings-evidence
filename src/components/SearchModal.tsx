@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, CornerDownLeft, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { passageSearchText } from "@/data/derived";
 import type { Passage } from "@/data/types";
@@ -20,12 +20,16 @@ const quickLinks = [
   { href: "/fathers", label: "Church fathers" },
   { href: "/versions", label: "Ancient versions" },
   { href: "/methodology", label: "Oldest & Best" },
+  { href: "/research", label: "Research Desk" },
 ];
 
 export function SearchModal({ passages, open, onClose }: SearchModalProps) {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const router = useRouter();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -64,8 +68,25 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
         setActiveIndex((index) => Math.max(index - 1, 0));
       }
       if (event.key === "Enter") {
+        if (event.target instanceof HTMLButtonElement) return;
         const target = results[activeIndex];
         if (target) go(`/passages/${target.slug}`);
+      }
+      if (event.key === "Tab" && dialogRef.current) {
+        const focusable = Array.from(
+          dialogRef.current.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+          ),
+        );
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
       }
     }
 
@@ -79,10 +100,13 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
 
   useEffect(() => {
     if (open) {
+      returnFocusRef.current = document.activeElement as HTMLElement | null;
       const original = document.body.style.overflow;
       document.body.style.overflow = "hidden";
+      window.requestAnimationFrame(() => inputRef.current?.focus());
       return () => {
         document.body.style.overflow = original;
+        returnFocusRef.current?.focus();
       };
     }
   }, [open]);
@@ -103,6 +127,7 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
             aria-hidden="true"
           />
           <motion.div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Search the evidence database"
@@ -115,12 +140,17 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
             <div className="flex items-center gap-3 border-b border-ink-100 px-5 py-4 dark:border-white/10">
               <Search className="h-5 w-5 shrink-0 text-archive-teal dark:text-teal-200" aria-hidden="true" />
               <input
-                autoFocus
+                ref={inputRef}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search a passage, manuscript, father, or phrase..."
                 className="min-w-0 flex-1 bg-transparent text-base text-ink-900 outline-none placeholder:text-ink-400 dark:text-white dark:placeholder:text-ink-100/40"
                 aria-label="Search the evidence database"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded="true"
+                aria-controls="search-results"
+                aria-activedescendant={results[activeIndex] ? `search-result-${results[activeIndex].id}` : undefined}
               />
               <button
                 type="button"
@@ -131,16 +161,24 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="max-h-[55vh] overflow-y-auto p-2">
+            <div
+              id="search-results"
+              role="listbox"
+              aria-label="Passage search results"
+              className="max-h-[55vh] overflow-y-auto p-2"
+            >
               {results.length ? (
                 results.map((passage, index) => (
                   <button
                     key={passage.id}
+                    id={`search-result-${passage.id}`}
+                    role="option"
+                    aria-selected={index === activeIndex}
                     onClick={() => go(`/passages/${passage.slug}`)}
                     onMouseEnter={() => setActiveIndex(index)}
                     className={`flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left transition ${
                       index === activeIndex
-                        ? "bg-archive-gold/12 dark:bg-white/10"
+                        ? "bg-archive-gold/[0.12] dark:bg-white/10"
                         : "hover:bg-archive-gold/10 dark:hover:bg-white/5"
                     }`}
                   >

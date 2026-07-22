@@ -19,6 +19,7 @@ const navItems = [
   { href: "/fathers", label: "Fathers" },
   { href: "/versions", label: "Versions" },
   { href: "/methodology", label: "Oldest & Best" },
+  { href: "/research", label: "Research Desk" },
 ];
 
 export function Header() {
@@ -49,6 +50,10 @@ export function Header() {
     function handleKey(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
       const isTyping = !!target && ["INPUT", "TEXTAREA"].includes(target.tagName);
+      if (event.key === "Escape" && mobileOpen) {
+        setMobileOpen(false);
+        return;
+      }
       if ((event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey)) || (event.key === "/" && !isTyping)) {
         event.preventDefault();
         setSearchOpen(true);
@@ -56,7 +61,7 @@ export function Header() {
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, []);
+  }, [mobileOpen]);
 
   function isActive(href: string) {
     return pathname === href || pathname?.startsWith(`${href}/`);
@@ -75,7 +80,7 @@ export function Header() {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <Link
             href="/"
-            className="relative block h-11 w-[170px] shrink-0 overflow-hidden rounded-2xl bg-archive-paper/80 transition hover:-translate-y-0.5 hover:shadow-glow dark:bg-white/95 sm:h-14 sm:w-[250px] lg:w-[285px]"
+            className="relative block h-11 w-[108px] shrink-0 overflow-hidden rounded-xl bg-archive-paper/80 transition hover:-translate-y-0.5 hover:shadow-glow dark:bg-white/95 sm:h-14 sm:w-[250px] lg:w-[285px]"
             aria-label="Oldest & Best Manuscript Evidence Database home"
           >
             <Image
@@ -83,12 +88,12 @@ export function Header() {
               alt="Oldest & Best Manuscript Evidence Database"
               fill
               priority
-              sizes="(min-width: 1024px) 285px, (min-width: 640px) 250px, 170px"
+              sizes="(min-width: 1024px) 285px, (min-width: 640px) 250px, 108px"
               className="object-contain"
             />
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary">
             {navItems.map((item) => {
               const active = isActive(item.href);
               return (
@@ -125,7 +130,7 @@ export function Header() {
             >
               <Search className="h-4 w-4 text-archive-teal transition group-hover:scale-110 dark:text-teal-200" />
               <span className="hidden sm:inline">Search</span>
-              <kbd className="hidden rounded-md border border-ink-200/80 bg-white/70 px-1.5 py-0.5 text-[10px] font-bold text-ink-400 dark:border-white/10 dark:bg-white/5 dark:text-ink-100/40 lg:inline-block">
+              <kbd className="hidden rounded-md border border-ink-200/80 bg-white/70 px-1.5 py-0.5 text-[10px] font-bold text-ink-400 dark:border-white/10 dark:bg-white/5 dark:text-ink-100/40 xl:inline-block">
                 {isMac ? "⌘ K" : "Ctrl K"}
               </kbd>
             </button>
@@ -133,9 +138,10 @@ export function Header() {
             <button
               type="button"
               onClick={() => setMobileOpen((open) => !open)}
-              className="grid h-10 w-10 place-items-center rounded-full border border-ink-200 bg-white/70 text-ink-700 shadow-sm transition hover:-translate-y-0.5 hover:border-archive-gold/60 dark:border-white/10 dark:bg-white/5 dark:text-ink-100 lg:hidden"
+              className="grid h-11 w-11 place-items-center rounded-full border border-ink-200 bg-white/70 text-ink-700 shadow-sm transition hover:-translate-y-0.5 hover:border-archive-gold/60 dark:border-white/10 dark:bg-white/5 dark:text-ink-100 xl:hidden"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation"
             >
               <AnimatePresence initial={false} mode="wait">
                 {mobileOpen ? (
@@ -156,12 +162,13 @@ export function Header() {
           {mobileOpen && (
             <motion.nav
               key="mobile-nav"
+              id="mobile-navigation"
               aria-label="Mobile"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.28, ease: [0.21, 0.47, 0.32, 0.98] }}
-              className="overflow-hidden lg:hidden"
+              className="overflow-hidden xl:hidden"
             >
               <div className="flex flex-col gap-1.5 px-4 pb-4">
                 {navItems.map((item, index) => {

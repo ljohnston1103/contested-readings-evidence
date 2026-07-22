@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUp, ArrowUpRight, BookOpen, Globe2, Landmark, ScrollText } from "lucide-react";
+import { ArrowUp, ArrowUpRight, BookOpen, FlaskConical, Globe2, Landmark, ScrollText } from "lucide-react";
 import Link from "next/link";
 
 import { Reveal } from "@/components/motion/Reveal";
@@ -10,6 +10,7 @@ const exploreLinks = [
   { href: "/manuscripts", label: "Manuscript witnesses", icon: ScrollText },
   { href: "/fathers", label: "Church fathers", icon: Landmark },
   { href: "/versions", label: "Ancient versions", icon: Globe2 },
+  { href: "/research", label: "Research Desk", icon: FlaskConical },
 ];
 
 export function Footer() {

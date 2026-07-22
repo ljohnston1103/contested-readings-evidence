@@ -1,4 +1,4 @@
-import { BookOpenCheck, GitCompare } from "lucide-react";
+import { BookOpenCheck, GitCompare, Quote } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -8,6 +8,7 @@ import { EvidenceTabs } from "@/components/EvidenceTabs";
 import { ManuscriptSnapshotCard } from "@/components/ManuscriptSnapshotCard";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { NextPreviousPassageNav } from "@/components/NextPreviousPassageNav";
+import { PassageActionBar } from "@/components/PassageActionBar";
 import { TagBadge } from "@/components/TagBadge";
 import { adjacentPassages, displayedPassages, findPassage } from "@/data/derived";
 
@@ -45,7 +46,7 @@ export default async function PassagePage({ params }: PassagePageProps) {
       />
 
       <RevealGroup className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.78fr] lg:items-start">
-        <RevealItem className="rounded-[2.5rem] border border-ink-200 bg-white/78 p-6 shadow-card dark:border-white/10 dark:bg-white/[0.06]">
+        <RevealItem className="rounded-[2.5rem] border border-ink-200 bg-white/[0.78] p-6 shadow-card dark:border-white/10 dark:bg-white/[0.06]">
           <p className="text-sm font-black uppercase tracking-[0.24em] text-archive-teal dark:text-teal-200">
             {passage.reference}
           </p>
@@ -85,13 +86,13 @@ export default async function PassagePage({ params }: PassagePageProps) {
           src="/videos/ambient-manuscripts.mp4"
           className="h-full rounded-[2.5rem] border border-ink-200 bg-ink-900 text-white shadow-card dark:border-white/10 dark:bg-white/[0.06]"
           videoClassName="opacity-30 dark:opacity-20"
-          overlayClassName="bg-gradient-to-br from-ink-900/94 via-ink-900/88 to-archive-teal/35 dark:from-archive-navy/94 dark:via-archive-navy/84 dark:to-archive-gold/14"
+          overlayClassName="bg-gradient-to-br from-ink-900/[0.94] via-ink-900/[0.88] to-archive-teal/35 dark:from-archive-navy/[0.94] dark:via-archive-navy/[0.84] dark:to-archive-gold/[0.14]"
         >
         <div className="p-6">
           <p className="text-sm font-black uppercase tracking-[0.24em] text-archive-gold">
             Quick read
           </p>
-          <p className="mt-4 text-lg leading-8 text-white/82 dark:text-ink-100/80">
+          <p className="mt-4 text-lg leading-8 text-white/[0.82] dark:text-ink-100/80">
             {passage.shortSummary}
           </p>
           <div className="mt-6 grid gap-3">
@@ -108,6 +109,39 @@ export default async function PassagePage({ params }: PassagePageProps) {
         </AmbientVideo>
         </RevealItem>
       </RevealGroup>
+
+      <Reveal className="mt-8">
+        <section
+          id="kjv-reading"
+          aria-labelledby="kjv-reading-heading"
+          className="relative overflow-hidden rounded-[2rem] border border-archive-gold/30 bg-white/80 p-6 shadow-card dark:border-archive-gold/20 dark:bg-white/[0.055] sm:p-8"
+        >
+          <div
+            className="absolute -right-12 -top-16 font-display text-[13rem] leading-none text-archive-gold/[0.07] dark:text-archive-gold/[0.08]"
+            aria-hidden="true"
+          >
+            &ldquo;
+          </div>
+          <div className="relative">
+            <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.24em] text-archive-teal dark:text-teal-200">
+              <Quote className="h-4 w-4" aria-hidden="true" />
+              King James Bible reading
+            </p>
+            <h2 id="kjv-reading-heading" className="sr-only">
+              {passage.reference} in the King James Bible
+            </h2>
+            <blockquote className="mt-5 max-w-5xl whitespace-pre-line font-display text-2xl font-bold leading-[1.55] text-ink-900 dark:text-white sm:text-3xl">
+              {passage.kjvText}
+            </blockquote>
+            <PassageActionBar
+              slug={passage.slug}
+              reference={passage.reference}
+              title={passage.title}
+              kjvText={passage.kjvText}
+            />
+          </div>
+        </section>
+      </Reveal>
 
       <Reveal className="mt-8">
         <ManuscriptSnapshotCard passage={passage} />
