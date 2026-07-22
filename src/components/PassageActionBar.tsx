@@ -5,19 +5,20 @@ import {
   BookmarkPlus,
   Check,
   Copy,
+  Download,
   FlaskConical,
   Share2,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import type { Passage } from "@/data/types";
+import { downloadEvidenceCard } from "@/lib/evidenceCard";
+
 const researchShelfKey = "oldest-best-research-passages";
 
 type PassageActionBarProps = {
-  slug: string;
-  reference: string;
-  title: string;
-  kjvText: string;
+  passage: Passage;
 };
 
 function readResearchShelf() {
@@ -32,12 +33,8 @@ function readResearchShelf() {
   }
 }
 
-export function PassageActionBar({
-  slug,
-  reference,
-  title,
-  kjvText,
-}: PassageActionBarProps) {
+export function PassageActionBar({ passage }: PassageActionBarProps) {
+  const { slug, reference, title, kjvText } = passage;
   const [saved, setSaved] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -90,6 +87,11 @@ export function PassageActionBar({
     announce(nextShelf.includes(slug) ? "Added to Research Desk" : "Removed from Research Desk");
   }
 
+  function saveCard() {
+    downloadEvidenceCard(passage, `${window.location.origin}/passages/${slug}`);
+    announce("Evidence card downloaded");
+  }
+
   const buttonClass =
     "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-ink-200 bg-white/80 px-4 py-2.5 text-sm font-black text-ink-700 shadow-sm transition hover:-translate-y-0.5 hover:border-archive-gold/60 hover:text-ink-900 dark:border-white/10 dark:bg-white/[0.06] dark:text-ink-100 dark:hover:text-white";
 
@@ -121,6 +123,15 @@ export function PassageActionBar({
       <button type="button" onClick={sharePassage} className={buttonClass}>
         <Share2 className="h-4 w-4" aria-hidden="true" />
         Share
+      </button>
+
+      <button type="button" onClick={saveCard} className={buttonClass}>
+        {message === "Evidence card downloaded" ? (
+          <Check className="h-4 w-4 text-archive-teal dark:text-teal-200" aria-hidden="true" />
+        ) : (
+          <Download className="h-4 w-4" aria-hidden="true" />
+        )}
+        Save evidence card
       </button>
 
       <Link

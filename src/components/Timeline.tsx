@@ -5,7 +5,7 @@ type TimelineProps = {
   events: TimelineEvent[];
 };
 
-const eventLabels: Record<TimelineEvent["type"], string> = {
+export const eventLabels: Record<TimelineEvent["type"], string> = {
   patristic: "Church father",
   "greek-manuscript": "Greek manuscript",
   "latin-manuscript": "Latin manuscript",

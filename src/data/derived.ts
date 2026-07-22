@@ -1,5 +1,5 @@
 import { passages } from "./passages";
-import type { Passage, PatristicWitness, Witness } from "./types";
+import type { Passage, PatristicWitness, TimelineEvent, Witness } from "./types";
 
 export const allPassages = [...passages].sort(
   (a, b) => a.biblicalOrder - b.biblicalOrder,
@@ -334,4 +334,380 @@ export function buildVersionIndex(): VersionProfile[] {
 
 export function hasTag(passage: Passage, tag: string) {
   return passage.tags.some((item) => item.toLowerCase() === tag.toLowerCase());
+}
+
+// ---------------------------------------------------------------------------
+// Full transmission timeline: every individual Greek, Latin, versional, and
+// patristic witness, every "evidence against" row, and every curated
+// milestone event, each with its own parsed date range, flattened onto one
+// axis. This is deliberately the raw, complete witness list rather than the
+// ~5 curated highlights per passage.
+// ---------------------------------------------------------------------------
+
+/**
+ * Extracts a {start, end} year range from a free-text date label such as
+ * "c. AD 210", "AD 1362 to 1363", "AD 500s to 1500s", or "before AD 150".
+ * A trailing "s" (e.g. "1300s") is treated as spanning that whole century-ish
+ * decade block. Returns {0, 0} when no year can be found.
+ */
+export function parseYearRange(dateLabel: string): { start: number; end: number } {
+  const tokens = dateLabel.match(/\d{3,4}s?/g);
+  if (!tokens || !tokens.length) return { start: 0, end: 0 };
+
+  const parsed = tokens.map((token) => {
+    const fuzzy = /s$/.test(token);
+    const value = Number.parseInt(token, 10);
+    return { start: value, end: fuzzy ? value + 99 : value };
+  });
+
+  let start = Math.min(...parsed.map((p) => p.start));
+  let end = Math.max(...parsed.map((p) => p.end));
+
+  if (/\bbefore\b/i.test(dateLabel)) start = Math.max(1, start - 40);
+  if (/\bafter\b/i.test(dateLabel)) end += 40;
+
+  return { start, end: Math.max(start, end) };
+}
+
+export type TimelineCategory =
+  | "patristic"
+  | "greek"
+  | "latin"
+  | "versional"
+  | "lectionary"
+  | "printed"
+  | "reformation";
+
+export type TimelineSide = "support" | "oppose" | "milestone";
+
+export type FullTimelineEntry = {
+  id: string;
+  name: string;
+  date: string;
+  start: number;
+  end: number;
+  category: TimelineCategory;
+  side: TimelineSide;
+  note: string;
+  passageSlug: string;
+  passageReference: string;
+  passageTitle: string;
+};
+
+export const timelineCategoryOrder: TimelineCategory[] = [
+  "patristic",
+  "greek",
+  "latin",
+  "versional",
+  "lectionary",
+  "printed",
+  "reformation",
+];
+
+export const timelineCategoryLabels: Record<TimelineCategory, string> = {
+  patristic: "Church Fathers",
+  greek: "Greek Manuscripts",
+  latin: "Latin Witnesses",
+  versional: "Versions (Syriac, Coptic & more)",
+  lectionary: "Lectionaries",
+  printed: "Printed Editions",
+  reformation: "Reformation Bibles",
+};
+
+export const timelineCategoryColors: Record<TimelineCategory, string> = {
+  patristic: "#7c3aed",
+  greek: "#0369a1",
+  latin: "#a16207",
+  versional: "#0f766e",
+  lectionary: "#475569",
+  printed: "#be123c",
+  reformation: "#c49a3f",
+};
+
+function classifyWitnessCategory(witness: Witness): TimelineCategory {
+  switch (witness.kind) {
+    case "greek-manuscript":
+      return "greek";
+    case "latin":
+      return "latin";
+    case "syriac":
+    case "coptic":
+    case "version":
+      return "versional";
+    case "patristic":
+      return "patristic";
+    case "printed":
+      return "printed";
+    case "lectionary":
+      return "lectionary";
+    default:
+      break;
+  }
+  const text = witness.witness;
+  if (/lectionar/i.test(text)) return "lectionary";
+  if (/codex|papyrus|minuscule|uncial|\bGA\s?\d|byzantine|majority|family \d/i.test(text)) return "greek";
+  if (/vulgate|old latin|\blatin\b/i.test(text)) return "latin";
+  if (/syriac|peshitta|coptic|sahidic|bohairic|gothic|armenian|georgian|ethiopic|slavonic|version/i.test(text)) {
+    return "versional";
+  }
+  if (/chrysostom|augustine|origen|tertullian|jerome|cyprian|irenaeus|father|hilary|ambrose|eusebius/i.test(text)) {
+    return "patristic";
+  }
+  return "greek";
+}
+
+const milestoneCategory: Record<TimelineEvent["type"], TimelineCategory> = {
+  patristic: "patristic",
+  "greek-manuscript": "greek",
+  "latin-manuscript": "latin",
+  "ancient-version": "versional",
+  "printed-edition": "printed",
+  "reformation-bible": "reformation",
+  lectionary: "lectionary",
+};
+
+function pushTimelineEntry(
+  list: FullTimelineEntry[],
+  passage: Passage,
+  source: string,
+  name: string,
+  date: string,
+  category: TimelineCategory,
+  side: TimelineSide,
+  note: string,
+  index: number,
+) {
+  const { start, end } = parseYearRange(date);
+  if (start <= 0) return;
+  list.push({
+    id: `${passage.slug}-${source}-${index}`,
+    name,
+    date,
+    start,
+    end,
+    category,
+    side,
+    note,
+    passageSlug: passage.slug,
+    passageReference: passage.reference,
+    passageTitle: passage.title,
+  });
+}
+
+export function buildFullTimeline(): FullTimelineEntry[] {
+  const entries: FullTimelineEntry[] = [];
+
+  for (const passage of displayedPassages) {
+    passage.greekSupportWitnesses.forEach((witness, i) =>
+      pushTimelineEntry(entries, passage, "greek-support", witness.witness, witness.date, "greek", "support", witness.note, i),
+    );
+    passage.latinWitnesses.forEach((witness, i) =>
+      pushTimelineEntry(entries, passage, "latin-support", witness.witness, witness.date, "latin", "support", witness.note, i),
+    );
+    passage.versionalWitnesses.forEach((witness, i) =>
+      pushTimelineEntry(
+        entries,
+        passage,
+        "versional-support",
+        witness.witness,
+        witness.date,
+        classifyWitnessCategory(witness),
+        "support",
+        witness.note,
+        i,
+      ),
+    );
+    (passage.printedWitnesses ?? []).forEach((witness, i) =>
+      pushTimelineEntry(entries, passage, "printed-support", witness.witness, witness.date, "printed", "support", witness.note, i),
+    );
+    publicPatristicWitnesses(passage).forEach((witness, i) =>
+      pushTimelineEntry(
+        entries,
+        passage,
+        "patristic-support",
+        witness.source,
+        witness.date,
+        "patristic",
+        "support",
+        witness.quoteSummary,
+        i,
+      ),
+    );
+    passage.evidenceAgainst.forEach((witness, i) =>
+      pushTimelineEntry(
+        entries,
+        passage,
+        "evidence-against",
+        witness.witness,
+        witness.date,
+        classifyWitnessCategory(witness),
+        "oppose",
+        witness.note,
+        i,
+      ),
+    );
+    passage.timeline.forEach((event, i) =>
+      pushTimelineEntry(
+        entries,
+        passage,
+        "milestone",
+        event.label,
+        event.date,
+        milestoneCategory[event.type],
+        "milestone",
+        event.label,
+        i,
+      ),
+    );
+  }
+
+  return entries.sort((a, b) => a.start - b.start);
+}
+
+// ---------------------------------------------------------------------------
+// Witness constellation: fathers + versions grouped into ancient-church
+// branches, for a radial network view of how geographically wide the
+// support for each reading actually is.
+// ---------------------------------------------------------------------------
+
+const branchOrder = [
+  "byzantine-east",
+  "alexandrian-greek",
+  "latin-west",
+  "syriac-east",
+  "coptic-egypt",
+  "armenian-georgian",
+  "gothic",
+  "ethiopic",
+  "slavonic",
+] as const;
+
+export type ConstellationBranchId = (typeof branchOrder)[number];
+
+export const branchLabels: Record<ConstellationBranchId, string> = {
+  "byzantine-east": "Byzantine Greek East",
+  "alexandrian-greek": "Alexandrian Greek",
+  "latin-west": "Latin West",
+  "syriac-east": "Syriac East",
+  "coptic-egypt": "Coptic Egypt",
+  "armenian-georgian": "Armenian & Georgian",
+  gothic: "Gothic",
+  ethiopic: "Ethiopic",
+  slavonic: "Slavonic",
+};
+
+export const branchColors: Record<ConstellationBranchId, string> = {
+  "byzantine-east": "#1b4f72",
+  "alexandrian-greek": "#64748b",
+  "latin-west": "#c49a3f",
+  "syriac-east": "#0f766e",
+  "coptic-egypt": "#7c3aed",
+  "armenian-georgian": "#b45309",
+  gothic: "#0369a1",
+  ethiopic: "#be123c",
+  slavonic: "#16a34a",
+};
+
+export type ConstellationLeaf = {
+  id: string;
+  name: string;
+  kind: "father" | "version" | "aggregate";
+  detail: string;
+  supports: Passage[];
+  opposes: Passage[];
+};
+
+export type ConstellationBranch = {
+  id: ConstellationBranchId;
+  label: string;
+  color: string;
+  leaves: ConstellationLeaf[];
+};
+
+function uniquePassages(list: Passage[]) {
+  const seen = new Set<string>();
+  return list.filter((passage) => {
+    if (seen.has(passage.id)) return false;
+    seen.add(passage.id);
+    return true;
+  });
+}
+
+function fatherBranch(region: string): ConstellationBranchId {
+  if (/constantinople/i.test(region)) return "byzantine-east";
+  if (/alexandria|caesarea/i.test(region)) return "alexandrian-greek";
+  return "latin-west";
+}
+
+function versionBranch(language: string): ConstellationBranchId {
+  switch (language) {
+    case "Syriac":
+      return "syriac-east";
+    case "Coptic":
+      return "coptic-egypt";
+    case "Gothic":
+      return "gothic";
+    case "Armenian":
+    case "Georgian":
+      return "armenian-georgian";
+    case "Ethiopic":
+      return "ethiopic";
+    case "Old Church Slavonic":
+      return "slavonic";
+    default:
+      return "latin-west";
+  }
+}
+
+export function buildWitnessConstellation(): ConstellationBranch[] {
+  const map = new Map<ConstellationBranchId, ConstellationLeaf[]>();
+  for (const id of branchOrder) map.set(id, []);
+
+  for (const father of buildFatherIndex()) {
+    const branch = fatherBranch(father.region);
+    const passages = uniquePassages(father.passages.map((item) => item.passage));
+    map.get(branch)!.push({
+      id: `father-${father.name}`,
+      name: father.name,
+      kind: "father",
+      detail: `${father.dateRange} · ${father.region}`,
+      supports: passages,
+      opposes: [],
+    });
+  }
+
+  for (const version of buildVersionIndex()) {
+    const branch = versionBranch(version.language);
+    map.get(branch)!.push({
+      id: `version-${version.name}`,
+      name: version.name,
+      kind: "version",
+      detail: `${version.language} · ${version.date}`,
+      supports: uniquePassages(version.supports.map((item) => item.passage)),
+      opposes: uniquePassages(version.opposes.map((item) => item.passage)),
+    });
+  }
+
+  const majorityPassages = displayedPassages.filter((passage) =>
+    hasTag(passage, "Majority Greek support"),
+  );
+  if (majorityPassages.length) {
+    map.get("byzantine-east")!.push({
+      id: "aggregate-byzantine-majority",
+      name: "Byzantine Majority Text",
+      kind: "aggregate",
+      detail: `${majorityPassages.length} passages with majority Greek support`,
+      supports: majorityPassages,
+      opposes: [],
+    });
+  }
+
+  return branchOrder
+    .map((id) => ({
+      id,
+      label: branchLabels[id],
+      color: branchColors[id],
+      leaves: map.get(id)!.sort((a, b) => b.supports.length - a.supports.length),
+    }))
+    .filter((branch) => branch.leaves.length > 0);
 }

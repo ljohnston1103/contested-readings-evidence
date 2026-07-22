@@ -16,6 +16,7 @@ import { useMemo, useState } from "react";
 import { formatEntryCount, publicPatristicWitnesses } from "@/data/derived";
 import type { Passage, Witness } from "@/data/types";
 
+import { EvidenceScale } from "./EvidenceScale";
 import { EvidenceTable } from "./EvidenceTable";
 import { PatristicQuoteCard } from "./PatristicQuoteCard";
 import { SupportComparisonBar } from "./SupportComparisonBar";
@@ -141,7 +142,10 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
               </div>
             </div>
           </div>
-          <SupportComparisonBar passage={passage} />
+          <div className="grid gap-5">
+            <SupportComparisonBar passage={passage} />
+            <EvidenceScale passage={passage} />
+          </div>
         </div>
       )}
 

@@ -55,6 +55,14 @@ a {
   background-size: 42px 42px, 42px 42px, auto, auto, auto;
 }
 
+/* Custom search inputs already render their own clear button; suppress the
+   native WebKit one so the two don't stack. */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 /* Focus visibility for keyboard navigation */
 :focus-visible {
   outline: 2px solid #c49a3f;

@@ -18,6 +18,7 @@ const navItems = [
   { href: "/manuscripts", label: "Manuscripts" },
   { href: "/fathers", label: "Fathers" },
   { href: "/versions", label: "Versions" },
+  { href: "/timeline", label: "Timeline" },
   { href: "/methodology", label: "Oldest & Best" },
   { href: "/research", label: "Research Desk" },
 ];

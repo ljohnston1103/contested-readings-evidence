@@ -133,12 +133,7 @@ export default async function PassagePage({ params }: PassagePageProps) {
             <blockquote className="mt-5 max-w-5xl whitespace-pre-line font-display text-2xl font-bold leading-[1.55] text-ink-900 dark:text-white sm:text-3xl">
               {passage.kjvText}
             </blockquote>
-            <PassageActionBar
-              slug={passage.slug}
-              reference={passage.reference}
-              title={passage.title}
-              kjvText={passage.kjvText}
-            />
+            <PassageActionBar passage={passage} />
           </div>
         </section>
       </Reveal>

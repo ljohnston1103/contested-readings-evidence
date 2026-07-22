@@ -4,6 +4,7 @@ import {
   BookOpen,
   FlaskConical,
   Globe2,
+  History,
   Landmark,
   Microscope,
   Quote,
@@ -79,6 +80,13 @@ const quickLinks = [
     label: "Research Desk",
     description: "Save passages, compare evidence records, and share a focused study set.",
     icon: FlaskConical,
+    tone: "gold" as const,
+  },
+  {
+    href: "/timeline",
+    label: "Transmission Timeline",
+    description: "Play sixteen centuries of testimony as one interactive timeline, or explore the witness constellation.",
+    icon: History,
     tone: "gold" as const,
   },
 ];
@@ -249,7 +257,7 @@ export default function HomePage() {
             Where to start
           </p>
           <h2 className="mt-2 font-display text-4xl font-black text-ink-900 dark:text-white">
-            Six ways into the evidence.
+            Seven ways into the evidence.
           </h2>
         </Reveal>
         <RevealGroup className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
