@@ -434,18 +434,18 @@ export default function MethodologyPage() {
         </Reveal>
         <SnapshotTable title="Sinaiticus: Burgon-Style Divergence Statistics" rows={sinaiticusBurgon} />
         <Reveal>
-        <p className="rounded-[2rem] border border-ink-200 bg-white/78 p-5 leading-7 text-ink-700 shadow-card dark:border-white/10 dark:bg-white/[0.05] dark:text-ink-100/75">
-          Traditional Text sources cite Burgon's figures that Sinaiticus, in the Gospels, omits 3,455 words, adds 839, substitutes 1,114, transposes 2,299, and modifies 1,265, for a total of 8,972 differences from the Traditional Text.
+        <p className="rounded-[2rem] border border-ink-200 bg-white/[0.78] p-5 leading-7 text-ink-700 shadow-card dark:border-white/10 dark:bg-white/[0.05] dark:text-ink-100/75">
+          Traditional Text sources cite Burgon’s figures that Sinaiticus, in the Gospels, omits 3,455 words, adds 839, substitutes 1,114, transposes 2,299, and modifies 1,265, for a total of 8,972 differences from the Traditional Text.
         </p>
         </Reveal>
         <SnapshotTable title="Sinaiticus: Origin and Textual Environment" rows={sinaiticusOrigin} />
         <Reveal>
-        <section className="rounded-[2rem] border border-ink-200 bg-white/78 p-5 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
+        <section className="rounded-[2rem] border border-ink-200 bg-white/[0.78] p-5 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
           <h2 className="font-display text-2xl font-black text-ink-900 dark:text-white">
             J. F. Fenlon on the Origen/Pamphilus Connection
           </h2>
           <p className="mt-3 leading-7 text-ink-700 dark:text-ink-100/75">
-            A note associated with Sinaiticus connects a source exemplar with Pamphilus and Origen's Hexapla, and Fenlon observes that the text of Codex Sinaiticus bears a close resemblance to Codex Vaticanus.
+            A note associated with Sinaiticus connects a source exemplar with Pamphilus and Origen’s Hexapla, and Fenlon observes that the text of Codex Sinaiticus bears a close resemblance to Codex Vaticanus.
           </p>
         </section>
         </Reveal>

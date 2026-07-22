@@ -16,20 +16,14 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    linear-gradient(135deg, rgba(251, 247, 239, 0.98), rgba(244, 237, 224, 0.92)),
-    radial-gradient(circle at 12% 12%, rgba(196, 154, 63, 0.16), transparent 34%),
-    radial-gradient(circle at 82% 2%, rgba(15, 118, 110, 0.13), transparent 30%);
+  background-color: #fbf7ef;
   color: #121722;
   font-family: Aptos, "Segoe UI Variable", "Segoe UI", sans-serif;
   transition: background-color 300ms ease, color 300ms ease;
 }
 
 .dark body {
-  background:
-    linear-gradient(135deg, rgba(12, 20, 36, 0.98), rgba(18, 23, 34, 0.96)),
-    radial-gradient(circle at 14% 8%, rgba(196, 154, 63, 0.14), transparent 34%),
-    radial-gradient(circle at 82% 4%, rgba(20, 184, 166, 0.13), transparent 30%);
+  background-color: #0c1424;
   color: #fbf7ef;
 }
 
@@ -44,14 +38,21 @@ a {
 .archive-grid {
   background-image:
     linear-gradient(rgba(18, 23, 34, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(18, 23, 34, 0.05) 1px, transparent 1px);
-  background-size: 42px 42px;
+    linear-gradient(90deg, rgba(18, 23, 34, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 12% 12%, rgba(196, 154, 63, 0.16), transparent 34%),
+    radial-gradient(circle at 82% 2%, rgba(15, 118, 110, 0.13), transparent 30%),
+    linear-gradient(135deg, rgba(251, 247, 239, 0.98), rgba(244, 237, 224, 0.92));
+  background-size: 42px 42px, 42px 42px, auto, auto, auto;
 }
 
 .dark .archive-grid {
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 14% 8%, rgba(196, 154, 63, 0.14), transparent 34%),
+    radial-gradient(circle at 82% 4%, rgba(20, 184, 166, 0.13), transparent 30%),
+    linear-gradient(135deg, rgba(12, 20, 36, 0.98), rgba(18, 23, 34, 0.96));
+  background-size: 42px 42px, 42px 42px, auto, auto, auto;
 }
 
 /* Focus visibility for keyboard navigation */
@@ -114,5 +115,14 @@ html {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

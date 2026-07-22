@@ -1,5 +1,8 @@
 ﻿.next/
 node_modules/
+.next-stale-*/
 out/
 .env*
 .vercel/
+preview-artifacts/
+.codex-dev.*.log
