@@ -7,8 +7,10 @@ out/
 preview-artifacts/
 .codex-dev.*.log
 .codex-start.*.log
+.codex-preview*.log
 .open-next/
 .sites-build/
 .wrangler/
 dist/
 *.site.tar.gz
+.openai/*.tar.gz
