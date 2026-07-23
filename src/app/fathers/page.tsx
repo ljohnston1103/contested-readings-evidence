@@ -64,6 +64,9 @@ export default function FathersPage() {
                     <p className="text-sm font-black text-ink-900 dark:text-white">
                       {passage.reference} · {passage.title}
                     </p>
+                    <p className="mt-1 text-xs font-bold leading-5 text-archive-teal dark:text-teal-200">
+                      Earliest KJV support: {passage.earliestSupport?.[0]?.statement}
+                    </p>
                     {(witness.workSection || witness.relationship) && (
                       <p className="mt-1 text-xs font-bold text-archive-teal dark:text-teal-200">
                         {[witness.workSection, witness.relationship?.replaceAll("_", " ")]

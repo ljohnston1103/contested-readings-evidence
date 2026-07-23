@@ -18,10 +18,9 @@ export function PassageTable({ passages }: PassageTableProps) {
             <tr>
               <th className="px-5 py-4 font-bold">Passage</th>
               <th className="px-5 py-4 font-bold">Reading Summary</th>
-              <th className="px-5 py-4 font-bold">Greek Support</th>
-              <th className="px-5 py-4 font-bold">Against</th>
-              <th className="px-5 py-4 font-bold">Strength</th>
-              <th className="px-5 py-4 font-bold">Key Evidence</th>
+              <th className="px-5 py-4 font-bold">Earliest KJV support</th>
+              <th className="px-5 py-4 font-bold">Primary support</th>
+              <th className="px-5 py-4 font-bold">Evidence represented</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-ink-100 dark:divide-white/10">
@@ -37,29 +36,25 @@ export function PassageTable({ passages }: PassageTableProps) {
                 <td className="max-w-xs px-5 py-4 align-top text-ink-700 dark:text-ink-100/75">
                   {passage.readingSupported}
                 </td>
-                <td className="px-5 py-4 align-top font-bold text-ink-900 dark:text-white">
-                  {passage.manuscriptSnapshot.greekSupport}
-                </td>
-                <td className="px-5 py-4 align-top text-ink-700 dark:text-ink-100/75">
-                  {passage.manuscriptSnapshot.greekAgainst}
+                <td className="max-w-sm px-5 py-4 align-top font-bold leading-6 text-ink-900 dark:text-white">
+                  {passage.earliestSupport?.[0]?.statement}
                 </td>
                 <td className="px-5 py-4 align-top">
-                  <TagBadge
-                    tone={
-                      passage.supportScore === undefined
-                        ? "neutral"
-                        : passage.supportScore > 90
-                          ? "teal"
-                          : passage.supportScore < 30
-                            ? "red"
-                            : "gold"
-                    }
-                  >
+                  <TagBadge tone="teal">
                     {passage.supportCategory}
                   </TagBadge>
                 </td>
                 <td className="px-5 py-4 align-top text-ink-700 dark:text-ink-100/75">
-                  {passage.manuscriptSnapshot.mainEvidenceAgainst.join(", ")}
+                  {[
+                    passage.greekSupportWitnesses.length ? "Greek" : "",
+                    passage.latinWitnesses.length || passage.versionalWitnesses.length
+                      ? "Versions"
+                      : "",
+                    passage.patristicWitnesses.length ? "Fathers" : "",
+                    passage.printedWitnesses?.length ? "Printed editions" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
                 </td>
               </tr>
             ))}

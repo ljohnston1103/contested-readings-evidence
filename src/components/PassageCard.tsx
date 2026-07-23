@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import type { Passage } from "@/data/types";
 
+import { EarliestSupportPanel } from "./EarliestSupportPanel";
 import { TagBadge } from "./TagBadge";
 
 type PassageCardProps = {
@@ -35,27 +36,14 @@ export function PassageCard({ passage, featured = false }: PassageCardProps) {
             </h3>
           </div>
           <span className="line-clamp-2 max-w-[11rem] rounded-2xl border border-archive-gold/40 bg-archive-gold/12 px-3 py-1 text-right text-xs font-black text-ink-700 dark:text-ink-50">
-            {passage.manuscriptSnapshot.percentSupport ?? passage.supportCategory.split(",")[0]}
+            {passage.supportCategory.split(",")[0]}
           </span>
         </div>
         <p className="relative mt-4 line-clamp-3 text-sm leading-6 text-ink-600 dark:text-ink-100/75">
           {featured ? passage.readingSupported : passage.shortSummary}
         </p>
-        <div className="relative mt-5 grid gap-3 rounded-2xl border border-ink-100 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-archive-navy/50">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400">Support</p>
-              <p className="mt-1 line-clamp-4 break-words text-sm font-black text-ink-900 dark:text-white">
-                {passage.manuscriptSnapshot.greekSupport}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400">Against</p>
-              <p className="mt-1 line-clamp-4 break-words text-sm font-black text-ink-900 dark:text-white">
-                {passage.manuscriptSnapshot.greekAgainst}
-              </p>
-            </div>
-          </div>
+        <div className="relative mt-5">
+          <EarliestSupportPanel passage={passage} compact />
         </div>
         <div className="relative mt-5 flex flex-wrap gap-2">
           {passage.tags.slice(0, 4).map((tag) => (

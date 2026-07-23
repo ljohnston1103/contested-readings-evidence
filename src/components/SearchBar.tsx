@@ -73,6 +73,9 @@ export function SearchBar({
                   <span className="line-clamp-1 text-sm text-ink-600 dark:text-ink-100/70">
                     {passage.shortSummary}
                   </span>
+                  <span className="line-clamp-2 text-xs font-bold leading-5 text-archive-teal dark:text-teal-200">
+                    Earliest KJV support: {passage.earliestSupport?.[0]?.statement}
+                  </span>
                 </Link>
               ))
             ) : (

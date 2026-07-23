@@ -74,8 +74,8 @@ function evidenceSegments(passage: Passage): EvidenceSegment[] {
     },
     {
       key: "opposition",
-      shortLabel: "Against",
-      label: "Evidence-against records",
+      shortLabel: "Competing",
+      label: "Competing reading records",
       count: passage.evidenceAgainst.filter(
         (record) => !record.direction || record.direction.startsWith("AGAINST"),
       ).length,
@@ -97,10 +97,6 @@ function evidenceSegments(passage: Passage): EvidenceSegment[] {
   ];
 }
 
-function recordTotal(passage: Passage) {
-  return evidenceSegments(passage).reduce((sum, segment) => sum + segment.count, 0);
-}
-
 function uniqueValidSlugs(slugs: string[], passages: Passage[]) {
   const valid = new Set(passages.map((passage) => passage.slug));
   return Array.from(new Set(slugs.filter((slug) => valid.has(slug)))).slice(0, maximumSelection);
@@ -109,7 +105,8 @@ function uniqueValidSlugs(slugs: string[], passages: Passage[]) {
 function buildBrief(passages: Passage[]) {
   const sections = passages.map((passage) => {
     const breakdown = evidenceSegments(passage)
-      .map((segment) => `${segment.shortLabel}: ${segment.count}`)
+      .filter((segment) => segment.count > 0)
+      .map((segment) => segment.shortLabel)
       .join("; ");
 
     return [
@@ -117,7 +114,8 @@ function buildBrief(passages: Passage[]) {
       `KJV text: “${passage.kjvText}”`,
       `Reading catalogued by the site: ${passage.readingSupported}`,
       `Variant issue: ${passage.variantIssue}`,
-      `Evidence records (${recordTotal(passage)} total): ${breakdown}`,
+      `Earliest KJV-supporting evidence: ${passage.earliestSupport?.[0]?.statement ?? "See full dossier"}`,
+      `Evidence represented: ${breakdown}`,
       `Full dossier: ${window.location.origin}/passages/${passage.slug}`,
     ].join("\n");
   });
@@ -125,7 +123,7 @@ function buildBrief(passages: Passage[]) {
   return [
     "# Oldest & Best — Research Set",
     "",
-    "Counts below are catalog records, not counts of unique physical witnesses. Read the full dossiers for qualifications and source notes.",
+    "Evidence types are listed without treating database rows as votes. Read the full dossiers for dates, qualifications, competing witnesses, and references.",
     "",
     ...sections.flatMap((section) => [section, ""]),
   ].join("\n");
@@ -224,16 +222,10 @@ export function ResearchDesk({ passages }: ResearchDeskProps) {
     .map((slug) => passages.find((passage) => passage.slug === slug))
     .filter((passage): passage is Passage => Boolean(passage));
 
-  const selectedRecordTotal = selectedPassages.reduce(
-    (sum, passage) => sum + recordTotal(passage),
-    0,
-  );
   const selectedBooks = new Set(selectedPassages.map((passage) => passage.book)).size;
   const selectedVariantTypes = new Set(
     selectedPassages.flatMap((passage) => passage.variantType),
   ).size;
-  const catalogRecordTotal = passages.reduce((sum, passage) => sum + recordTotal(passage), 0);
-
   const tagCounts = selectedPassages
     .flatMap((passage) => passage.tags)
     .reduce<Record<string, number>>((counts, tag) => {
@@ -321,15 +313,15 @@ export function ResearchDesk({ passages }: ResearchDeskProps) {
                   <dd>{passages.length}</dd>
                 </div>
                 <div>
-                  <dt>Evidence records</dt>
-                  <dd>{catalogRecordTotal.toLocaleString()}</dd>
+                  <dt>Curated earliest dates</dt>
+                  <dd>{passages.length}</dd>
                 </div>
                 <div>
                   <dt>Desk capacity</dt>
                   <dd>{maximumSelection}</dd>
                 </div>
               </dl>
-              <p>Evidence records are catalog entries—not unique physical witnesses.</p>
+              <p>Every dossier includes a reviewed earliest-support record.</p>
             </div>
           </div>
         </div>
@@ -394,7 +386,7 @@ export function ResearchDesk({ passages }: ResearchDeskProps) {
                     <strong>{passage.reference}</strong>
                     <small>{passage.title}</small>
                   </span>
-                  <em>{recordTotal(passage)} records</em>
+                  <em>{passage.earliestSupport?.[0]?.statement}</em>
                 </button>
               );
             })}
@@ -474,9 +466,9 @@ export function ResearchDesk({ passages }: ResearchDeskProps) {
                 </div>
                 <dl className={styles.metricGrid}>
                   <div>
-                    <dt>Evidence records</dt>
-                    <dd>{selectedRecordTotal.toLocaleString()}</dd>
-                    <small>Across selected dossiers</small>
+                    <dt>Curated earliest dates</dt>
+                    <dd>{selectedPassages.length}</dd>
+                    <small>One or more per selected dossier</small>
                   </div>
                   <div>
                     <dt>Biblical books</dt>
@@ -501,68 +493,13 @@ export function ResearchDesk({ passages }: ResearchDeskProps) {
                 ) : null}
               </section>
 
-              <section className={styles.fingerprints} aria-labelledby="fingerprints-title">
-                <div className={styles.sectionHeading}>
-                  <div>
-                    <span className={styles.sectionKicker}>Evidence fingerprints</span>
-                    <h3 id="fingerprints-title">See each dossier’s shape</h3>
-                  </div>
-                  <p>Widths show each category’s share of that dossier’s catalog records.</p>
-                </div>
-
-                <div className={styles.fingerprintGrid}>
-                  {selectedPassages.map((passage) => {
-                    const segments = evidenceSegments(passage);
-                    const total = recordTotal(passage);
-                    return (
-                      <article key={passage.slug} className={styles.fingerprintCard}>
-                        <div>
-                          <strong>{passage.reference}</strong>
-                          <span>{total} records</span>
-                        </div>
-                        <div
-                          className={styles.fingerprintBar}
-                          role="img"
-                          aria-label={`${passage.reference}: ${segments
-                            .map((segment) => `${segment.label}, ${segment.count}`)
-                            .join("; ")}`}
-                        >
-                          {segments.map((segment) =>
-                            segment.count ? (
-                              <span
-                                key={segment.key}
-                                data-segment={segment.key}
-                                style={{ width: `${(segment.count / total) * 100}%` }}
-                              />
-                            ) : null,
-                          )}
-                        </div>
-                        <dl>
-                          {segments.map((segment) => (
-                            <div key={segment.key} data-segment={segment.key}>
-                              <dt>{segment.shortLabel}</dt>
-                              <dd>{segment.count}</dd>
-                            </div>
-                          ))}
-                        </dl>
-                      </article>
-                    );
-                  })}
-                </div>
-                <p className={styles.countCaveat}>
-                  This visualization compares data-entry distribution only. A record may describe
-                  a manuscript, group, correction, tradition, quotation, or summary; it is not a
-                  vote and does not establish evidentiary weight.
-                </p>
-              </section>
-
               <section className={styles.matrixSection} aria-labelledby="matrix-title">
                 <div className={styles.sectionHeading}>
                   <div>
                     <span className={styles.sectionKicker}>Comparison matrix</span>
                     <h3 id="matrix-title">Read across the dossiers</h3>
                   </div>
-                  <p id="record-count-note">Numerical cells are evidence-record counts, not unique witnesses.</p>
+                  <p id="record-count-note">Dates come from each dossier’s curated earliest-support record.</p>
                 </div>
                 <div className={styles.tableFrame} tabIndex={0} role="region" aria-label="Scrollable passage comparison">
                   <table aria-describedby="record-count-note">
@@ -596,24 +533,28 @@ export function ResearchDesk({ passages }: ResearchDeskProps) {
                           <td key={passage.slug}>{passage.variantType.join(", ")}</td>
                         ))}
                       </tr>
-                      {([
-                        ["greek", "Greek support records"],
-                        ["latin", "Latin support records"],
-                        ["versions", "Versional support records"],
-                        ["fathers", "Patristic records"],
-                        ["opposition", "Evidence-against records"],
-                        ["other", "Other or qualified reading records"],
-                        ["printed", "Printed-edition records"],
-                      ] as const).map(([key, label]) => (
-                        <tr key={key}>
-                          <th scope="row">{label}</th>
-                          {selectedPassages.map((passage) => (
-                            <td key={passage.slug} className={styles.numberCell}>
-                              {evidenceSegments(passage).find((segment) => segment.key === key)?.count ?? 0}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
+                      <tr>
+                        <th scope="row">Earliest KJV-supporting evidence</th>
+                        {selectedPassages.map((passage) => (
+                          <td key={passage.slug}>
+                            {passage.earliestSupport?.map((entry) => entry.statement).join("; ")}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th scope="row">Evidence represented</th>
+                        {selectedPassages.map((passage) => (
+                          <td key={passage.slug}>
+                            {evidenceSegments(passage).filter((segment) => segment.count > 0).map((segment) => segment.label).join(", ")}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th scope="row">Editorial conclusion</th>
+                        {selectedPassages.map((passage) => (
+                          <td key={passage.slug}>{passage.shortSummary}</td>
+                        ))}
+                      </tr>
                     </tbody>
                   </table>
                 </div>

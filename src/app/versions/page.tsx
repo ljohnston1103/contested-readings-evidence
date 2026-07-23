@@ -62,6 +62,9 @@ export default function VersionsPage() {
                       <Link key={`${version.name}-${passage.id}-support`} href={`/passages/${passage.slug}`} className="rounded-2xl bg-archive-teal/10 px-3 py-2 text-xs font-bold text-archive-teal transition hover:bg-archive-teal/15 dark:text-teal-200">
                         <span className="block">{passage.reference}</span>
                         <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                          Earliest KJV support: {passage.earliestSupport?.[0]?.statement}
+                        </span>
+                        <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
                           {notes.join("; ")}
                         </span>
                       </Link>
@@ -80,6 +83,9 @@ export default function VersionsPage() {
                     version.opposes.map(({ passage, notes }) => (
                       <Link key={`${version.name}-${passage.id}-oppose`} href={`/passages/${passage.slug}`} className="rounded-2xl bg-amber-700/10 px-3 py-2 text-xs font-bold text-amber-800 transition hover:bg-amber-700/15 dark:text-amber-100">
                         <span className="block">{passage.reference}</span>
+                        <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                          Earliest KJV support: {passage.earliestSupport?.[0]?.statement}
+                        </span>
                         <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
                           {notes.join("; ")}
                         </span>

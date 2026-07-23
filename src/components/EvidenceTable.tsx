@@ -12,10 +12,21 @@ type EvidenceTableProps = {
   searchable?: boolean;
 };
 
+function relationshipLabel(row: Witness) {
+  if (row.direction?.startsWith("AGAINST")) return "Competing witness";
+  if (row.relationship === "exact") return "Exact reading";
+  if (row.relationship === "close") return "Close quotation";
+  if (row.relationship === "related") return "Related evidence";
+  if (row.relationship === "mixed") return "Mixed citation";
+  if (row.relationship === "versional") return "Versional witness";
+  if (row.relationship === "printed") return "Printed edition";
+  return "Evidence record";
+}
+
 export function EvidenceTable({
   title,
   rows,
-  columns = ["Witness", "Date", "Reading / Note"],
+  columns = ["Witness", "Public evidence date", "Reading / note"],
   searchable = true,
 }: EvidenceTableProps) {
   const [query, setQuery] = useState("");
@@ -24,7 +35,7 @@ export function EvidenceTable({
     const needle = query.toLowerCase().trim();
     if (!needle) return uniqueRows;
     return uniqueRows.filter((row) =>
-      `${row.direction ?? ""} ${row.unit ?? ""} ${row.witness} ${row.date} ${row.note} ${row.source ?? ""} ${row.confidence ?? ""}`
+      `${row.direction ?? ""} ${row.unit ?? ""} ${row.witness} ${row.date} ${row.note}`
         .toLowerCase()
         .includes(needle),
     );
@@ -33,7 +44,7 @@ export function EvidenceTable({
   if (!uniqueRows.length) {
     return (
       <div className="rounded-3xl border border-dashed border-ink-200 p-6 text-sm text-ink-600 dark:border-white/10 dark:text-ink-100/70">
-        No witnesses are listed in this section yet.
+        No witness is listed in this section.
       </div>
     );
   }
@@ -42,7 +53,11 @@ export function EvidenceTable({
     <div className="rounded-[2rem] border border-ink-200 bg-white/80 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
       {(title || searchable) && (
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink-100 p-4 dark:border-white/10">
-          {title && <h3 className="font-display text-2xl font-black text-ink-900 dark:text-white">{title}</h3>}
+          {title && (
+            <h3 className="font-display text-2xl font-black text-ink-900 dark:text-white">
+              {title}
+            </h3>
+          )}
           {searchable && uniqueRows.length > 5 && (
             <input
               value={query}
@@ -72,23 +87,17 @@ export function EvidenceTable({
                 className="align-top transition hover:bg-archive-gold/10 dark:hover:bg-white/5"
               >
                 <td className="px-5 py-4">
-                  <p className="font-bold text-ink-900 dark:text-white">{row.witness}</p>
-                  {row.direction && (
-                    <span
-                      className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] ${
-                        row.direction.startsWith("FOR")
-                          ? "bg-archive-teal/10 text-archive-teal dark:text-teal-200"
-                          : row.direction.startsWith("AGAINST")
-                            ? "bg-amber-700/10 text-amber-800 dark:text-amber-100"
-                            : "bg-ink-100 text-ink-600 dark:bg-white/10 dark:text-ink-100/70"
-                      }`}
-                    >
-                      {row.direction.replaceAll("_", " ")}
-                    </span>
-                  )}
+                  <p className="font-bold text-ink-900 dark:text-white">
+                    {row.witness}
+                  </p>
+                  <span className="mt-2 inline-flex rounded-full bg-archive-teal/10 px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-archive-teal dark:text-teal-200">
+                    {relationshipLabel(row)}
+                  </span>
                 </td>
-                <td className="whitespace-nowrap px-5 py-4 text-ink-600 dark:text-ink-100/70">
-                  {row.date || "—"}
+                <td className="px-5 py-4 text-ink-600 dark:text-ink-100/70">
+                  <span className="inline-flex rounded-full bg-ink-900 px-3 py-1.5 text-xs font-black text-white dark:bg-archive-gold dark:text-ink-900">
+                    {row.date}
+                  </span>
                 </td>
                 <td className="px-5 py-4 leading-6 text-ink-700 dark:text-ink-100/75">
                   {row.unit && (
@@ -97,25 +106,6 @@ export function EvidenceTable({
                     </p>
                   )}
                   <p>{row.note}</p>
-                  {(row.confidence || row.source || row.lastVerified) && (
-                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-ink-100 pt-3 text-xs font-semibold text-ink-500 dark:border-white/10 dark:text-ink-100/55">
-                      {row.confidence && <span>Confidence: {row.confidence}</span>}
-                      {row.lastVerified && <span>Verified: {row.lastVerified}</span>}
-                      {row.source &&
-                        (row.sourceUrl ? (
-                          <a
-                            href={row.sourceUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-black text-archive-blue hover:underline dark:text-teal-200"
-                          >
-                            Source: {row.source}
-                          </a>
-                        ) : (
-                          <span>Source: {row.source}</span>
-                        ))}
-                    </div>
-                  )}
                 </td>
               </tr>
             ))}

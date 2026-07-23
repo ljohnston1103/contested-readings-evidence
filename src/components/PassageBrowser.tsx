@@ -19,10 +19,8 @@ type PassageBrowserProps = {
 
 const sortOptions = [
   ["biblical", "Biblical order"],
-  ["support", "Strongest KJV manuscript support"],
-  ["against", "Smallest evidence against KJV"],
+  ["earliest", "Earliest KJV-supporting evidence"],
   ["patristic", "Earliest patristic evidence"],
-  ["controversial", "Most controversial"],
   ["alphabetical", "Alphabetical"],
 ] as const;
 
@@ -32,6 +30,11 @@ const viewOptions = [
   { value: "cards", label: "Cards", icon: LayoutGrid },
   { value: "table", label: "Table", icon: Table2 },
 ] as const;
+
+const earliestYear = (passage: Passage) => {
+  const match = passage.earliestSupport?.[0]?.statement.match(/\b(\d{2,4})\b/);
+  return match ? Number(match[1]) : 9999;
+};
 
 export function PassageBrowser({ passages, initialSearch = "" }: PassageBrowserProps) {
   const [query, setQuery] = useState(initialSearch);
@@ -49,16 +52,8 @@ export function PassageBrowser({ passages, initialSearch = "" }: PassageBrowserP
       .filter((passage) => selectedTags.every((tag) => hasTag(passage, tag)))
       .filter((passage) => (needle ? passageSearchText(passage).includes(needle) : true))
       .sort((a, b) => {
-        if (sort === "support") {
-          return (b.supportScore ?? Number.NEGATIVE_INFINITY) - (a.supportScore ?? Number.NEGATIVE_INFINITY);
-        }
-        if (sort === "against") {
-          return (a.oppositionScore ?? Number.POSITIVE_INFINITY) - (b.oppositionScore ?? Number.POSITIVE_INFINITY);
-        }
+        if (sort === "earliest") return earliestYear(a) - earliestYear(b);
         if (sort === "patristic") return (a.earliestPatristicYear ?? 9999) - (b.earliestPatristicYear ?? 9999);
-        if (sort === "controversial") {
-          return (b.controversyScore ?? Number.NEGATIVE_INFINITY) - (a.controversyScore ?? Number.NEGATIVE_INFINITY);
-        }
         if (sort === "alphabetical") return a.reference.localeCompare(b.reference);
         return a.biblicalOrder - b.biblicalOrder;
       });

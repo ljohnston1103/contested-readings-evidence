@@ -1,0 +1,1573 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": "oldestandbest-kjv-forward-site-corrections.md",
+  "earliestSupport": [
+    {
+      "slug": "matthew-1-25",
+      "reference": "Matthew 1:25",
+      "statement": "Late fourth century — Basilian corpus. Against Eunomius 4 quotes the longer “firstborn son” form.",
+      "earliestGreek": "Fourth–fifth century — Codices W, C, and D."
+    },
+    {
+      "slug": "matthew-5-22",
+      "reference": "Matthew 5:22",
+      "statement": "Fourth–fifth century — Greek and Old Latin transmission. The phrase “without a cause” is already present in the ancient manuscript and versional streams.",
+      "earliestGreek": "Fourth–fifth century — Sinaiticus correction and Codex D."
+    },
+    {
+      "slug": "matthew-5-44",
+      "reference": "Matthew 5:44",
+      "statement": "Late first–early second century — Didache 1.3, related fuller teaching. This is early Christian evidence for the fuller command, not a manuscript of Matthew.",
+      "earliestGreek": "Fifth century — Codices D and W preserve the fuller Matthean form."
+    },
+    {
+      "slug": "matthew-6-13",
+      "reference": "Matthew 6:13",
+      "statement": "Early second century — Didache 8, related doxology. The Didache places a doxology after the Lord’s Prayer; its form is shorter than the complete KJV wording. Complete Matthean form: c. AD 400 — John Chrysostom.",
+      "earliestGreek": "Fifth century — Codex W."
+    },
+    {
+      "slug": "matthew-17-21",
+      "reference": "Matthew 17:21",
+      "statement": "c. AD 100–200 — Pseudo-Clement. The fasting-and-prayer wording was known in early Christian literature.",
+      "earliestGreek": "Fifth century — Codices C, D, and W."
+    },
+    {
+      "slug": "matthew-18-11",
+      "reference": "Matthew 18:11",
+      "statement": "c. AD 390–407 — John Chrysostom. His use shows the verse in late-fourth-century Greek ecclesiastical transmission.",
+      "earliestGreek": "Fifth century — Codex D."
+    },
+    {
+      "slug": "matthew-19-16-17",
+      "reference": "Matthew 19:16–17",
+      "statement": "Mid-second century — Justin Martyr, traditional core in a mixed form. Justin knows the traditional question, although his complete wording is not identical to the KJV.",
+      "earliestGreek": "Fifth century — Codices C and W."
+    },
+    {
+      "slug": "matthew-23-14",
+      "reference": "Matthew 23:14",
+      "statement": "AD 310–367 — Hilary of Poitiers. Hilary’s use establishes fourth-century circulation of the verse.",
+      "earliestGreek": "Fifth century — Codex W."
+    },
+    {
+      "slug": "matthew-27-35",
+      "reference": "Matthew 27:35",
+      "statement": "Early fourth century — Eusebius of Caesarea. Eusebius attests the fulfillment clause before the medieval period.",
+      "earliestGreek": "Fifth century — Codex D."
+    },
+    {
+      "slug": "mark-1-2",
+      "reference": "Mark 1:2",
+      "statement": "Fifth century — Codices A and W. These are the earliest identified Greek witnesses for “in the prophets.”",
+      "earliestGreek": "Fifth century — Codices A and W."
+    },
+    {
+      "slug": "mark-7-16",
+      "reference": "Mark 7:16",
+      "statement": "c. AD 350 — Gothic version. The verse was already present in a fourth-century translation.",
+      "earliestGreek": "Fifth century — Codices A, D, and W."
+    },
+    {
+      "slug": "mark-9-29",
+      "reference": "Mark 9:29",
+      "statement": "Third century — Papyrus 45, apparent reading. P45vid supports “prayer and fasting”; retain the vid qualification.",
+      "earliestGreek": "Third century — P45vid."
+    },
+    {
+      "slug": "mark-9-44-46",
+      "reference": "Mark 9:44, 46",
+      "statement": "c. AD 350 — Gothic version. Both verses were present in a fourth-century translation.",
+      "earliestGreek": "Fifth century — Codices A and D."
+    },
+    {
+      "slug": "mark-10-24",
+      "reference": "Mark 10:24",
+      "statement": "Late second century — Clement of Alexandria. Clement explicitly knows the longer “trust in riches” reading.",
+      "earliestGreek": "Fifth century — Codices A, C, and D."
+    },
+    {
+      "slug": "mark-11-26",
+      "reference": "Mark 11:26",
+      "statement": "c. AD 250 — Cyprian. Cyprian cites Mark’s forgiveness saying.",
+      "earliestGreek": "Fifth century — Codices A, C, and D."
+    },
+    {
+      "slug": "mark-15-28",
+      "reference": "Mark 15:28",
+      "statement": "Fourth century — Eusebius of Caesarea. Eusebius appears to know the prophecy-fulfillment verse. Additional versional support: c. AD 350 — Gothic.",
+      "earliestGreek": "Sixth century — Codex P."
+    },
+    {
+      "slug": "mark-16-9-20",
+      "reference": "Mark 16:9–20",
+      "statement": "Before AD 150 — Epistula Apostolorum, related awareness of the longer ending. Exact citation: c. AD 180 — Irenaeus quotes Mark 16:19 by name.",
+      "earliestGreek": "Fifth century — Codices A, C, D, and W."
+    },
+    {
+      "slug": "luke-2-14",
+      "reference": "Luke 2:14",
+      "statement": "Fourth–fifth century — ancient Greek witnesses and correctors. The nominative εὐδοκία behind the KJV was already circulating in the great uncial period.",
+      "earliestGreek": "Fourth–fifth century — Sinaiticus and Vaticanus correctors, followed by C and other witnesses."
+    },
+    {
+      "slug": "luke-2-33",
+      "reference": "Luke 2:33",
+      "statement": "Fourth–fifth century — Old Latin and Greek transmission. “Joseph and his mother” is present in the ancient versional stream and Codex A.",
+      "earliestGreek": "Fifth century — Codex A."
+    },
+    {
+      "slug": "luke-4-4",
+      "reference": "Luke 4:4",
+      "statement": "Fourth–fifth century — Latin and Greek transmission. The completed quotation “by every word of God” is present in ancient versions and major Greek witnesses.",
+      "earliestGreek": "Fifth century — Codices A and D."
+    },
+    {
+      "slug": "luke-9-55-56",
+      "reference": "Luke 9:55–56",
+      "statement": "Fourth century onward — Latin transmission. The fuller rebuke and purpose saying circulated in the ancient Latin stream.",
+      "earliestGreek": "Fifth century — Codex D."
+    },
+    {
+      "slug": "luke-11-2-4",
+      "reference": "Luke 11:2–4",
+      "statement": "Fourth–fifth century — Old Latin and Greek transmission. The fuller clauses are ancient, although individual witnesses vary by clause.",
+      "earliestGreek": "Fifth century — Codices A, C, D, and W support parts of the fuller form."
+    },
+    {
+      "slug": "luke-22-43-44",
+      "reference": "Luke 22:43–44",
+      "statement": "c. AD 150 — Justin Martyr, related agony tradition. Earliest surviving Greek text: late third–early fourth century — Uncial 0171.",
+      "earliestGreek": "Late third–early fourth century — Uncial 0171."
+    },
+    {
+      "slug": "luke-23-17",
+      "reference": "Luke 23:17",
+      "statement": "c. AD 340–360 — Codex Sinaiticus. The verse is present in one of the earliest complete Greek New Testament manuscripts.",
+      "earliestGreek": "c. AD 340–360 — Codex Sinaiticus."
+    },
+    {
+      "slug": "luke-23-34",
+      "reference": "Luke 23:34",
+      "statement": "c. AD 170s — Hegesippus, related forgiveness prayer. Exact Greek saying: c. AD 340–360 — Codex Sinaiticus.",
+      "earliestGreek": "c. AD 340–360 — Codex Sinaiticus."
+    },
+    {
+      "slug": "luke-24-6",
+      "reference": "Luke 24:6",
+      "statement": "Early third century — Papyrus 75. P75 contains “He is not here, but is risen.”",
+      "earliestGreek": "Early third century — P75."
+    },
+    {
+      "slug": "luke-24-40",
+      "reference": "Luke 24:40",
+      "statement": "c. AD 175–225 — Papyrus 75. P75 contains the verse.",
+      "earliestGreek": "c. AD 175–225 — P75."
+    },
+    {
+      "slug": "luke-24-51",
+      "reference": "Luke 24:51",
+      "statement": "c. AD 175–225 — Papyrus 75. P75 contains the ascension phrase.",
+      "earliestGreek": "c. AD 175–225 — P75."
+    },
+    {
+      "slug": "luke-24-52",
+      "reference": "Luke 24:52",
+      "statement": "c. AD 175–225 — Papyrus 75. P75 contains “and they worshipped him.”",
+      "earliestGreek": "c. AD 175–225 — P75."
+    },
+    {
+      "slug": "john-1-18",
+      "reference": "John 1:18",
+      "statement": "c. AD 190–200 — Hippolytus. Hippolytus quotes John 1:18 with “only-begotten Son.”",
+      "earliestGreek": "Fifth century — Codex A."
+    },
+    {
+      "slug": "john-3-13",
+      "reference": "John 3:13",
+      "statement": "Early third century — Hippolytus. Hippolytus knows the longer “which is in heaven” form; Novatian supplies additional mid-third-century support.",
+      "earliestGreek": "Fifth century — Codex A, with a correction detail preserved in the evidence row."
+    },
+    {
+      "slug": "john-5-3b-4",
+      "reference": "John 5:3b–4",
+      "statement": "c. AD 200 — Tertullian, related account of angelic activity and healing water. The complete verse is later explicit in the manuscript tradition.",
+      "earliestGreek": "Fifth century or later correction — Codex A²."
+    },
+    {
+      "slug": "john-6-47",
+      "reference": "John 6:47",
+      "statement": "Fourth century — Old Latin and Coptic transmission. “Believeth on me” was present in ancient versional evidence.",
+      "earliestGreek": "Fifth century — Codices A and D."
+    },
+    {
+      "slug": "john-7-53-8-11",
+      "reference": "John 7:53–8:11",
+      "statement": "c. AD 110–140 — Papias, related story of a woman accused before the Lord. This is evidence for an early story tradition, not proof of its location in John. Johannine manuscript form: fifth century — Codex D.",
+      "earliestGreek": "Fifth century — Codex D."
+    },
+    {
+      "slug": "acts-8-37",
+      "reference": "Acts 8:37",
+      "statement": "c. AD 180 — Irenaeus. Irenaeus witnesses to the eunuch’s confession centuries before the printed Textus Receptus.",
+      "earliestGreek": "c. AD 550–650 — Codex Laudianus (E), in a variant form."
+    },
+    {
+      "slug": "acts-9-5-6",
+      "reference": "Acts 9:5–6",
+      "statement": "Fourth century — Old Latin and patristic constituent wording. Parts of the fuller KJV wording circulated in Latin and patristic transmission. Complete received Greek form: AD 1516 onward.",
+      "earliestGreek": "No known continuous Greek manuscript contains the complete KJV wording; minuscule 629, thirteenth–fourteenth century, contains a partial related form."
+    },
+    {
+      "slug": "acts-20-28",
+      "reference": "Acts 20:28",
+      "statement": "Early second century — Ignatius, related phrase “blood of God.” This is theological and verbal support, not an Acts quotation. Exact Greek “Church of God”: fourth century — Codices Sinaiticus and Vaticanus.",
+      "earliestGreek": "Fourth century — Codices Sinaiticus and Vaticanus."
+    },
+    {
+      "slug": "acts-28-29",
+      "reference": "Acts 28:29",
+      "statement": "Sixth century — Byzantine Greek transmission. The verse is represented in the Greek tradition by the early medieval period. Versional support: AD 616 — Syriac Harklean plus reading.",
+      "earliestGreek": "Sixth century onward — Byzantine Greek manuscripts."
+    },
+    {
+      "slug": "romans-8-1",
+      "reference": "Romans 8:1",
+      "statement": "Sixth century onward — Byzantine Greek transmission. The complete final clause is present in the Greek tradition by the early medieval period.",
+      "earliestGreek": "Sixth century onward — Byzantine witnesses; the Claromontanus correction must retain its later-correction qualification."
+    },
+    {
+      "slug": "romans-14-10",
+      "reference": "Romans 14:10",
+      "statement": "Early–mid second century — Polycarp, related phrase “judgment seat of Christ.” The source verse is uncertain. Exact Greek “Christ”: fourth–fifth-century correctors and later Byzantine witnesses.",
+      "earliestGreek": "Fourth–fifth century — correctors of Sinaiticus and Ephraemi, followed by the Byzantine tradition."
+    },
+    {
+      "slug": "romans-16-24",
+      "reference": "Romans 16:24",
+      "statement": "Fourth century onward — Latin transmission. The benediction was present in the ancient Latin stream.",
+      "earliestGreek": "Sixth century — Codex D."
+    },
+    {
+      "slug": "1-corinthians-15-47",
+      "reference": "1 Corinthians 15:47",
+      "statement": "Early third century — Tertullian, mixed long and short forms. His works show that “the Lord” form was already known.",
+      "earliestGreek": "Fifth century — Codex A and later correctors."
+    },
+    {
+      "slug": "ephesians-3-9",
+      "reference": "Ephesians 3:9",
+      "statement": "“By Jesus Christ”: late fourth century — Chrysostom, mixed exposition; sixth century or later — Greek correction D²; AD 616 — Syriac Harklean. “Fellowship”: twelfth century — minuscule 2817; early printed period — Textus Receptus. The two units must never share one date or support statement.",
+      "earliestGreek": "Unit 1, “fellowship”: twelfth century — 2817. Unit 2, “by Jesus Christ”: sixth century or later — D², retaining the correction qualification."
+    },
+    {
+      "slug": "colossians-1-14",
+      "reference": "Colossians 1:14",
+      "statement": "AD 616 — Syriac Harklean. “Through his blood” is present in this early medieval Syriac witness.",
+      "earliestGreek": "Thirteenth century — minuscule 614."
+    },
+    {
+      "slug": "1-timothy-3-16",
+      "reference": "1 Timothy 3:16",
+      "statement": "Sixth century onward — Byzantine Greek transmission. “God was manifest” is present in the Greek tradition by the early medieval period; the Claromontanus support is a correction and remains labeled as such.",
+      "earliestGreek": "Sixth century onward — Byzantine witnesses; Dᶜ is displayed with its correction qualification."
+    },
+    {
+      "slug": "1-john-4-3",
+      "reference": "1 John 4:3",
+      "statement": "Early–mid second century — Polycarp, related fuller Johannine confession. Fuller Greek family: fourth century — Codex Sinaiticus. Exact KJV-family wording: ninth century onward — Codex K and the Byzantine tradition.",
+      "earliestGreek": "Fourth century for a related fuller form — Sinaiticus; ninth century for the exact KJV-family form — K."
+    },
+    {
+      "slug": "1-john-5-7",
+      "reference": "1 John 5:7",
+      "statement": "c. AD 210 — Tertullian, related three-one language. c. AD 250 — Cyprian, debated verbal relationship. Earliest explicit full Latin heavenly-witness formula listed on the site: c. AD 380 — Priscillian. Earliest Latin biblical-text witness listed on the site: fifth century — Codex Speculum.",
+      "earliestGreek": "AD 1362–1363 — minuscule 629, earliest dated Greek main-text witness listed on the site."
+    },
+    {
+      "slug": "revelation-1-8",
+      "reference": "Revelation 1:8",
+      "statement": "Fourth century — Codex Sinaiticus first hand. Sinaiticus includes “the beginning and the ending”; the separate “saith the Lord” unit rests on versional and received-text evidence.",
+      "earliestGreek": "Fourth century — Codex Sinaiticus first hand, for “the beginning and the ending.”"
+    },
+    {
+      "slug": "revelation-1-11",
+      "reference": "Revelation 1:11",
+      "statement": "Twelfth century — minuscule 2814. It contains the exact Alpha-and-Omega expansion later received into the Textus Receptus.",
+      "earliestGreek": "Twelfth century — 2814."
+    },
+    {
+      "slug": "revelation-16-5",
+      "reference": "Revelation 16:5",
+      "statement": "Eighth century — Beatus of Liébana, related Latin future-tense form. This is commentary evidence, not a Greek manuscript. Exact printed Greek form: AD 1582 — Beza’s third edition.",
+      "earliestGreek": "No surviving Greek manuscript is presently identified for “and shall be.” The earliest exact Greek evidence is the printed Beza text of AD 1582, not a manuscript."
+    },
+    {
+      "slug": "revelation-22-19",
+      "reference": "Revelation 22:19",
+      "statement": "Late fourth century — Ambrose and Bachiarius, Latin “book of life” evidence. Exact printed Greek form: AD 1516 — Erasmus. Related Greek βιβλίου form: c. AD 1520 — minuscule 61.",
+      "earliestGreek": "No surviving Greek manuscript is identified for exact TR βίβλου. Related βιβλίου appears in minuscule 61, c. AD 1520, and the corrector of 2067."
+    }
+  ],
+  "references": [
+    {
+      "slug": "matthew-1-25",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 1, Matthew. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 1, Matthew",
+              "url": "https://www.willker.de/wie/TCG/TC-Matthew.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Pseudo-Basil. Against Eunomius, Book 4, note on Colossians 1:15. In Nicene and Post-Nicene Fathers, Second Series, vol. 8.",
+          "links": [
+            {
+              "label": "Against Eunomius, Book 4, note on Colossians 1:15",
+              "url": "https://ccel.org/ccel/schaff/npnf208.all.html"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "matthew-5-22",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 1, Matthew. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 1, Matthew",
+              "url": "https://www.willker.de/wie/TCG/TC-Matthew.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Justin Martyr. The First Apology, §16. In Ante-Nicene Fathers, vol. 1.",
+          "links": [
+            {
+              "label": "The First Apology, §16",
+              "url": "https://www.newadvent.org/fathers/0126.htm"
+            }
+          ]
+        },
+        {
+          "citation": "Mattison, William C., III. “Jesus’ Prohibition of Anger (Mt 5:22): The Person/Sin Distinction from Augustine to Aquinas”. Theological Studies 68 (2007): 839–864.",
+          "links": [
+            {
+              "label": "“Jesus’ Prohibition of Anger (Mt 5:22): The Person/Sin Distinction from Augustine to Aquinas”",
+              "url": "https://theologicalstudies.net/wp-content/uploads/2022/08/68.4.5.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "matthew-5-44",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 1, Matthew. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 1, Matthew",
+              "url": "https://www.willker.de/wie/TCG/TC-Matthew.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "The Didache, §1.3. In Ante-Nicene Fathers, vol. 7.",
+          "links": [
+            {
+              "label": "The Didache, §1.3",
+              "url": "https://www.newadvent.org/fathers/0714.htm"
+            }
+          ]
+        },
+        {
+          "citation": "Justin Martyr. The First Apology, §15. In Ante-Nicene Fathers, vol. 1.",
+          "links": [
+            {
+              "label": "The First Apology, §15",
+              "url": "https://www.newadvent.org/fathers/0126.htm"
+            }
+          ]
+        },
+        {
+          "citation": "Athenagoras. A Plea for the Christians, §11. In Ante-Nicene Fathers, vol. 2.",
+          "links": [
+            {
+              "label": "A Plea for the Christians, §11",
+              "url": "https://www.newadvent.org/fathers/0205.htm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "matthew-19-16-17",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 1, Matthew. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 1, Matthew",
+              "url": "https://www.willker.de/wie/TCG/TC-Matthew.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Justin Martyr. The First Apology, §16. In Ante-Nicene Fathers, vol. 1.",
+          "links": [
+            {
+              "label": "The First Apology, §16",
+              "url": "https://www.newadvent.org/fathers/0126.htm"
+            }
+          ]
+        },
+        {
+          "citation": "Justin Martyr. Dialogue with Trypho, §101. In Ante-Nicene Fathers, vol. 1.",
+          "links": [
+            {
+              "label": "Dialogue with Trypho, §101",
+              "url": "https://www.newadvent.org/fathers/01287.htm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "matthew-27-35",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 1, Matthew. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 1, Matthew",
+              "url": "https://www.willker.de/wie/TCG/TC-Matthew.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Eusebius of Caesarea. Demonstration of the Gospel, Book 10, §8.",
+          "links": []
+        }
+      ]
+    },
+    {
+      "slug": "mark-1-2",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 2, Mark. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 2, Mark",
+              "url": "https://www.willker.de/wie/TCG/TC-Mark.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "mark-10-24",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 2, Mark. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 2, Mark",
+              "url": "https://www.willker.de/wie/TCG/TC-Mark.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Clement of Alexandria. Who Is the Rich Man That Shall Be Saved?, §4. In Ante-Nicene Fathers, vol. 2.",
+          "links": [
+            {
+              "label": "Who Is the Rich Man That Shall Be Saved?, §4",
+              "url": "https://www.newadvent.org/fathers/0207.htm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "luke-2-14",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 3, Luke. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 3, Luke",
+              "url": "https://www.willker.de/wie/TCG/TC-Luke.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "luke-2-33",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 3, Luke. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 3, Luke",
+              "url": "https://www.willker.de/wie/TCG/TC-Luke.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "luke-4-4",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 3, Luke. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 3, Luke",
+              "url": "https://www.willker.de/wie/TCG/TC-Luke.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "luke-24-6",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 3, Luke. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 3, Luke",
+              "url": "https://www.willker.de/wie/TCG/TC-Luke.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "john-3-13",
+      "entries": [
+        {
+          "citation": "Willker, Wieland. A Textual Commentary on the Greek Gospels. Vol. 4, John. 12th ed. Bremen, 2015.",
+          "links": [
+            {
+              "label": "A Textual Commentary on the Greek Gospels. Vol. 4, John",
+              "url": "https://www.willker.de/wie/TCG/TC-John.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Hippolytus of Rome. Against Noetus, §4. In Ante-Nicene Fathers, vol. 5.",
+          "links": [
+            {
+              "label": "Against Noetus, §4",
+              "url": "https://www.newadvent.org/fathers/0521.htm"
+            }
+          ]
+        },
+        {
+          "citation": "Novatian. On the Trinity, §13. In Ante-Nicene Fathers, vol. 5.",
+          "links": [
+            {
+              "label": "On the Trinity, §13",
+              "url": "https://www.newadvent.org/fathers/0511.htm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "acts-20-28",
+      "entries": [
+        {
+          "citation": "Aland, Barbara, et al., eds. Novum Testamentum Graece. 28th rev. ed. Stuttgart: Deutsche Bibelgesellschaft, 2012.",
+          "links": []
+        },
+        {
+          "citation": "Aland, Barbara, et al., eds. The Greek New Testament. 5th rev. ed. Stuttgart: Deutsche Bibelgesellschaft, 2014.",
+          "links": []
+        },
+        {
+          "citation": "Irenaeus. Against Heresies, Book 3, §14.2. In Ante-Nicene Fathers, vol. 1.",
+          "links": [
+            {
+              "label": "Against Heresies, Book 3, §14.2",
+              "url": "https://www.newadvent.org/fathers/0103314.htm"
+            }
+          ]
+        },
+        {
+          "citation": "Ignatius of Antioch. Epistle to the Ephesians, §1. In Ante-Nicene Fathers, vol. 1.",
+          "links": [
+            {
+              "label": "Epistle to the Ephesians, §1",
+              "url": "https://www.andrews.edu/~toews/classes/sources/early/Ignatius%20Ephesians.htm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "romans-14-10",
+      "entries": [
+        {
+          "citation": "Aland, Barbara, et al., eds. Novum Testamentum Graece. 28th rev. ed. Stuttgart: Deutsche Bibelgesellschaft, 2012.",
+          "links": []
+        },
+        {
+          "citation": "Aland, Barbara, et al., eds. The Greek New Testament. 5th rev. ed. Stuttgart: Deutsche Bibelgesellschaft, 2014.",
+          "links": []
+        },
+        {
+          "citation": "Polycarp of Smyrna. Epistle to the Philippians, §6.2. In Ante-Nicene Fathers, vol. 1.",
+          "links": [
+            {
+              "label": "Epistle to the Philippians, §6.2",
+              "url": "https://en.wikisource.org/wiki/Ante-Nicene_Christian_Library/Epistle_of_Polycarp_to_the_Philippians"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "1-corinthians-15-47",
+      "entries": [
+        {
+          "citation": "Aland, Barbara, et al., eds. Novum Testamentum Graece. 28th rev. ed. Stuttgart: Deutsche Bibelgesellschaft, 2012.",
+          "links": []
+        },
+        {
+          "citation": "Aland, Barbara, et al., eds. The Greek New Testament. 5th rev. ed. Stuttgart: Deutsche Bibelgesellschaft, 2014.",
+          "links": []
+        },
+        {
+          "citation": "Estes, Joel D. “Reading for the Spirit of the Text: nomina sacra and πνεῦμα Language in P46”. New Testament Studies 61, no. 4 (2015): 566–594.",
+          "links": [
+            {
+              "label": "“Reading for the Spirit of the Text: nomina sacra and πνεῦμα Language in P46”",
+              "url": "https://doi.org/10.1017/S0028688515000259"
+            }
+          ]
+        },
+        {
+          "citation": "Tertullian. On the Flesh of Christ, §8; Against Marcion, Book 5, §10; and On the Resurrection of the Flesh, §49. In Ante-Nicene Fathers, vol. 3.",
+          "links": [
+            {
+              "label": "On the Flesh of Christ, §8",
+              "url": "https://www.newadvent.org/fathers/0315.htm"
+            },
+            {
+              "label": "Against Marcion, Book 5, §10",
+              "url": "https://www.newadvent.org/fathers/03125.htm"
+            },
+            {
+              "label": "On the Resurrection of the Flesh, §49",
+              "url": "https://www.newadvent.org/fathers/0316.htm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "ephesians-3-9",
+      "entries": [
+        {
+          "citation": "Aland, Barbara, et al., eds. Novum Testamentum Graece. 28th rev. ed. Stuttgart: Deutsche Bibelgesellschaft, 2012.",
+          "links": []
+        },
+        {
+          "citation": "Aland, Barbara, et al., eds. The Greek New Testament. 5th rev. ed. Stuttgart: Deutsche Bibelgesellschaft, 2014.",
+          "links": []
+        },
+        {
+          "citation": "Robinson, Maurice A., and William G. Pierpont. The New Testament in the Original Greek: Byzantine Textform 2018. Nürnberg: VTR Publications, 2018.",
+          "links": [
+            {
+              "label": "The New Testament in the Original Greek: Byzantine Textform 2018",
+              "url": "https://byzantinetext.com/wp-content/uploads/2021/03/robinson-pierpont-2018-gnt-edition.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "John Chrysostom. Homilies on Ephesians, Homily 7. In Nicene and Post-Nicene Fathers, First Series, vol. 13.",
+          "links": [
+            {
+              "label": "Homilies on Ephesians, Homily 7",
+              "url": "https://www.newadvent.org/fathers/230107.htm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "1-john-4-3",
+      "entries": [
+        {
+          "citation": "Aland, Barbara, et al., eds. Novum Testamentum Graece. 28th rev. ed. Stuttgart: Deutsche Bibelgesellschaft, 2012.",
+          "links": []
+        },
+        {
+          "citation": "Houghton, H. A. G. “The Text of the Gospel and Letters of John”. In The Oxford Handbook of Johannine Studies, edited by Judith M. Lieu and Martinus C. de Boer, 5–22. Oxford: Oxford University Press, 2018.",
+          "links": [
+            {
+              "label": "“The Text of the Gospel and Letters of John”",
+              "url": "https://pure-oai.bham.ac.uk/ws/files/29525014/Houghton_OHJS_preprint.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Polycarp of Smyrna. Epistle to the Philippians, §7.1. In Ante-Nicene Fathers, vol. 1.",
+          "links": [
+            {
+              "label": "Epistle to the Philippians, §7.1",
+              "url": "https://en.wikisource.org/wiki/Ante-Nicene_Christian_Library/Epistle_of_Polycarp_to_the_Philippians"
+            }
+          ]
+        },
+        {
+          "citation": "Irenaeus. Against Heresies, Book 3, §16.8. In Ante-Nicene Fathers, vol. 1.",
+          "links": [
+            {
+              "label": "Against Heresies, Book 3, §16.8",
+              "url": "https://www.newadvent.org/fathers/0103316.htm"
+            }
+          ]
+        },
+        {
+          "citation": "Socrates Scholasticus. Ecclesiastical History, Book 7, §32. In Nicene and Post-Nicene Fathers, Second Series, vol. 2.",
+          "links": [
+            {
+              "label": "Ecclesiastical History, Book 7, §32",
+              "url": "https://www.newadvent.org/fathers/26017.htm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "revelation-1-8",
+      "entries": [
+        {
+          "citation": "Palmer, David Robert. The Revelation of John: The Ancient Greek Text, Alternating Verse by Verse with a New English Translation from the Greek. 2026 ed.",
+          "links": [
+            {
+              "label": "The Revelation of John: The Ancient Greek Text, Alternating Verse by Verse with a New English Translation from the Greek",
+              "url": "https://www.bibletranslation.ws/trans/revwgrk.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Hoskier, Herman C. Concerning the Text of the Apocalypse: Collations of All Existing Available Greek Documents with the Standard Text of Stephen’s Third Edition, Together with the Testimony of Versions, Commentaries and Fathers. 2 vols. London: Bernard Quaritch, 1929.",
+          "links": [
+            {
+              "label": "Concerning the Text of the Apocalypse: Collations of All Existing Available Greek Documents with the Standard Text of Stephen’s Third Edition, Together with the Testimony of Versions, Commentaries and Fathers",
+              "url": "https://archive.org/details/Hoskier-ConcerningTheTextOfTheApokalypse"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "revelation-1-11",
+      "entries": [
+        {
+          "citation": "Palmer, David Robert. The Revelation of John: The Ancient Greek Text, Alternating Verse by Verse with a New English Translation from the Greek. 2026 ed.",
+          "links": [
+            {
+              "label": "The Revelation of John: The Ancient Greek Text, Alternating Verse by Verse with a New English Translation from the Greek",
+              "url": "https://www.bibletranslation.ws/trans/revwgrk.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Hoskier, Herman C. Concerning the Text of the Apocalypse: Collations of All Existing Available Greek Documents with the Standard Text of Stephen’s Third Edition, Together with the Testimony of Versions, Commentaries and Fathers. 2 vols. London: Bernard Quaritch, 1929.",
+          "links": [
+            {
+              "label": "Concerning the Text of the Apocalypse: Collations of All Existing Available Greek Documents with the Standard Text of Stephen’s Third Edition, Together with the Testimony of Versions, Commentaries and Fathers",
+              "url": "https://archive.org/details/Hoskier-ConcerningTheTextOfTheApokalypse"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "revelation-16-5",
+      "entries": [
+        {
+          "citation": "Palmer, David Robert. The Revelation of John: The Ancient Greek Text, Alternating Verse by Verse with a New English Translation from the Greek. 2026 ed.",
+          "links": [
+            {
+              "label": "The Revelation of John: The Ancient Greek Text, Alternating Verse by Verse with a New English Translation from the Greek",
+              "url": "https://www.bibletranslation.ws/trans/revwgrk.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Hoskier, Herman C. Concerning the Text of the Apocalypse: Collations of All Existing Available Greek Documents with the Standard Text of Stephen’s Third Edition, Together with the Testimony of Versions, Commentaries and Fathers. 2 vols. London: Bernard Quaritch, 1929.",
+          "links": [
+            {
+              "label": "Concerning the Text of the Apocalypse: Collations of All Existing Available Greek Documents with the Standard Text of Stephen’s Third Edition, Together with the Testimony of Versions, Commentaries and Fathers",
+              "url": "https://archive.org/details/Hoskier-ConcerningTheTextOfTheApokalypse"
+            }
+          ]
+        },
+        {
+          "citation": "Krans, Jan. Beyond What Is Written: Erasmus and Beza as Conjectural Critics of the New Testament. New Testament Tools, Studies and Documents 35. Leiden: Brill, 2006.",
+          "links": [
+            {
+              "label": "Beyond What Is Written: Erasmus and Beza as Conjectural Critics of the New Testament",
+              "url": "https://books.google.com/books?id=zy2hDwAAQBAJ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "revelation-22-19",
+      "entries": [
+        {
+          "citation": "Palmer, David Robert. The Revelation of John: The Ancient Greek Text, Alternating Verse by Verse with a New English Translation from the Greek. 2026 ed.",
+          "links": [
+            {
+              "label": "The Revelation of John: The Ancient Greek Text, Alternating Verse by Verse with a New English Translation from the Greek",
+              "url": "https://www.bibletranslation.ws/trans/revwgrk.pdf"
+            }
+          ]
+        },
+        {
+          "citation": "Hoskier, Herman C. Concerning the Text of the Apocalypse: Collations of All Existing Available Greek Documents with the Standard Text of Stephen’s Third Edition, Together with the Testimony of Versions, Commentaries and Fathers. 2 vols. London: Bernard Quaritch, 1929.",
+          "links": [
+            {
+              "label": "Concerning the Text of the Apocalypse: Collations of All Existing Available Greek Documents with the Standard Text of Stephen’s Third Edition, Together with the Testimony of Versions, Commentaries and Fathers",
+              "url": "https://archive.org/details/Hoskier-ConcerningTheTextOfTheApokalypse"
+            }
+          ]
+        },
+        {
+          "citation": "Krans, Jan. “Erasmus and the Text of Revelation 22:19: A Critique of Thomas Holland’s Crowned with Glory”. TC: A Journal of Textual Criticism 16 (2011).",
+          "links": [
+            {
+              "label": "“Erasmus and the Text of Revelation 22:19: A Critique of Thomas Holland’s Crowned with Glory”",
+              "url": "https://research.vu.nl/ws/portalfiles/portal/2424542/218636.pdf"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "wave2Copy": [
+    {
+      "slug": "matthew-1-25",
+      "reference": "Matthew 1:25",
+      "title": "Her Firstborn Son",
+      "whyRetained": "The KJV preserves the longer reading, “her firstborn son,” found throughout the Byzantine tradition and supported by important Greek witnesses, the Old Latin and Vulgate traditions, the Syriac Peshitta and Harklean versions, and a fourth-century quotation in the Basilian corpus. This combination shows that the wording is both ancient and widely transmitted, not a late English or printed-text addition.",
+      "editorialConclusion": "The KJV reading has broad Greek, Latin, Syriac, and patristic support. Although several important early witnesses preserve the shorter wording, the longer form was already known in the fourth century and became the dominant ecclesiastical reading. Oldest & Best favors retaining “her firstborn son” as the ancient and broadly received form of Matthew 1:25.",
+      "primarySupport": "Broad Byzantine Greek support with ancient Latin, Syriac, and fourth-century patristic attestation",
+      "evidenceNotes": [
+        "The quotation in Against Eunomius 4 establishes fourth-century circulation of the longer wording even though the authorship of that portion of the work is disputed.",
+        "Luke 2:7 independently and securely calls Jesus Mary’s “firstborn,” confirming that the expression belongs to the earliest Gospel tradition.",
+        "The early witnesses divide, but the geographical and ecclesiastical breadth of the longer reading supports its retention in the KJV."
+      ]
+    },
+    {
+      "slug": "matthew-5-22",
+      "reference": "Matthew 5:22",
+      "title": "Without a Cause",
+      "whyRetained": "The KJV phrase “without a cause” represents the Greek majority reading and is supported by a wide range of Greek manuscripts and ancient versions. The wording was known across multiple branches of transmission and gives the saying its received distinction between causeless anger and morally warranted anger.",
+      "editorialConclusion": "The omission is ancient and must remain represented in the evidence, but the KJV phrase has the broader Greek manuscript tradition and extensive versional reception behind it. Oldest & Best favors retaining “without a cause” as the established ecclesiastical reading of Matthew 5:22.",
+      "primarySupport": "Greek majority support with widespread ancient versional and ecclesiastical reception",
+      "evidenceNotes": [
+        "The Vulgate belongs with the shorter form, while other Latin and versional witnesses support the KJV wording.",
+        "The physical manuscript variation concerns one short phrase, but that phrase meaningfully defines the kind of anger being condemned.",
+        "Early Christian citations preserve both forms, confirming that the variation arose long before the printed-text period."
+      ]
+    },
+    {
+      "slug": "matthew-5-44",
+      "reference": "Matthew 5:44",
+      "title": "Bless Them That Curse You",
+      "whyRetained": "The KJV preserves the full four-part command to love, bless, do good, and pray. This fuller form has broad Byzantine Greek support, extensive versional transmission, and close parallels in very early Christian teaching. Its circulation across Greek, Latin, Syriac, and early Christian sources shows that it is an ancient ecclesiastical form of the saying.",
+      "editorialConclusion": "The shorter form has important early witnesses, yet the KJV wording is broadly transmitted and preserves the complete command also reflected in Luke 6:27–28. Oldest & Best favors the fuller reading as the received and richly attested form of Matthew 5:44.",
+      "primarySupport": "Broad Byzantine, versional, and early Christian support for the fuller command",
+      "evidenceNotes": [
+        "The Didache, Justin, and Athenagoras show the antiquity of the fuller Christian teaching, although their wording is not treated as an exact copy of Matthew.",
+        "Luke 6:27–28 independently preserves the blessing and doing-good language.",
+        "The evidence shows early circulation of both a shorter and a fuller form; the KJV follows the form that became dominant in the church’s manuscript tradition."
+      ]
+    },
+    {
+      "slug": "matthew-19-16-17",
+      "reference": "Matthew 19:16–17",
+      "title": "Why Callest Thou Me Good?",
+      "whyRetained": "The KJV wording is the Byzantine majority form and is supported by significant versional and patristic evidence. It also agrees closely with the undisputed parallel wording in Mark and Luke, preserving the familiar exchange in which Christ directs attention to the goodness of God.",
+      "editorialConclusion": "Important early Greek witnesses support a distinctively Matthean shorter form, but the KJV wording is ancient, widespread, and firmly embedded in the Synoptic tradition. Oldest & Best favors retaining the received wording of both verses while recording the evidence for each disputed unit separately.",
+      "primarySupport": "Byzantine majority support with substantial Synoptic, versional, and patristic confirmation",
+      "evidenceNotes": [
+        "The disputed wording in verse 16 and the wording in verse 17 are separate textual units and are evaluated separately.",
+        "The KJV form agrees with the secure parallel sayings in Mark 10:17–18 and Luke 18:18–19.",
+        "Early Christian quotations may reflect Matthew, Mark, Luke, or a combined Gospel tradition; they demonstrate antiquity without being counted as identical manuscript votes."
+      ]
+    },
+    {
+      "slug": "matthew-27-35",
+      "reference": "Matthew 27:35",
+      "title": "That It Might Be Fulfilled",
+      "whyRetained": "The KJV’s fulfillment clause has a smaller Greek manuscript base than many traditional readings, but its support is ancient and diverse. It appears in Codex Bezae, Codex Θ, Codex Φ, additional Greek witnesses, Old Latin and Clementine Vulgate transmission, Syriac evidence, and Eusebius. That range demonstrates that the clause circulated long before the Textus Receptus.",
+      "editorialConclusion": "The competing form is supported by most Greek manuscripts, yet the KJV clause has early Greek, Latin, Syriac, and patristic attestation and explicitly connects the crucifixion with Psalm 22:18. Oldest & Best retains the KJV reading as an ancient harmonized fulfillment tradition rather than treating it as a late invention.",
+      "primarySupport": "Ancient and diverse Greek, Latin, Syriac, and patristic attestation",
+      "evidenceNotes": [
+        "Codex Φ, not Codex Δ, is the supporting uncial identified in the controlling apparatus.",
+        "The clause is a minority Greek reading, but manuscript quantity alone does not erase its early and geographically diverse circulation.",
+        "John 19:24 securely preserves the same fulfillment quotation, providing a clear ancient source for the wording found in Matthew’s received text."
+      ]
+    },
+    {
+      "slug": "mark-1-2",
+      "reference": "Mark 1:2",
+      "title": "As It Is Written in the Prophets",
+      "whyRetained": "“As it is written in the prophets” is the Greek majority and Byzantine reading. It accurately introduces a composite citation drawn from Malachi and Isaiah and avoids assigning the entire combined quotation to only one prophet. Its broad Greek transmission and reception in the church support the KJV wording.",
+      "editorialConclusion": "The Isaiah attribution is early and supported by major witnesses and Origen, but the KJV reading is not a late anomaly: it is the majority form and accurately describes the composite prophetic source. Oldest & Best favors “in the prophets” as the received reading of Mark 1:2.",
+      "primarySupport": "Greek majority and Byzantine support for the composite-prophets attribution",
+      "evidenceNotes": [
+        "The citation combines Malachi 3:1 with Isaiah 40:3, so “the prophets” directly describes its two-source form.",
+        "The Isaiah reading is ancient and remains in the competing-witness section.",
+        "GA 2427 is excluded because it is a modern forgery and is not evidence for either ancient reading."
+      ]
+    },
+    {
+      "slug": "mark-10-24",
+      "reference": "Mark 10:24",
+      "title": "Them That Trust in Riches",
+      "whyRetained": "The KJV phrase “for them that trust in riches” has broad Greek support together with Latin, Syriac, and early patristic attestation. It makes explicit the spiritual danger already illustrated by the rich young ruler and preserves the form received across a wide ecclesiastical tradition.",
+      "editorialConclusion": "The shorter form has several important early witnesses, but the KJV wording is supported across Greek, Latin, Syriac, and patristic streams. Oldest & Best favors retaining the fuller reading as an ancient and broadly received explanation of Christ’s warning.",
+      "primarySupport": "Broad Greek, Latin, Syriac, and early patristic support",
+      "evidenceNotes": [
+        "The surrounding verses concern wealth in either textual form; the KJV phrase makes the moral focus explicit.",
+        "Clement supplies early patristic evidence for the fuller wording.",
+        "The shorter reading remains represented by Sinaiticus, Vaticanus, Codex Δ, and other witnesses."
+      ]
+    },
+    {
+      "slug": "luke-2-14",
+      "reference": "Luke 2:14",
+      "title": "Good Will Toward Men",
+      "whyRetained": "The KJV’s nominative reading, “good will toward men,” is the Greek majority form and is supported by a wide Byzantine transmission, important uncials and correctors, and ancient versions. It preserves the church’s familiar proclamation of peace and divine goodwill at Christ’s birth.",
+      "editorialConclusion": "The difference is only one Greek letter in the manuscripts, but both readings are ancient. The KJV form has the broader Greek manuscript tradition and long ecclesiastical reception. Oldest & Best favors “good will toward men” as the received reading of Luke 2:14.",
+      "primarySupport": "Greek majority support with ancient uncial, versional, and ecclesiastical attestation",
+      "evidenceNotes": [
+        "The competing genitive form is ancient and has significant early Greek and Latin support.",
+        "The one-letter physical difference produces a meaningful grammatical and translational difference.",
+        "English renderings of the genitive vary; those translations do not constitute additional Greek readings."
+      ]
+    },
+    {
+      "slug": "luke-2-33",
+      "reference": "Luke 2:33",
+      "title": "Joseph and His Mother",
+      "whyRetained": "“Joseph and his mother” is the Byzantine majority reading and is supported by important Greek, Old Latin, and Syriac witnesses. It preserves Luke’s careful distinction between Joseph and Mary within the infancy narrative while remaining fully consistent with Joseph’s legal and social role as Jesus’ father.",
+      "editorialConclusion": "The phrase “his father and mother” has strong early witnesses, but the KJV form is ancient, broadly transmitted, and especially natural within Luke’s explicit account of the virgin conception. Oldest & Best favors retaining “Joseph and his mother” as the received reading.",
+      "primarySupport": "Byzantine majority support with Greek, Old Latin, and Syriac attestation",
+      "evidenceNotes": [
+        "Luke 1:26–35 explicitly teaches the virgin conception in every mainstream textual form.",
+        "Luke 2:48 uses “thy father” as ordinary family language, so the competing reading does not deny the virgin birth.",
+        "The KJV form’s breadth in the Byzantine and versional traditions supports its established place in the text."
+      ]
+    },
+    {
+      "slug": "luke-4-4",
+      "reference": "Luke 4:4",
+      "title": "By Every Word of God",
+      "whyRetained": "The complete KJV quotation, “Man shall not live by bread alone, but by every word of God,” has broad Byzantine Greek support and extensive ancient versional attestation. It preserves the full wording of Deuteronomy 8:3 and agrees with the secure parallel in Matthew 4:4.",
+      "editorialConclusion": "The shorter form is early, but the complete saying is ancient, widely transmitted, and textually secure elsewhere in the Gospel tradition. Oldest & Best favors retaining the full KJV quotation in Luke 4:4.",
+      "primarySupport": "Broad Byzantine and versional support confirmed by Deuteronomy 8:3 and Matthew 4:4",
+      "evidenceNotes": [
+        "Matthew 4:4 and Deuteronomy 8:3 securely preserve the complete quotation.",
+        "Early Christian quotations are treated as evidence for Luke only when their source can be identified.",
+        "The shorter reading remains represented by important early Greek, Syriac, and Coptic witnesses."
+      ]
+    },
+    {
+      "slug": "luke-24-6",
+      "reference": "Luke 24:6",
+      "title": "He Is Not Here, but Is Risen",
+      "whyRetained": "The KJV sentence is supported by overwhelming Greek manuscript evidence, including Papyrus 75, Sinaiticus, Alexandrinus, Vaticanus, and the broader Greek tradition. Its omission is principally associated with Codex Bezae and a limited Western versional stream.",
+      "editorialConclusion": "This is one of the strongest KJV readings in the new group. The sentence is early, geographically broad, and overwhelmingly attested in Greek. Oldest & Best firmly retains “He is not here, but is risen” in Luke 24:6.",
+      "primarySupport": "Overwhelming Greek support, including major early witnesses",
+      "evidenceNotes": [
+        "The omission is ancient but exceptionally narrow in surviving Greek evidence.",
+        "Current critical Greek editions and mainstream translations also retain the sentence.",
+        "The KJV reading is supported by both early manuscript quality and the breadth of the Greek tradition."
+      ]
+    },
+    {
+      "slug": "john-3-13",
+      "reference": "John 3:13",
+      "title": "Which Is in Heaven",
+      "whyRetained": "“Which is in heaven” is the Greek majority reading and has significant ancient support from Greek manuscripts, versions, and early fathers including Hippolytus and Novatian. These witnesses demonstrate that the phrase circulated centuries before the Textus Receptus and belongs to an ancient interpretive and textual tradition.",
+      "editorialConclusion": "The earliest surviving papyri preserve the shorter form, but the KJV phrase has majority Greek support and unusually early patristic attestation. Oldest & Best favors retaining “which is in heaven” as an ancient and theologically characteristic Johannine reading.",
+      "primarySupport": "Greek majority support with early patristic and broad versional attestation",
+      "evidenceNotes": [
+        "Early patristic quotations prove early circulation of the phrase even though they are not surviving second- or third-century Gospel manuscripts.",
+        "John repeatedly presents the Son as coming from and belonging to heaven.",
+        "The competing shorter form has strong early Greek support and remains fully documented in its own section."
+      ]
+    },
+    {
+      "slug": "acts-20-28",
+      "reference": "Acts 20:28",
+      "title": "The Church of God … His Own Blood",
+      "whyRetained": "The KJV’s “church of God” is supported by Sinaiticus, Vaticanus, and a substantial Greek manuscript group. On this principal noun, the KJV agrees with the modern critical text against both the “Lord” reading and the later Byzantine conflation “Lord and God.”",
+      "editorialConclusion": "The evidence is genuinely three-way, but the KJV reading has exceptionally important early Greek support and is also the reading adopted by the principal modern critical editions. Oldest & Best firmly favors “the church of God” in Acts 20:28.",
+      "primarySupport": "Major early Greek support shared by the KJV and the modern critical text",
+      "evidenceNotes": [
+        "The Byzantine majority’s “Lord and God” is a conflated third reading, not the exact KJV form.",
+        "The construction “his own” may be interpreted as referring to God’s own Son, but that interpretation is not a separate manuscript reading.",
+        "Ignatius provides a theological parallel rather than direct evidence for the wording of a copy of Acts."
+      ]
+    },
+    {
+      "slug": "romans-14-10",
+      "reference": "Romans 14:10",
+      "title": "The Judgment Seat of Christ",
+      "whyRetained": "“The judgment seat of Christ” is the Greek majority reading and is supported by important manuscripts, Syriac and Gothic evidence, and early Christian use of the same expression. It also agrees exactly with Paul’s undisputed wording in 2 Corinthians 5:10.",
+      "editorialConclusion": "The “God” reading has strong early continuous-text support, but the KJV form has the broader Greek tradition and direct Pauline confirmation in 2 Corinthians. Oldest & Best favors “the judgment seat of Christ” as the received and characteristically Pauline reading.",
+      "primarySupport": "Greek majority support with Pauline, Syriac, Gothic, and patristic confirmation",
+      "evidenceNotes": [
+        "Polycarp’s wording confirms early Christian use of “judgment seat of Christ,” though it may draw directly from 2 Corinthians 5:10.",
+        "Paul’s judgment-seat language identifies the judgment with Christ elsewhere, so the KJV reading is contextually and theologically natural.",
+        "The early codex group supporting “God” remains listed as the principal competing evidence."
+      ]
+    },
+    {
+      "slug": "1-corinthians-15-47",
+      "reference": "1 Corinthians 15:47",
+      "title": "The Second Man Is the Lord from Heaven",
+      "whyRetained": "The title “the Lord” has broad Byzantine Greek support and early Latin patristic attestation. It makes explicit the identity already developed throughout Paul’s argument: the second man from heaven is Jesus Christ the Lord.",
+      "editorialConclusion": "Important early Greek witnesses preserve a shorter form, while Papyrus 46 has the distinct third reading “the second spiritual man.” The KJV reading nevertheless has broad Greek and ancient Latin support and states Paul’s Christological meaning directly. Oldest & Best favors retaining “the Lord.”",
+      "primarySupport": "Broad Byzantine Greek support with ancient Latin patristic attestation",
+      "evidenceNotes": [
+        "Papyrus 46 is a third reading and is not counted as an ordinary witness for the shorter form.",
+        "Tertullian preserves more than one form and is represented as mixed evidence.",
+        "The surrounding chapter unmistakably identifies the heavenly man with Christ; the variant concerns whether the title “Lord” is explicit at this point."
+      ]
+    },
+    {
+      "slug": "ephesians-3-9",
+      "reference": "Ephesians 3:9",
+      "title": "Fellowship … by Jesus Christ",
+      "whyRetained": "The KJV preserves two distinct readings. “By Jesus Christ” belongs to a broad Byzantine tradition and explicitly identifies Christ’s agency in creation, a truth securely stated elsewhere in the New Testament. “Fellowship” has a much smaller Greek base, but it expresses the shared participation in the mystery already described in Ephesians 3:6 and received in the KJV tradition.",
+      "editorialConclusion": "The two disputed units must be weighed separately. The Christological phrase has strong Byzantine support; “fellowship” rests primarily on the received-text tradition and a narrow Greek line. Oldest & Best retains the complete KJV sentence because it coherently expresses both participation in the mystery and creation through Christ, while accurately distinguishing the evidence for each phrase.",
+      "primarySupport": "Broad Byzantine support for “by Jesus Christ,” with received-text and contextual support for “fellowship”",
+      "evidenceNotes": [
+        "“Fellowship” and “by Jesus Christ” are independent variants and do not share one manuscript-support total.",
+        "The Byzantine majority reads “dispensation” rather than “fellowship,” so the KJV’s first disputed word is defended from received-text and contextual grounds rather than a majority claim.",
+        "John 1:3 and Colossians 1:16 independently and securely affirm creation through Christ.",
+        "Chrysostom uses more than one form within the same homily and is represented as mixed evidence."
+      ]
+    },
+    {
+      "slug": "1-john-4-3",
+      "reference": "1 John 4:3",
+      "title": "Jesus Christ Is Come in the Flesh",
+      "whyRetained": "The KJV’s fuller confession is broadly Byzantine and reflects an exceptionally early Christian formula. Polycarp’s closely related wording shows that an explicit confession of Jesus Christ coming in the flesh was in circulation near the beginning of the second century.",
+      "editorialConclusion": "The shorter form has important early Greek support, and a separate “dissolves Jesus” form survives mainly in patristic and Latin evidence. The KJV wording, however, combines broad Greek transmission with very early Christian use of the same confessional formula. Oldest & Best favors retaining the fuller reading.",
+      "primarySupport": "Broad Byzantine support with very early Christian confessional attestation",
+      "evidenceNotes": [
+        "Sinaiticus belongs to a fuller-reading family rather than the ordinary short form.",
+        "The “dissolves Jesus” reading is ancient in fathers and Latin transmission but appears in surviving Greek manuscript evidence only as a marginal alternative in 1739.",
+        "Polycarp’s wording is a close quotation that may combine 1 John 4:2–3 with 2 John 7.",
+        "The competing short form does not deny the incarnation because verse 2 states it explicitly."
+      ]
+    },
+    {
+      "slug": "revelation-1-8",
+      "reference": "Revelation 1:8",
+      "title": "Alpha and Omega, the Beginning and the Ending",
+      "whyRetained": "The KJV’s title “the beginning and the ending” has genuine Greek manuscript support and belongs unmistakably to Revelation’s own language, appearing securely at Revelation 21:6 and in closely related form at 22:13. The full KJV wording also stands in the historic Textus Receptus and versional tradition.",
+      "editorialConclusion": "The two disputed units have different evidence profiles: the title expansion has a real Greek manuscript base, while the exact “saith the Lord” form rests mainly on versional and received-text history. Oldest & Best retains the complete KJV reading because it preserves Revelation’s characteristic divine titles in the form received by the English church.",
+      "primarySupport": "Genuine Greek support for the title expansion with canonical, versional, and received-text support for the complete form",
+      "evidenceNotes": [
+        "Codex Vaticanus does not contain Revelation and is not a witness at this passage.",
+        "“The beginning and the ending” is a minority Greek reading, but it is genuinely present in the Greek manuscript tradition.",
+        "The “Lord” and “Lord God” variation is a separate unit with a different support profile.",
+        "The same titles are textually secure elsewhere in Revelation."
+      ]
+    },
+    {
+      "slug": "revelation-1-11",
+      "reference": "Revelation 1:11",
+      "title": "I Am Alpha and Omega, the First and the Last",
+      "whyRetained": "The KJV expansion is preserved exactly in two known late Greek witnesses, with related expansions in additional Greek manuscripts. More importantly, every title in the expansion is securely Johannine: “the first and the last” appears in Revelation 1:17 and 2:8, and the Alpha-and-Omega title appears elsewhere in the book.",
+      "editorialConclusion": "The exact KJV wording has a small Greek manuscript base, but the wider family of related expansions and Revelation’s undisputed use of the same titles show that the wording is neither foreign to the book nor doctrinally invented. Oldest & Best retains the KJV form as the received-text expression of titles that are authentically and repeatedly Johannine.",
+      "primarySupport": "Exact and related Greek expansion witnesses supported by Revelation’s undisputed title formulas and the received text",
+      "evidenceNotes": [
+        "Exact KJV support and related expansion forms are listed separately.",
+        "The reading is not presented as the Greek majority form.",
+        "Revelation 1:17, 2:8, and 22:13 securely preserve the same divine titles."
+      ]
+    },
+    {
+      "slug": "revelation-16-5",
+      "reference": "Revelation 16:5",
+      "title": "Which Art, and Wast, and Shalt Be",
+      "whyRetained": "The KJV preserves Revelation’s characteristic threefold divine title: the One who is, who was, and who is to come. That formula is securely established at Revelation 1:4, 1:8, and 4:8. Related future-tense wording is also preserved in the Ethiopic tradition and in Beatus’s Latin commentary, showing that the future element was not unknown outside the later printed Greek text. Beza introduced the Greek form into his 1582 edition, and it became the received reading behind the KJV.",
+      "editorialConclusion": "The surviving Greek manuscripts at Revelation 16:5 read forms of “the Holy One,” so the KJV’s case here does not rest on a currently identified Greek manuscript. It rests on Revelation’s repeated title formula, related versional and commentary evidence, and the historic received text. Oldest & Best retains “and shalt be” as the KJV’s coherent preservation of a distinctively Johannine divine title while stating the manuscript limitation accurately in the competing-evidence section.",
+      "primarySupport": "Canonical Johannine usage, related ancient versional and commentary forms, and historic received-text transmission",
+      "evidenceNotes": [
+        "The future-tense title is textually secure at Revelation 1:4, 1:8, and 4:8.",
+        "Beza’s Greek wording first appeared in his 1582 third edition and was later received into the Textus Receptus tradition.",
+        "Beza referred to an old manuscript, but no presently identifiable Greek witness can be connected to that report.",
+        "Beatus and the Ethiopic tradition are versional or commentary evidence, not surviving Greek manuscripts."
+      ]
+    },
+    {
+      "slug": "revelation-22-19",
+      "reference": "Revelation 22:19",
+      "title": "The Book of Life",
+      "whyRetained": "“Book of life” has substantial historical support outside the dominant surviving Greek line. It is found in important Vulgate witnesses, the Bohairic Coptic and Arabic traditions, and Latin fathers and commentators including Primasius and Ambrose. Two late Greek witnesses preserve the closely related word βιβλίου, demonstrating that a Greek “book” form also entered manuscript transmission. The phrase “book of life” is itself securely biblical and appears elsewhere in Revelation.",
+      "editorialConclusion": "Most surviving Greek manuscripts read “tree of life,” and the exact Textus Receptus form is not presently identified in a Greek manuscript. Nevertheless, “book of life” is ancient in Latin and other versional and patristic transmission and became the received reading behind the KJV. Oldest & Best retains the KJV form as a historically rooted ecclesiastical reading rather than treating it as a meaningless printing accident.",
+      "primarySupport": "Ancient Latin, Coptic, Arabic, patristic, related Greek, and received-text support",
+      "evidenceNotes": [
+        "The Latin words ligno (“tree/wood”) and libro (“book”) are different words, not a one-letter variation.",
+        "Greek manuscripts 61 and the corrected form of 2067 preserve the related word βιβλίου rather than the exact Textus Receptus form βίβλου.",
+        "Manuscript 2814 is missing this passage and is not evidence for either reading at Revelation 22:19.",
+        "Revelation uses both “book of life” and “tree of life” elsewhere, so internal familiarity could influence transmission in either direction."
+      ]
+    }
+  ],
+  "olderCategoryRows": [
+    {
+      "slug": "luke-9-55-56",
+      "supportCategory": "Ancient versional and diverse Greek support for the fuller KJV form"
+    },
+    {
+      "slug": "acts-8-37",
+      "supportCategory": "Ancient patristic and Latin support with a smaller Greek manuscript base"
+    },
+    {
+      "slug": "acts-9-5-6",
+      "supportCategory": "Ancient Latin, patristic, and received-text support for the full KJV wording"
+    },
+    {
+      "slug": "colossians-1-14",
+      "supportCategory": "Ancient versional and limited Greek support for “through his blood”"
+    },
+    {
+      "slug": "1-john-5-7",
+      "supportCategory": "Ancient Latin ecclesiastical reception with Greek, patristic, and received-text support"
+    }
+  ],
+  "olderConclusions": [
+    {
+      "slug": "luke-9-55-56",
+      "editorialConclusion": "The fuller KJV account preserves an ancient form of the passage attested by Codex Bezae, additional Greek witnesses, Old Latin and other versional evidence, and the received ecclesiastical text. The shorter form is early, but the fuller reading is neither a modern invention nor an isolated expansion. Oldest & Best retains the KJV wording as an ancient and theologically coherent part of Luke’s account."
+    },
+    {
+      "slug": "acts-8-37",
+      "editorialConclusion": "The Ethiopian eunuch’s confession is supported by a small Greek manuscript group but by ancient and geographically broad evidence outside that group, including early Latin transmission and patristic testimony associated with Irenaeus and Cyprian. That evidence places the confession centuries before the Textus Receptus. Oldest & Best therefore retains Acts 8:37 as an ancient Christian reading preserved in the KJV."
+    },
+    {
+      "slug": "acts-9-5-6",
+      "editorialConclusion": "The full KJV wording is not preserved in the continuous Greek manuscript tradition at this location, but its principal expressions are ancient: the saying about kicking against the pricks is securely present in Acts 26:14, and the fuller Acts 9 form circulated in Latin, patristic, and marginal traditions before entering the received Greek text. Oldest & Best retains the KJV form as the historic received reading while identifying the kind of evidence on which it rests."
+    },
+    {
+      "slug": "colossians-1-14",
+      "editorialConclusion": "“Through his blood” has limited Greek support in Colossians 1:14 but strong canonical, versional, and ecclesiastical continuity. The identical redemption language is secure in Ephesians 1:7, and the phrase circulated in ancient translations before its reception in the KJV tradition. Oldest & Best retains the fuller wording as an ancient and orthodox form of the verse."
+    },
+    {
+      "slug": "1-john-5-7",
+      "editorialConclusion": "The heavenly-witness wording has a narrow surviving Greek manuscript base, but its history is broader than that fact alone: it is deeply rooted in the Latin ecclesiastical tradition, appears in patristic and conciliar use, entered Greek manuscript and printed transmission, and became part of the received text behind the KJV. Oldest & Best retains the KJV reading as the historic Trinitarian form received by the English church while presenting the competing manuscript evidence separately. ---"
+    }
+  ],
+  "oneJohnFiveSeven": {
+    "latinWriters": [
+      {
+        "evidence": "Tertullian, Against Praxeas 25",
+        "date": "c. AD 210",
+        "relationship": "Related three-one theological language"
+      },
+      {
+        "evidence": "Cyprian, On the Unity of the Church 6",
+        "date": "c. AD 250",
+        "relationship": "Debated verbal relationship"
+      },
+      {
+        "evidence": "Priscillian, Liber Apologeticus 1",
+        "date": "c. AD 380",
+        "relationship": "Earliest explicit full Latin formula listed on the site"
+      },
+      {
+        "evidence": "Expositio Fidei",
+        "date": "Late fourth century",
+        "relationship": "Explicit Latin Father/Word/Spirit three-one form"
+      },
+      {
+        "evidence": "Contra Varimadum",
+        "date": "c. AD 450",
+        "relationship": "Explicit heavenly-witness form"
+      },
+      {
+        "evidence": "Carthaginian confession presented under Huneric",
+        "date": "AD 484",
+        "relationship": "Explicit heavenly-witness form"
+      },
+      {
+        "evidence": "Fulgentius of Ruspe, Contra Arianos",
+        "date": "c. AD 527",
+        "relationship": "Explicit heavenly-witness citation"
+      },
+      {
+        "evidence": "Fulgentius of Ruspe, Contra Fabianum",
+        "date": "c. AD 527",
+        "relationship": "Explicit three-one form"
+      },
+      {
+        "evidence": "Fulgentius of Ruspe, De Trinitate ad Felicem",
+        "date": "c. AD 527",
+        "relationship": "Explicit heavenly-witness citation"
+      },
+      {
+        "evidence": "Cassiodorus, Complexiones in Epistolis Apostolorum",
+        "date": "Sixth century",
+        "relationship": "Explicit Father/Son/Spirit form"
+      },
+      {
+        "evidence": "Isidore of Seville, Testimonia Divinae Scripturae et Patrum",
+        "date": "Early seventh century",
+        "relationship": "Explicit heavenly-witness citation"
+      },
+      {
+        "evidence": "Ambrose Ansbert, Commentary on Revelation",
+        "date": "Mid-eighth century",
+        "relationship": "Explicit heavenly-witness citation"
+      }
+    ],
+    "latinManuscripts": [
+      {
+        "evidence": "Codex Speculum (m)",
+        "date": "Fifth century",
+        "relationship": "Contains the Comma in Latin Scripture quotations"
+      },
+      {
+        "evidence": "Frisingensia Fragmenta (r/q)",
+        "date": "Fifth–seventh century",
+        "relationship": "Contains the Comma, with the earthly witnesses before the heavenly witnesses"
+      },
+      {
+        "evidence": "Codex Fuldensis",
+        "date": "AD 546",
+        "relationship": "Does not contain the Comma in 1 John; place under competing evidence. Its prologue discusses the disputed clause and is related history, not biblical-text support"
+      },
+      {
+        "evidence": "Leon Palimpsest (l)",
+        "date": "Seventh century",
+        "relationship": "Contains a Father/Word/Holy Spirit form ending “one in Christ Jesus”"
+      },
+      {
+        "evidence": "Codex Amiatinus",
+        "date": "c. AD 700",
+        "relationship": "Does not contain the Comma; place under competing evidence"
+      },
+      {
+        "evidence": "Codex Wizanburgensis",
+        "date": "Eighth century, disputed",
+        "relationship": "Contains the Comma; retain the disputed-date/evidence qualification"
+      },
+      {
+        "evidence": "Codex Theodulphianus",
+        "date": "Eighth–ninth century",
+        "relationship": "Contains the Comma"
+      },
+      {
+        "evidence": "Codex Sangallensis 907",
+        "date": "Eighth–ninth century",
+        "relationship": "Contains the Comma"
+      },
+      {
+        "evidence": "Codex Cavensis",
+        "date": "Ninth century",
+        "relationship": "Contains the Comma"
+      },
+      {
+        "evidence": "Codex Ulmensis",
+        "date": "Ninth century",
+        "relationship": "Contains the Comma"
+      },
+      {
+        "evidence": "Codex Lemovicensis",
+        "date": "Ninth century",
+        "relationship": "Contains the Comma"
+      },
+      {
+        "evidence": "Codex Vercellensis",
+        "date": "Ninth century",
+        "relationship": "Contains the Comma"
+      },
+      {
+        "evidence": "Codex Sangallensis 63",
+        "date": "Ninth century",
+        "relationship": "Contains the Comma in the margin"
+      },
+      {
+        "evidence": "Codex Complutensis I",
+        "date": "AD 927",
+        "relationship": "Contains the Comma"
+      },
+      {
+        "evidence": "Codex Gothicus Legionensis",
+        "date": "AD 960",
+        "relationship": "Contains the Comma"
+      },
+      {
+        "evidence": "Codex Toletanus",
+        "date": "Tenth century",
+        "relationship": "Contains the Comma"
+      },
+      {
+        "evidence": "Codex Demidovianus",
+        "date": "Twelfth century",
+        "relationship": "Contains the Comma"
+      }
+    ],
+    "greekManuscripts": [
+      {
+        "evidence": "GA 629, Codex Ottobonianus",
+        "date": "AD 1362–1363",
+        "relationship": "Contains the Comma in the main text"
+      },
+      {
+        "evidence": "GA 61, Codex Montfortianus",
+        "date": "c. AD 1495–1521",
+        "relationship": "Contains the Comma in the main text"
+      },
+      {
+        "evidence": "GA 918, Codex Escurialensis",
+        "date": "c. AD 1573–1578",
+        "relationship": "Contains the Comma in the main text"
+      },
+      {
+        "evidence": "GA 2473",
+        "date": "AD 1634",
+        "relationship": "Contains the Comma in the main text"
+      },
+      {
+        "evidence": "GA 2318",
+        "date": "Eighteenth century",
+        "relationship": "Contains the Comma in the main text"
+      },
+      {
+        "evidence": "GA 429 margin",
+        "date": "Fourteenth-century manuscript; addition after AD 1522",
+        "relationship": "Marginal Comma"
+      },
+      {
+        "evidence": "GA 177 margin",
+        "date": "Eleventh-century manuscript; addition c. AD 1785",
+        "relationship": "Marginal Comma"
+      },
+      {
+        "evidence": "GA 221 margin",
+        "date": "Tenth-century manuscript; addition after AD 1854",
+        "relationship": "Marginal Comma"
+      },
+      {
+        "evidence": "GA 88 margin",
+        "date": "Twelfth-century manuscript; later addition of uncertain date",
+        "relationship": "Marginal Comma; do not present the manuscript’s twelfth-century date as the date of the addition"
+      },
+      {
+        "evidence": "GA 636 margin",
+        "date": "Fifteenth-century manuscript; later addition of uncertain date",
+        "relationship": "Marginal Comma; do not present the manuscript’s fifteenth-century date as the date of the addition"
+      }
+    ],
+    "reception": [
+      {
+        "evidence": "Douay–Rheims New Testament",
+        "date": "AD 1582",
+        "relationship": "English Catholic New Testament containing the Comma"
+      },
+      {
+        "evidence": "Clementine Vulgate",
+        "date": "AD 1592",
+        "relationship": "Official Clementine edition containing the Comma"
+      },
+      {
+        "evidence": "King James Bible",
+        "date": "AD 1611",
+        "relationship": "English received-text translation containing the Comma"
+      }
+    ]
+  },
+  "groupedDates": [
+    {
+      "group": "Matthew 1:25 — Greek group",
+      "publicDate": "Earliest in this group: fourth–fifth century — Codex W; Codices C and D are fifth century."
+    },
+    {
+      "group": "Matthew 1:25 — Latin and Syriac group",
+      "publicDate": "Earliest in this group: fourth–fifth century — ancient Latin/Vulgate transmission; Syriac Peshitta is early fifth century and the Harklean is AD 616."
+    },
+    {
+      "group": "Matthew 5:22 — Greek group",
+      "publicDate": "Earliest in this group: fourth–fifth century — Sinaiticus correction and Codex D. Retain the correction qualification."
+    },
+    {
+      "group": "Matthew 5:22 — versional group",
+      "publicDate": "Earliest in this group: c. AD 350 — Gothic; fourth century onward — Old Latin; early fifth century — Syriac Peshitta."
+    },
+    {
+      "group": "Matthew 5:44 — Greek group",
+      "publicDate": "Earliest in this group: fifth century — Codices D and W."
+    },
+    {
+      "group": "Matthew 5:44 — versional group",
+      "publicDate": "Earliest in this group: c. AD 350 — Gothic; fourth century onward — Latin; early fifth century — Syriac Peshitta."
+    },
+    {
+      "group": "Matthew 19:16–17 — Greek groups for the two units",
+      "publicDate": "Earliest in these groups: fifth century — Codices C and W. Keep the two units separate."
+    },
+    {
+      "group": "Matthew 19:16–17 — versional group",
+      "publicDate": "Earliest in this group: fourth century onward — Old Latin transmission; early fifth century — Syriac Peshitta."
+    },
+    {
+      "group": "Matthew 27:35 — Greek group",
+      "publicDate": "Earliest in this group: fifth century — Codex D."
+    },
+    {
+      "group": "Matthew 27:35 — versional group",
+      "publicDate": "Earliest in this group: fourth–fifth century — Old Latin witnesses; AD 616 — Syriac Harklean; AD 1592 — Clementine Vulgate. Do not give the entire group the 1592 date."
+    },
+    {
+      "group": "Mark 1:2 — Greek group",
+      "publicDate": "Earliest in this group: fifth century — Codices A and W."
+    },
+    {
+      "group": "Mark 1:2 — versional group",
+      "publicDate": "Earliest in this group: fourth–fifth century — Bohairic strand; AD 616 — Syriac Harklean."
+    },
+    {
+      "group": "Mark 10:24 — Greek group",
+      "publicDate": "Earliest in this group: fifth century — Codices A, C, and D."
+    },
+    {
+      "group": "Mark 10:24 — versional group",
+      "publicDate": "Earliest in this group: c. AD 350 — Gothic; fourth century onward — Latin; early fifth century — Syriac Peshitta."
+    },
+    {
+      "group": "Luke 2:14 — Greek group",
+      "publicDate": "Earliest in this group: fourth–fifth century — correctors of Sinaiticus and Vaticanus, followed by C and other witnesses."
+    },
+    {
+      "group": "Luke 2:14 — versional group",
+      "publicDate": "Earliest in this group: fourth–fifth century — Bohairic and Syriac transmission."
+    },
+    {
+      "group": "Luke 2:33 — Greek group",
+      "publicDate": "Earliest in this group: fifth century — Codex A."
+    },
+    {
+      "group": "Luke 2:33 — versional group",
+      "publicDate": "Earliest in this group: fourth century onward — Old Latin; early fifth century — Syriac Peshitta; AD 616 — Syriac Harklean."
+    },
+    {
+      "group": "Luke 4:4 — Greek group",
+      "publicDate": "Earliest in this group: fifth century — Codices A and D."
+    },
+    {
+      "group": "Luke 4:4 — versional group",
+      "publicDate": "Earliest in this group: c. AD 350 — Gothic; fourth century onward — Latin; early fifth century — Syriac Peshitta."
+    },
+    {
+      "group": "Luke 24:6 — Greek group",
+      "publicDate": "Earliest in this group: c. AD 175–225 — Papyrus 75."
+    },
+    {
+      "group": "Luke 24:6 — Latin group",
+      "publicDate": "Earliest in this group: fourth century onward — Old Latin; c. AD 382–405 — Jerome’s Vulgate revision period. Date individual Vulgate manuscripts separately when named."
+    },
+    {
+      "group": "John 3:13 — Greek group",
+      "publicDate": "Earliest in this group: fifth century — Codex A; preserve the first-hand/corrector distinction."
+    },
+    {
+      "group": "John 3:13 — versional group",
+      "publicDate": "Earliest in this group: fourth century onward — Old Latin; early fifth century — Syriac Peshitta; AD 616 — Syriac Harklean."
+    },
+    {
+      "group": "Acts 20:28 — Greek “God” group",
+      "publicDate": "Earliest in this group: fourth century — Codices Sinaiticus and Vaticanus."
+    },
+    {
+      "group": "Acts 20:28 — Vulgate and Syriac group",
+      "publicDate": "Earliest in this group: c. AD 382–405 — Vulgate revision period; early fifth century — Syriac Peshitta; AD 616 — Syriac Harklean. Date named manuscripts separately."
+    },
+    {
+      "group": "Romans 14:10 — Greek “Christ” group",
+      "publicDate": "Earliest in this group: fourth–fifth century — correctors of Sinaiticus and Ephraemi. Retain vid and correction qualifiers."
+    },
+    {
+      "group": "Romans 14:10 — versional group",
+      "publicDate": "Earliest in this group: c. AD 350 — Gothic; early fifth century — Syriac Peshitta; AD 616 — Syriac Harklean; AD 1592 — Clementine Vulgate."
+    },
+    {
+      "group": "1 Corinthians 15:47 — Greek “the Lord” group",
+      "publicDate": "Earliest in this group: fifth century — Codex A; the Sinaiticus and Claromontanus evidence is corrective and must be labeled as such."
+    },
+    {
+      "group": "1 Corinthians 15:47 — versional group",
+      "publicDate": "Earliest in this group: early fifth century — Syriac Peshitta, which reads “the Lord from heaven”; AD 616 — Syriac Harklean. Render these as separate dated witnesses."
+    },
+    {
+      "group": "Ephesians 3:9 — “fellowship” group",
+      "publicDate": "Earliest named Greek witness in this group: twelfth century — minuscule 2817."
+    },
+    {
+      "group": "Ephesians 3:9 — “by Jesus Christ” Greek group",
+      "publicDate": "Earliest in this group: sixth century or later — correction D²; ninth century — Codices K and L. Do not date D² more precisely than the correction evidence permits."
+    },
+    {
+      "group": "Ephesians 3:9 — Syriac Harklean",
+      "publicDate": "AD 616."
+    },
+    {
+      "group": "1 John 4:3 — exact KJV-family Greek group",
+      "publicDate": "Earliest exact witness in this group: ninth century — Codex K. Earlier related fuller Greek form: fourth century — Codex Sinaiticus."
+    },
+    {
+      "group": "Revelation 1:8 — “beginning and ending” Greek group",
+      "publicDate": "Earliest in this group: fourth century — Codex Sinaiticus first hand."
+    },
+    {
+      "group": "Revelation 1:8 — “saith the Lord” versional group",
+      "publicDate": "Earliest responsible description: ancient Latin/versional evidence, fourth–fifth century onward. Split Old Latin, Armenian, Ethiopic, and later Vulgate witnesses into individually dated cards rather than leaving this as one permanent aggregate."
+    },
+    {
+      "group": "Revelation 1:11 — exact Greek expansion group",
+      "publicDate": "Earliest in this group: twelfth century — minuscule 2814."
+    },
+    {
+      "group": "Revelation 16:5 — related future-tense evidence",
+      "publicDate": "Earliest named evidence: eighth century — Beatus of Liébana. Exact printed Greek form: AD 1582 — Beza’s third edition."
+    },
+    {
+      "group": "Revelation 16:5 — “O Lord” versional group",
+      "publicDate": "Date the Clementine Vulgate AD 1592 and Beatus eighth century separately; date each named Vulgate, Bohairic, and Ethiopic witness by its actual manuscript or edition rather than as one group."
+    },
+    {
+      "group": "Revelation 22:19 — “book of life” versional/patristic group",
+      "publicDate": "Earliest named evidence: late fourth century — Ambrose and Bachiarius. Mid-sixth century — Primasius. Ninth century — Haymo. AD 1592 — Clementine Vulgate."
+    },
+    {
+      "group": "Revelation 22:19 — Greek evidence",
+      "publicDate": "Exact TR βίβλου: no surviving Greek manuscript identified. Exact printed Greek: AD 1516 — Erasmus. Related βιβλίου: c. AD 1520 — minuscule 61; later correction — 2067."
+    }
+  ]
+}

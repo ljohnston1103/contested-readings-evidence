@@ -92,7 +92,10 @@ export default function ManuscriptsPage() {
                     {profile.supports.length ? (
                       profile.supports.map((item) => (
                         <Link key={item.passage.id} href={`/passages/${item.passage.slug}`} className="rounded-full bg-archive-teal/10 px-3 py-1 text-xs font-bold text-archive-teal dark:text-teal-200">
-                          {passageLabel(item)}
+                          <span className="block">{passageLabel(item)}</span>
+                          <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                            Earliest KJV support: {item.passage.earliestSupport?.[0]?.statement}
+                          </span>
                         </Link>
                       ))
                     ) : (
@@ -108,7 +111,10 @@ export default function ManuscriptsPage() {
                     {profile.opposes.length ? (
                       profile.opposes.map((item) => (
                         <Link key={item.passage.id} href={`/passages/${item.passage.slug}`} className="rounded-full bg-amber-700/10 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-100">
-                          {passageLabel(item)}
+                          <span className="block">{passageLabel(item)}</span>
+                          <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                            Earliest KJV support: {item.passage.earliestSupport?.[0]?.statement}
+                          </span>
                         </Link>
                       ))
                     ) : (

@@ -1,7 +1,8 @@
 import { passages } from "./passages";
+import { applyKjvForwardCorrections } from "./kjvForwardCorrections";
 import type { Passage, PatristicWitness, TimelineEvent, Witness } from "./types";
 
-export const allPassages = [...passages].sort(
+export const allPassages = passages.map(applyKjvForwardCorrections).sort(
   (a, b) => a.biblicalOrder - b.biblicalOrder,
 );
 

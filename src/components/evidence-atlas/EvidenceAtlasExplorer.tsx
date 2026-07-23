@@ -85,7 +85,7 @@ const measureMeta: Record<
     pale: "rgba(190, 18, 60, 0.14)",
   },
   against: {
-    shortLabel: "Against",
+    shortLabel: "Competing",
     label: "Directionally opposing evidence records",
     color: "#475569",
     pale: "rgba(71, 85, 105, 0.14)",
@@ -602,7 +602,7 @@ export function EvidenceAtlasExplorer({
               </dl>
               <p className="mt-4 flex items-start gap-2 text-xs leading-5 text-ink-500 dark:text-ink-100/50">
                 <Asterisk className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                Against records are directionally opposed; “Other” preserves related,
+                Competing records are directionally opposed; “Other” preserves related,
                 qualified, and third readings without flattening them into either side.
               </p>
             </div>

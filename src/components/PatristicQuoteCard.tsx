@@ -4,6 +4,25 @@ type PatristicQuoteCardProps = {
   witness: PatristicWitness;
 };
 
+function relationshipLabel(witness: PatristicWitness) {
+  switch (witness.relationship) {
+    case "explicit_quote":
+      return "Exact reading";
+    case "close_quote":
+      return "Close quotation";
+    case "mixed_citation":
+      return "Mixed citation";
+    case "parallel_tradition":
+    case "manuscript_report":
+    case "theological_parallel":
+      return "Related evidence";
+    default:
+      return /mixed|debated/iu.test(witness.quoteSummary)
+        ? "Mixed citation"
+        : "Close quotation";
+  }
+}
+
 export function PatristicQuoteCard({ witness }: PatristicQuoteCardProps) {
   return (
     <article className="rounded-[1.75rem] border border-archive-gold/25 bg-gradient-to-br from-archive-gold/12 to-white/80 p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:border-archive-gold/50 hover:shadow-glow dark:from-archive-gold/10 dark:to-white/[0.04]">
@@ -25,50 +44,14 @@ export function PatristicQuoteCard({ witness }: PatristicQuoteCardProps) {
           {witness.workSection}
         </p>
       )}
-      {(witness.reading || witness.relationship) && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {witness.reading && (
-            <span
-              className={`rounded-full px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] ${
-                witness.reading.startsWith("FOR")
-                  ? "bg-archive-teal/10 text-archive-teal dark:text-teal-200"
-                  : witness.reading.startsWith("AGAINST")
-                    ? "bg-amber-700/10 text-amber-800 dark:text-amber-100"
-                    : "bg-ink-100 text-ink-600 dark:bg-white/10 dark:text-ink-100/70"
-              }`}
-            >
-              {witness.reading.replaceAll("_", " ")}
-            </span>
-          )}
-          {witness.relationship && (
-            <span className="rounded-full border border-archive-gold/35 bg-white/55 px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-ink-700 dark:bg-white/10 dark:text-ink-100">
-              {witness.relationship.replaceAll("_", " ")}
-            </span>
-          )}
-        </div>
-      )}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <span className="rounded-full border border-archive-gold/35 bg-white/55 px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-ink-700 dark:bg-white/10 dark:text-ink-100">
+          {relationshipLabel(witness)}
+        </span>
+      </div>
       <p className="mt-4 text-sm leading-6 text-ink-700 dark:text-ink-100/78">
         {witness.quoteSummary}
       </p>
-      {(witness.confidence || witness.sourceCitation || witness.lastVerified) && (
-        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-archive-gold/20 pt-3 text-xs font-semibold text-ink-500 dark:text-ink-100/55">
-          {witness.confidence && <span>Confidence: {witness.confidence}</span>}
-          {witness.lastVerified && <span>Verified: {witness.lastVerified}</span>}
-          {witness.sourceCitation &&
-            (witness.sourceUrl ? (
-              <a
-                href={witness.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="font-black text-archive-blue hover:underline dark:text-teal-200"
-              >
-                Source: {witness.sourceCitation}
-              </a>
-            ) : (
-              <span>Source: {witness.sourceCitation}</span>
-            ))}
-        </div>
-      )}
     </article>
   );
 }

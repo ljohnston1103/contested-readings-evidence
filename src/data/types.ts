@@ -22,6 +22,25 @@ export type SourceLink = {
   url?: string;
 };
 
+export type EvidenceRelationship =
+  | "exact"
+  | "close"
+  | "related"
+  | "mixed"
+  | "versional"
+  | "printed";
+
+export type EarliestSupport = {
+  label?: string;
+  statement: string;
+  earliestGreek?: string;
+};
+
+export type ReferenceEntry = {
+  citation: string;
+  links?: SourceLink[];
+};
+
 export type Witness = {
   witness: string;
   date: string;
@@ -33,6 +52,7 @@ export type Witness = {
   source?: string;
   sourceUrl?: string;
   lastVerified?: string;
+  relationship?: EvidenceRelationship;
 };
 
 export type PatristicWitness = {
@@ -102,6 +122,8 @@ export type Passage = {
   disputedUnit?: string;
   cautions?: string[];
   sourceLinks?: SourceLink[];
+  earliestSupport?: EarliestSupport[];
+  references?: ReferenceEntry[];
   manuscriptSnapshot: ManuscriptSnapshot;
   greekSupportWitnesses: Witness[];
   latinWitnesses: Witness[];

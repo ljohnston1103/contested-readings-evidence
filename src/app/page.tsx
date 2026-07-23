@@ -154,17 +154,6 @@ export default function HomePage() {
     .map((reference) => displayedPassages.find((passage) => passage.reference === reference))
     .filter((passage): passage is Passage => Boolean(passage))
     .slice(0, 12);
-  const evidenceRecordCount = displayedPassages.reduce(
-    (total, passage) =>
-      total +
-      passage.greekSupportWitnesses.length +
-      passage.latinWitnesses.length +
-      passage.versionalWitnesses.length +
-      passage.patristicWitnesses.length +
-      passage.evidenceAgainst.length +
-      (passage.printedWitnesses?.length ?? 0),
-    0,
-  );
   const sourceCount = new Set(displayedPassages.flatMap((passage) => passage.sources)).size;
 
   return (
@@ -191,7 +180,7 @@ export default function HomePage() {
             <RevealItem>
               <p className="mt-6 max-w-3xl text-lg leading-8 text-ink-700 dark:text-ink-100/[0.78]">
                 Search disputed New Testament readings and compare Greek manuscripts,
-                ancient versions, patristic quotations, and evidence for and against the KJV/TR reading.
+                ancient versions, patristic quotations, and the competing readings cited for each passage.
               </p>
             </RevealItem>
             <RevealItem className="mt-8 flex flex-wrap gap-3">
@@ -233,9 +222,9 @@ export default function HomePage() {
               </div>
               <div className="rounded-3xl border border-ink-100 bg-white/75 p-4 dark:border-white/10 dark:bg-white/5">
                 <p className="font-display text-4xl font-black text-ink-900 dark:text-white">
-                  <AnimatedCounter value={evidenceRecordCount} />
+                  <AnimatedCounter value={displayedPassages.filter((passage) => passage.earliestSupport?.length).length} />
                 </p>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Evidence records</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Curated earliest dates</p>
               </div>
               <div className="rounded-3xl border border-ink-100 bg-white/75 p-4 dark:border-white/10 dark:bg-white/5">
                 <p className="font-display text-4xl font-black text-ink-900 dark:text-white">
@@ -245,7 +234,7 @@ export default function HomePage() {
               </div>
             </div>
             <p className="mt-3 text-xs leading-5 text-ink-500 dark:text-ink-100/55">
-              Evidence records are displayed database entries, not a count of unique physical manuscripts.
+              Each dossier identifies the earliest currently catalogued evidence supporting the KJV reading.
             </p>
           </RevealItem>
         </RevealGroup>
