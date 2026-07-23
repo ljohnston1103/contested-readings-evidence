@@ -470,6 +470,35 @@ function withEditorialConclusion(passage: Passage) {
   return `${passage.shortSummary} Oldest & Best retains the KJV reading while presenting the competing witnesses separately below.`;
 }
 
+function splitGroupedGreekWitnesses(rows: Witness[]) {
+  return rows.flatMap((row) => {
+    if (row.kind !== "greek-manuscript") return [row];
+
+    const list = row.witness
+      .replaceAll("`", "")
+      .replace(/\band some others.*$/iu, "")
+      .replace(/\bwithin .+$/iu, "")
+      .replace(/[.;]+$/u, "")
+      .replaceAll(",", " ")
+      .trim();
+    const tokens = list.split(/\s+/u).filter(Boolean);
+    const siglumPattern =
+      /^(?:[\p{Lu}ℵΔΘΣΦΨ][\p{L}\d*/-]*|P\d+|0\d{2,3}|f\d+(?:-part)?|Maj|Byz|𝔓\d+|\d+[a-z]?|[a-z]\d+)$/u;
+    const sigla = tokens.filter((token) => siglumPattern.test(token));
+
+    if (tokens.length < 3 || sigla.length / tokens.length < 0.8) return [row];
+
+    return sigla.map((witness) => ({
+      ...row,
+      witness: witness.replace(/\.$/u, ""),
+      note:
+        row.note === row.witness
+          ? `Individually listed from the catalogued Greek witness group for this reading.`
+          : row.note,
+    }));
+  });
+}
+
 export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
   const copy = copyBySlug.get(sourcePassage.slug);
   const publicDates = wave2PublicDates[sourcePassage.slug];
@@ -517,10 +546,8 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
 
   return {
     ...passage,
-    greekSupportWitnesses: dateSupportingRows(
-      greekSupport,
-      passage,
-      publicDates?.greek,
+    greekSupportWitnesses: splitGroupedGreekWitnesses(
+      dateSupportingRows(greekSupport, passage, publicDates?.greek),
     ),
     latinWitnesses: dateSupportingRows(
       latinSupport,
@@ -547,7 +574,7 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
         : witness.date,
     })),
     printedWitnesses: dateSupportingRows(printedSupport, passage, undefined),
-    evidenceAgainst: competing,
+    evidenceAgainst: splitGroupedGreekWitnesses(competing),
     manuscriptSnapshot: {
       ...passage.manuscriptSnapshot,
       supportCategory:
