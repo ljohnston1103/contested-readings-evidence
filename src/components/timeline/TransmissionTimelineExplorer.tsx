@@ -44,6 +44,9 @@ const laneGap = 8;
 const plotTop = 20;
 const plotLeftMargin = 10;
 const plotRightMargin = 26;
+const maxRowsPerLane = 5;
+const clusterBinPx = 18;
+const clusterDotSize = 22;
 
 function cx(...classes: Array<string | undefined | false>) {
   return classes.filter(Boolean).join(" ");
@@ -59,6 +62,15 @@ type PointGeometry = {
   xEnd: number;
   y: number;
   isRange: boolean;
+};
+
+type ClusterGeometry = {
+  id: string;
+  category: TimelineCategory;
+  x: number;
+  y: number;
+  minStart: number;
+  entries: FullTimelineEntry[];
 };
 
 type TimelinePointProps = {
@@ -128,12 +140,46 @@ const TimelinePoint = memo(function TimelinePoint({ point, color, revealed, sele
   );
 });
 
+type ClusterMarkerProps = {
+  cluster: ClusterGeometry;
+  color: string;
+  revealed: boolean;
+  selected: boolean;
+  reduceMotion: boolean;
+  onSelect: (id: string) => void;
+};
+
+const ClusterMarker = memo(function ClusterMarker({ cluster, color, revealed, selected, reduceMotion, onSelect }: ClusterMarkerProps) {
+  const left = cluster.x - clusterDotSize / 2;
+  const top = cluster.y - clusterDotSize / 2;
+  return (
+    <motion.button
+      type="button"
+      onClick={() => onSelect(cluster.id)}
+      initial={false}
+      animate={{ opacity: revealed ? 1 : 0.14, scale: selected ? 1.15 : 1 }}
+      transition={{ duration: reduceMotion ? 0 : 0.25 }}
+      className={cx(
+        "absolute flex items-center justify-center rounded-full text-[9px] font-black leading-none text-white shadow-sm dark:shadow-none",
+        selected ? "ring-2 ring-archive-gold ring-offset-1 ring-offset-white dark:ring-offset-archive-navy" : "hover:brightness-110",
+      )}
+      style={{ left, top, width: clusterDotSize, height: clusterDotSize, backgroundColor: color, border: "2px solid white" }}
+      aria-label={`${cluster.entries.length} more witnesses clustered near this date on the timeline, press to view the full list`}
+      title={`+${cluster.entries.length} more witnesses`}
+    >
+      +{cluster.entries.length}
+    </motion.button>
+  );
+});
+
 export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineExplorerProps) {
   const shouldReduceMotion = useReducedMotion();
   const [search, setSearch] = useState("");
   const [hiddenCategories, setHiddenCategories] = useState<Set<TimelineCategory>>(new Set());
   const [hiddenSides, setHiddenSides] = useState<Set<TimelineSide>>(new Set());
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedClusterId, setSelectedClusterId] = useState<string | null>(null);
+  const [expandedClusterEntryId, setExpandedClusterEntryId] = useState<string | null>(null);
   const [cursorYear, setCursorYear] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [focusedEraId, setFocusedEraId] = useState<string | null>(null);
@@ -171,7 +217,7 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
   const scrubMin = focusedEra ? focusedEra.start : dataMinYear;
   const scrubMax = focusedEra ? focusedEra.end : dataMaxYear;
 
-  const plotWidth = Math.max(1180, visibleEntries.length * 4.4);
+  const plotWidth = Math.max(1180, Math.min(2200, 1180 + visibleEntries.length * 0.6));
   const chartInnerWidth = plotWidth - plotLeftMargin - plotRightMargin;
 
   const erasWithGeometry = useMemo(() => {
@@ -207,6 +253,7 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
   const layout = useMemo(() => {
     let offsetY = plotTop;
     const positions = new Map<string, PointGeometry>();
+    const clusterPositions = new Map<string, ClusterGeometry>();
     const lanes = timelineCategoryOrder.map((category) => {
       const laneEntries = timeFilteredEntries.filter((entry) => entry.category === category);
       const withX = laneEntries
@@ -218,8 +265,10 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
         })
         .sort((a, b) => a.xStart - b.xStart);
 
+      // True interval-scheduling row assignment (as before) so range bars and dots
+      // never visually overlap, however many rows it takes.
       const rowEnds: number[] = [];
-      const placed = withX.map(({ entry, xStart, xEnd, isRange }) => {
+      const withRow = withX.map(({ entry, xStart, xEnd, isRange }) => {
         let row = rowEnds.findIndex((end) => end + minGapPx <= xStart);
         if (row === -1) {
           row = rowEnds.length;
@@ -230,20 +279,74 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
         return { entry, xStart, xEnd, isRange, row };
       });
 
-      const rowCount = Math.max(1, rowEnds.length);
+      // Cap what renders individually at maxRowsPerLane rows; anything that would
+      // need a deeper row gets bundled into a numbered cluster marker instead, so a
+      // lane with a dense cluster of same-era witnesses doesn't grow without limit.
+      const shown = withRow.filter((item) => item.row < maxRowsPerLane);
+      const overflow = withRow.filter((item) => item.row >= maxRowsPerLane);
+
+      const overflowBuckets: (typeof overflow)[] = [];
+      for (const item of overflow) {
+        const currentBucket = overflowBuckets[overflowBuckets.length - 1];
+        const lastItem = currentBucket?.[currentBucket.length - 1];
+        if (currentBucket && lastItem && item.xStart - lastItem.xStart <= clusterBinPx) {
+          currentBucket.push(item);
+        } else {
+          overflowBuckets.push([item]);
+        }
+      }
+
+      // Cluster markers are small and fixed-width, so they get their own simple
+      // interval scheduling, starting one row below the deepest individual row.
+      const clusterRowEnds: number[] = [];
+      const clusters: Array<{ id: string; x: number; minStart: number; entries: FullTimelineEntry[]; row: number }> = [];
+      overflowBuckets.forEach((bucket, bucketIndex) => {
+        const x = bucket.reduce((sum, item) => sum + item.xStart, 0) / bucket.length;
+        const left = x - clusterDotSize / 2;
+        const right = x + clusterDotSize / 2;
+        let slot = clusterRowEnds.findIndex((end) => end + minGapPx <= left);
+        if (slot === -1) {
+          slot = clusterRowEnds.length;
+          clusterRowEnds.push(right);
+        } else {
+          clusterRowEnds[slot] = right;
+        }
+        clusters.push({
+          id: `${category}-cluster-${bucketIndex}`,
+          x,
+          minStart: Math.min(...bucket.map((item) => item.entry.start)),
+          entries: bucket.map((item) => item.entry),
+          row: maxRowsPerLane + slot,
+        });
+      });
+
+      let maxRow = 0;
+      shown.forEach((item) => {
+        if (item.row > maxRow) maxRow = item.row;
+      });
+      clusters.forEach((cluster) => {
+        if (cluster.row > maxRow) maxRow = cluster.row;
+      });
+      const rowCount = Math.max(1, maxRow + 1);
       const laneHeight = Math.max(laneMinHeight, rowCount * dotSpacing + 24);
       const baseline = offsetY + laneHeight - 15;
-      const points: PointGeometry[] = placed.map(({ entry, xStart, xEnd, isRange, row }) => {
+
+      const points: PointGeometry[] = shown.map(({ entry, xStart, xEnd, isRange, row }) => {
         const point = { entry, x: xStart, xEnd, y: baseline - row * dotSpacing, isRange };
         positions.set(entry.id, point);
         return point;
       });
+      const laneClusters: ClusterGeometry[] = clusters.map(({ id, x, minStart, entries, row }) => {
+        const cluster = { id, category, x, y: baseline - row * dotSpacing, minStart, entries };
+        clusterPositions.set(id, cluster);
+        return cluster;
+      });
 
-      const lane = { category, top: offsetY, height: laneHeight, points };
+      const lane = { category, top: offsetY, height: laneHeight, points, clusters: laneClusters };
       offsetY += laneHeight + laneGap;
       return lane;
     });
-    return { lanes, totalHeight: offsetY, positions };
+    return { lanes, totalHeight: offsetY, positions, clusterPositions };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeFilteredEntries, erasWithGeometry]);
 
@@ -272,7 +375,11 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setSelectedId(null);
+      if (event.key === "Escape") {
+        setSelectedId(null);
+        setSelectedClusterId(null);
+        setExpandedClusterEntryId(null);
+      }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -311,16 +418,18 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
 
   const selected = selectedId ? timeFilteredEntries.find((entry) => entry.id === selectedId) : undefined;
   const selectedPoint = selectedId ? layout.positions.get(selectedId) : undefined;
+  const selectedCluster = selectedClusterId ? layout.clusterPositions.get(selectedClusterId) : undefined;
+  const activeAnchor = selectedPoint ?? selectedCluster;
 
   let popoverLeft = 0;
   let popoverTop = 0;
   const popoverWidth = 336;
-  if (selectedPoint) {
-    const anchorX = selectedPoint.x;
+  if (activeAnchor) {
+    const anchorX = activeAnchor.x;
     popoverLeft =
       anchorX + popoverWidth + 28 > plotWidth ? anchorX - popoverWidth - 20 : anchorX + 20;
     popoverLeft = Math.max(8, Math.min(plotWidth - popoverWidth - 8, popoverLeft));
-    popoverTop = Math.max(8, Math.min(chartHeight - 210, selectedPoint.y - 70));
+    popoverTop = Math.max(8, Math.min(chartHeight - 210, activeAnchor.y - 70));
   }
 
   return (
@@ -509,16 +618,20 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
                     strokeWidth={2}
                   />
                 )}
-                {layout.lanes.map((lane) => (
-                  <text
-                    key={lane.category}
-                    x={plotLeftMargin}
-                    y={lane.top + 12}
-                    className="fill-ink-500 text-[10px] font-black uppercase tracking-wide dark:fill-ink-100/50"
-                  >
-                    {timelineCategoryLabels[lane.category]} ({lane.points.length})
-                  </text>
-                ))}
+                {layout.lanes.map((lane) => {
+                  const laneCount =
+                    lane.points.length + lane.clusters.reduce((sum, cluster) => sum + cluster.entries.length, 0);
+                  return (
+                    <text
+                      key={lane.category}
+                      x={plotLeftMargin}
+                      y={lane.top + 12}
+                      className="fill-ink-500 text-[10px] font-black uppercase tracking-wide dark:fill-ink-100/50"
+                    >
+                      {timelineCategoryLabels[lane.category]} ({laneCount})
+                    </text>
+                  );
+                })}
               </svg>
 
               {erasWithGeometry.map((era) => (
@@ -535,8 +648,8 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
                 </button>
               ))}
 
-              {layout.lanes.flatMap((lane) =>
-                lane.points.map((point) => {
+              {layout.lanes.flatMap((lane) => [
+                ...lane.points.map((point) => {
                   const revealed = cursorYear === null || point.entry.start <= cursorYear;
                   return (
                     <TimelinePoint
@@ -546,13 +659,34 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
                       revealed={revealed}
                       selected={point.entry.id === selectedId}
                       reduceMotion={Boolean(shouldReduceMotion)}
-                      onSelect={setSelectedId}
+                      onSelect={(id) => {
+                        setSelectedId(id);
+                        setSelectedClusterId(null);
+                      }}
                     />
                   );
                 }),
-              )}
+                ...lane.clusters.map((cluster) => {
+                  const revealed = cursorYear === null || cluster.minStart <= cursorYear;
+                  return (
+                    <ClusterMarker
+                      key={cluster.id}
+                      cluster={cluster}
+                      color={timelineCategoryColors[cluster.category]}
+                      revealed={revealed}
+                      selected={cluster.id === selectedClusterId}
+                      reduceMotion={Boolean(shouldReduceMotion)}
+                      onSelect={(id) => {
+                        setSelectedClusterId(id);
+                        setSelectedId(null);
+                        setExpandedClusterEntryId(null);
+                      }}
+                    />
+                  );
+                }),
+              ])}
 
-              {selected && selectedPoint && (
+              {selected && selectedPoint && !selectedCluster && (
                 <div
                   className="pointer-events-none absolute z-20 w-[336px] rounded-2xl border border-archive-gold/40 bg-white p-4 shadow-card dark:border-archive-gold/30 dark:bg-archive-navy"
                   style={{ left: popoverLeft, top: popoverTop }}
@@ -592,6 +726,62 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
                   </Link>
                 </div>
               )}
+
+              {selectedCluster && (
+                <div
+                  className="pointer-events-none absolute z-20 w-[336px] rounded-2xl border border-archive-gold/40 bg-white p-4 shadow-card dark:border-archive-gold/30 dark:bg-archive-navy"
+                  style={{ left: popoverLeft, top: popoverTop }}
+                  role="dialog"
+                  aria-label={`${selectedCluster.entries.length} clustered witnesses`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p
+                      className="text-xs font-black uppercase tracking-[0.14em]"
+                      style={{ color: timelineCategoryColors[selectedCluster.category] }}
+                    >
+                      {timelineCategoryLabels[selectedCluster.category]} &middot; {selectedCluster.entries.length}{" "}
+                      witnesses, nearly the same date
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedClusterId(null)}
+                      className="pointer-events-auto shrink-0 rounded-full p-1 text-ink-400 hover:bg-ink-100 hover:text-ink-800 dark:text-ink-100/50 dark:hover:bg-white/10 dark:hover:text-white"
+                      aria-label="Close list"
+                    >
+                      <X className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <ul className="pointer-events-auto mt-3 max-h-[260px] space-y-1 overflow-y-auto pr-1">
+                    {selectedCluster.entries.map((entry) => {
+                      const expanded = expandedClusterEntryId === entry.id;
+                      return (
+                        <li key={entry.id}>
+                          <button
+                            type="button"
+                            onClick={() => setExpandedClusterEntryId(expanded ? null : entry.id)}
+                            aria-expanded={expanded}
+                            className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-bold text-ink-700 hover:bg-archive-paper dark:text-ink-100/80 dark:hover:bg-white/10"
+                          >
+                            <span className="truncate">{entry.name}</span>
+                            <span className="ml-2 shrink-0 text-ink-400 dark:text-ink-100/40">{entry.date}</span>
+                          </button>
+                          {expanded && (
+                            <div className="mt-1 rounded-lg bg-archive-paper px-2.5 py-2 dark:bg-white/5">
+                              <p className="text-xs leading-5 text-ink-700 dark:text-ink-100/75">{entry.note}</p>
+                              <Link
+                                href={`/passages/${entry.passageSlug}`}
+                                className="mt-2 inline-flex min-h-8 items-center gap-1 rounded-full bg-ink-900 px-3 text-[11px] font-black text-white hover:bg-archive-blue dark:bg-archive-gold dark:text-ink-900"
+                              >
+                                {entry.passageReference} &middot; {entry.passageTitle}
+                              </Link>
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </figure>
@@ -599,8 +789,10 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
         <p className="mt-3 text-xs leading-5 text-ink-500 dark:text-ink-100/50">
           A solid dot marks a single attested date; a fading bar marks a witness whose date is a
           range in the source note. A dashed outline means the row counts as evidence against a
-          reading; a diamond is a curated milestone rather than an individual witness. Hover an era
-          label to zoom into it. Click any marker for its full record.
+          reading; a diamond is a curated milestone rather than an individual witness. A larger
+          numbered marker bundles several witnesses that share nearly the same date&mdash;click it
+          to open the full list. Hover an era label to zoom into it. Click any marker for its full
+          record.
         </p>
       </div>
     </section>
