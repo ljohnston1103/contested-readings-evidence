@@ -16,7 +16,8 @@ export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps)
     {
       label: "Ancient versions",
       present:
-        passage.latinWitnesses.length + passage.versionalWitnesses.length > 0,
+        passage.latinWitnesses.length > 0 ||
+        passage.versionalWitnesses.length > 0,
       icon: Globe2,
     },
     {

@@ -21,9 +21,18 @@ export function EarliestSupportPanel({
           <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
           Earliest KJV support
         </p>
-        <p className="mt-1.5 text-sm font-bold leading-5 text-ink-800 dark:text-ink-100">
-          {records[0].statement}
-        </p>
+        <div className="mt-1.5 grid gap-1.5 text-sm font-bold leading-5 text-ink-800 dark:text-ink-100">
+          {records.map((record, index) => (
+            <p key={`${passage.slug}-compact-earliest-${index}`}>
+              {record.label && (
+                <span className="text-archive-teal dark:text-teal-200">
+                  {record.label}:{" "}
+                </span>
+              )}
+              {record.statement}
+            </p>
+          ))}
+        </div>
       </div>
     );
   }

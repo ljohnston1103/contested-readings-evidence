@@ -52,50 +52,82 @@ export default function VersionsPage() {
             <h2 className="mt-3 font-display text-3xl font-black text-ink-900 dark:text-white">{version.name}</h2>
             <p className="mt-1 text-sm font-bold text-ink-500 dark:text-ink-100/60">{version.date}</p>
             <div className="mt-5 grid gap-4">
+              {version.supports.length > 0 && (
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
                   Supports KJV/TR
                 </p>
                 <div className="mt-2 grid gap-2">
-                  {version.supports.length ? (
-                    version.supports.map(({ passage, notes }) => (
+                  {version.supports.map(({ passage, dates, notes }) => (
                       <Link key={`${version.name}-${passage.id}-support`} href={`/passages/${passage.slug}`} className="rounded-2xl bg-archive-teal/10 px-3 py-2 text-xs font-bold text-archive-teal transition hover:bg-archive-teal/15 dark:text-teal-200">
                         <span className="block">{passage.reference}</span>
-                        <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
-                          Earliest KJV support: {passage.earliestSupport?.[0]?.statement}
-                        </span>
-                        <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
-                          {notes.join("; ")}
-                        </span>
+                        {dates.length > 0 && (
+                          <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
+                            Evidence date: {dates.join("; ")}
+                          </span>
+                        )}
+                        {notes.length > 0 && (
+                          <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                            {notes.join("; ")}
+                          </span>
+                        )}
                       </Link>
-                    ))
-                  ) : (
-                    <span className="text-sm text-ink-500 dark:text-ink-100/60">No supporting examples listed yet.</span>
-                  )}
+                    ))}
                 </div>
               </div>
+              )}
+              {version.opposes.length > 0 && (
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700 dark:text-archive-gold">
                   Opposes KJV/TR
                 </p>
                 <div className="mt-2 grid gap-2">
-                  {version.opposes.length ? (
-                    version.opposes.map(({ passage, notes }) => (
+                  {version.opposes.map(({ passage, dates, notes }) => (
                       <Link key={`${version.name}-${passage.id}-oppose`} href={`/passages/${passage.slug}`} className="rounded-2xl bg-amber-700/10 px-3 py-2 text-xs font-bold text-amber-800 transition hover:bg-amber-700/15 dark:text-amber-100">
                         <span className="block">{passage.reference}</span>
-                        <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
-                          Earliest KJV support: {passage.earliestSupport?.[0]?.statement}
-                        </span>
-                        <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
-                          {notes.join("; ")}
-                        </span>
+                        {dates.length > 0 && (
+                          <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
+                            Evidence date: {dates.join("; ")}
+                          </span>
+                        )}
+                        {notes.length > 0 && (
+                          <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                            {notes.join("; ")}
+                          </span>
+                        )}
                       </Link>
-                    ))
-                  ) : (
-                    <span className="text-sm text-ink-500 dark:text-ink-100/60">No opposing examples listed yet.</span>
-                  )}
+                    ))}
                 </div>
               </div>
+              )}
+              {version.related.length > 0 && (
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-ink-600 dark:text-ink-100/70">
+                    Related or mixed evidence
+                  </p>
+                  <div className="mt-2 grid gap-2">
+                    {version.related.map(({ passage, dates, notes }) => (
+                      <Link
+                        key={`${version.name}-${passage.id}-related`}
+                        href={`/passages/${passage.slug}`}
+                        className="rounded-2xl bg-ink-100/80 px-3 py-2 text-xs font-bold text-ink-800 transition hover:bg-ink-200/80 dark:bg-white/10 dark:text-ink-100"
+                      >
+                        <span className="block">{passage.reference}</span>
+                        {dates.length > 0 && (
+                          <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
+                            Evidence date: {dates.join("; ")}
+                          </span>
+                        )}
+                        {notes.length > 0 && (
+                          <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                            {notes.join("; ")}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </article>
           </RevealItem>

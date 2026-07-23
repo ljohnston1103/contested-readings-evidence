@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   BookText,
   CircleEllipsis,
@@ -8,13 +8,18 @@ import {
   Globe2,
   History,
   LayoutGrid,
+  Library,
   ScrollText,
   ShieldAlert,
   UserRound,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { publicPatristicWitnesses } from "@/data/derived";
+import { dedupeWitnessRows, publicPatristicWitnesses } from "@/data/derived";
+import {
+  isCompetingEvidenceDirection,
+  isRelatedEvidenceDirection,
+} from "@/data/evidenceDirection";
 import type { Passage, Witness } from "@/data/types";
 
 import { EvidenceScale } from "./EvidenceScale";
@@ -34,69 +39,168 @@ const tabs = [
   { label: "Syriac Witnesses", icon: Globe },
   { label: "Other Versions", icon: Globe2 },
   { label: "Church Fathers", icon: UserRound },
+  { label: "Printed Editions", icon: Library },
   { label: "Competing Reading", icon: ShieldAlert },
   { label: "Related Evidence", icon: CircleEllipsis },
   { label: "Timeline", icon: History },
 ] as const;
 
+type TabLabel = (typeof tabs)[number]["label"];
+
 const easeOut = [0.21, 0.47, 0.32, 0.98] as const;
 
-function isSyriac(row: Witness) {
+function witnessName(row: Witness) {
+  return row.witness.normalize("NFKC");
+}
+
+function isExplicitlyMixedVersion(row: Witness) {
+  const name = witnessName(row);
   return (
-    row.kind === "syriac" ||
-    /syriac|peshitta|harclean|harklean|curetonian/iu.test(row.witness)
+    /(?:latin|vulgate).*(?:syriac|peshitta|harklean|harclean)|(?:syriac|peshitta|harklean|harclean).*(?:latin|vulgate)/iu.test(
+      name,
+    )
   );
+}
+
+function isSyriac(row: Witness) {
+  const name = witnessName(row);
+  if (isExplicitlyMixedVersion(row)) return false;
+  if (row.kind === "syriac") return true;
+  if (/syriac|peshitta|harclean|harklean|curetonian/iu.test(name)) {
+    return true;
+  }
+  if (
+    /latin|vulgate|coptic|sahidic|bohairic|armenian|georgian|ethiopic|gothic|slavonic|arabic/iu.test(
+      name,
+    )
+  ) {
+    return false;
+  }
+  return false;
 }
 
 function isLatin(row: Witness) {
-  return (
-    row.kind === "latin" ||
-    /latin|vulgate|codex fuldensis|codex amiatinus/iu.test(row.witness)
-  );
+  const name = witnessName(row);
+  if (isExplicitlyMixedVersion(row)) return false;
+  if (row.kind === "latin") return true;
+  if (
+    /old latin|vulgate|latin tradition|codex (?:fuldensis|amiatinus)|\bit(?:ala)?\b/iu.test(
+      name,
+    )
+  ) {
+    return true;
+  }
+  if (
+    /syriac|peshitta|harclean|harklean|curetonian|coptic|sahidic|bohairic|armenian|georgian|ethiopic|\bgothic\b|slavonic|arabic/iu.test(
+      name,
+    )
+  ) {
+    return false;
+  }
+  return false;
 }
 
 export function EvidenceTabs({ passage }: EvidenceTabsProps) {
-  const [activeTab, setActiveTab] =
-    useState<(typeof tabs)[number]["label"]>("Summary");
+  const [activeTab, setActiveTab] = useState<TabLabel>("Summary");
+  const greekWitnesses = useMemo(
+    () => dedupeWitnessRows(passage.greekSupportWitnesses),
+    [passage.greekSupportWitnesses],
+  );
   const earlyVersions = useMemo(
-    () => [...passage.latinWitnesses, ...passage.versionalWitnesses],
+    () =>
+      dedupeWitnessRows([
+        ...passage.latinWitnesses,
+        ...passage.versionalWitnesses,
+      ]),
     [passage],
+  );
+  const latin = useMemo(
+    () => earlyVersions.filter(isLatin),
+    [earlyVersions],
+  );
+  const syriac = useMemo(
+    () => earlyVersions.filter(isSyriac),
+    [earlyVersions],
+  );
+  const otherVersions = useMemo(
+    () => earlyVersions.filter((row) => !isLatin(row) && !isSyriac(row)),
+    [earlyVersions],
   );
   const visiblePatristicWitnesses = useMemo(
     () => publicPatristicWitnesses(passage),
     [passage],
   );
-  const patristicGroups = useMemo(() => {
-    const hasSupportGroups = visiblePatristicWitnesses.some((witness) =>
-      witness.region?.startsWith("Supporting "),
-    );
-    if (!hasSupportGroups) {
-      return [{ title: "", witnesses: visiblePatristicWitnesses }];
-    }
+  const competingEvidence = useMemo(
+    () =>
+      passage.evidenceAgainst.filter(
+        (row) => isCompetingEvidenceDirection(row.direction),
+      ),
+    [passage.evidenceAgainst],
+  );
+  const relatedEvidence = useMemo(
+    () =>
+      passage.evidenceAgainst.filter(
+        (row) => isRelatedEvidenceDirection(row.direction),
+      ),
+    [passage.evidenceAgainst],
+  );
+  const printedEditions = passage.printedWitnesses ?? [];
+  const visibleTabs = useMemo(
+    () =>
+      tabs.filter((tab) => {
+        switch (tab.label) {
+          case "Summary":
+            return true;
+          case "Greek Manuscripts":
+            return greekWitnesses.length > 0;
+          case "Early Versions":
+            return earlyVersions.length > 0;
+          case "Latin Witnesses":
+            return latin.length > 0;
+          case "Syriac Witnesses":
+            return syriac.length > 0;
+          case "Other Versions":
+            return otherVersions.length > 0;
+          case "Church Fathers":
+            return visiblePatristicWitnesses.length > 0;
+          case "Printed Editions":
+            return printedEditions.length > 0;
+          case "Competing Reading":
+            return competingEvidence.length > 0;
+          case "Related Evidence":
+            return relatedEvidence.length > 0;
+          case "Timeline":
+            return passage.timeline.length > 0;
+        }
+      }),
+    [
+      competingEvidence.length,
+      earlyVersions.length,
+      latin.length,
+      otherVersions.length,
+      greekWitnesses.length,
+      passage.timeline.length,
+      printedEditions.length,
+      relatedEvidence.length,
+      syriac.length,
+      visiblePatristicWitnesses.length,
+    ],
+  );
 
-    const groups = new Map<string, typeof visiblePatristicWitnesses>();
-    for (const witness of visiblePatristicWitnesses) {
-      const title = witness.region ?? "Other patristic witnesses";
-      groups.set(title, [...(groups.get(title) ?? []), witness]);
+  useEffect(() => {
+    if (!visibleTabs.some((tab) => tab.label === activeTab)) {
+      setActiveTab("Summary");
     }
-
-    return Array.from(groups, ([title, witnesses]) => ({ title, witnesses }));
-  }, [visiblePatristicWitnesses]);
-  const syriac = earlyVersions.filter(isSyriac);
-  const otherVersions = earlyVersions.filter(
-    (row) => !isLatin(row) && !isSyriac(row),
-  );
-  const competingEvidence = passage.evidenceAgainst.filter(
-    (row) => !row.direction || row.direction.startsWith("AGAINST"),
-  );
-  const relatedEvidence = passage.evidenceAgainst.filter(
-    (row) => row.direction && !row.direction.startsWith("AGAINST"),
-  );
+  }, [activeTab, visibleTabs]);
 
   return (
     <section className="grid gap-5">
-      <div className="sticky top-16 z-30 flex gap-2 overflow-x-auto rounded-full border border-ink-200 bg-white/85 p-2 shadow-card backdrop-blur dark:border-white/10 dark:bg-archive-navy/85 sm:top-20">
-        {tabs.map((tab) => {
+      <div
+        role="tablist"
+        aria-label="Passage evidence"
+        className="sticky top-16 z-30 flex gap-2 overflow-x-auto rounded-full border border-ink-200 bg-white/85 p-2 shadow-card backdrop-blur dark:border-white/10 dark:bg-archive-navy/85 sm:top-20"
+      >
+        {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.label;
           return (
@@ -104,6 +208,9 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
               key={tab.label}
               type="button"
               onClick={() => setActiveTab(tab.label)}
+              role="tab"
+              aria-selected={active}
+              aria-controls="passage-evidence-panel"
               className={`relative flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition ${
                 active
                   ? "text-white dark:text-ink-900"
@@ -127,19 +234,19 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
         })}
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.3, ease: easeOut }}
-        >
+      <motion.div
+        key={activeTab}
+        id="passage-evidence-panel"
+        role="tabpanel"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.22, ease: easeOut }}
+      >
           {activeTab === "Summary" && (
             <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr]">
               <div className="rounded-[2rem] border border-ink-200 bg-white/80 p-6 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
                 <p className="text-sm font-black uppercase tracking-[0.22em] text-archive-teal dark:text-teal-200">
-                  Editorial conclusion
+                  Evidence assessment
                 </p>
                 <h2 className="mt-2 font-display text-3xl font-black text-ink-900 dark:text-white">
                   Why the KJV reading is retained
@@ -163,7 +270,7 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
           {activeTab === "Greek Manuscripts" && (
             <EvidenceTable
               title="Greek manuscripts supporting the KJV reading"
-              rows={passage.greekSupportWitnesses}
+              rows={greekWitnesses}
             />
           )}
 
@@ -177,7 +284,7 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
           {activeTab === "Latin Witnesses" && (
             <EvidenceTable
               title="Latin witnesses supporting the KJV reading"
-              rows={passage.latinWitnesses}
+              rows={latin}
             />
           )}
 
@@ -190,40 +297,27 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
 
           {activeTab === "Other Versions" && (
             <EvidenceTable
-              title="Other ancient versions supporting the KJV reading"
+              title="Other and mixed ancient versions supporting the KJV reading"
               rows={otherVersions}
             />
           )}
 
           {activeTab === "Church Fathers" && (
-            <div className="grid gap-5">
-              {visiblePatristicWitnesses.length ? (
-                patristicGroups.map((group) => (
-                  <div
-                    key={group.title || "patristic-witnesses"}
-                    className="grid gap-4"
-                  >
-                    {group.title && (
-                      <h3 className="font-display text-2xl font-black text-ink-900 dark:text-white">
-                        {group.title}
-                      </h3>
-                    )}
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {group.witnesses.map((witness) => (
-                        <PatristicQuoteCard
-                          key={`${witness.source}-${witness.date}`}
-                          witness={witness}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="rounded-3xl border border-dashed border-ink-200 p-6 text-sm text-ink-600 dark:border-white/10 dark:text-ink-100/70">
-                  No patristic witness is listed for this passage.
-                </p>
-              )}
+            <div className="grid gap-4 md:grid-cols-2">
+              {visiblePatristicWitnesses.map((witness, witnessIndex) => (
+                <PatristicQuoteCard
+                  key={`${witness.source}-${witness.workSection ?? ""}-${witness.date}-${witnessIndex}`}
+                  witness={witness}
+                />
+              ))}
             </div>
+          )}
+
+          {activeTab === "Printed Editions" && (
+            <EvidenceTable
+              title="Printed editions supporting the KJV reading"
+              rows={printedEditions}
+            />
           )}
 
           {activeTab === "Competing Reading" && (
@@ -241,8 +335,7 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
           )}
 
           {activeTab === "Timeline" && <Timeline events={passage.timeline} />}
-        </motion.div>
-      </AnimatePresence>
+      </motion.div>
     </section>
   );
 }

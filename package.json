@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit --incremental false",
-    "test": "node scripts/validate-wave2.mjs",
+    "test": "node scripts/validate-wave2.mjs && node scripts/validate-derived.cjs",
     "validate": "npm run test && npm run typecheck && npm run lint"
   },
   "dependencies": {

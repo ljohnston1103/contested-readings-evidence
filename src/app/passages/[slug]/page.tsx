@@ -106,7 +106,7 @@ export default async function PassagePage({ params }: PassagePageProps) {
         >
         <div className="p-6">
           <p className="text-sm font-black uppercase tracking-[0.24em] text-archive-gold">
-            Editorial conclusion
+            Evidence assessment
           </p>
           <p className="mt-4 text-lg leading-8 text-white/[0.82] dark:text-ink-100/80">
             {passage.shortSummary}

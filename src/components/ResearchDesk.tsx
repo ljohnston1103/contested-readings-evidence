@@ -17,6 +17,10 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  isCompetingEvidenceDirection,
+  isRelatedEvidenceDirection,
+} from "@/data/evidenceDirection";
 import type { Passage } from "@/data/types";
 
 import styles from "./ResearchDesk.module.css";
@@ -52,19 +56,20 @@ function evidenceSegments(passage: Passage): EvidenceSegment[] {
       key: "greek",
       shortLabel: "Greek",
       label: "Greek support records",
-      count: passage.greekSupportWitnesses.length,
+      count: passage.greekSupportWitnesses.filter((row) => !row.aggregate)
+        .length,
     },
     {
       key: "latin",
       shortLabel: "Latin",
       label: "Latin support records",
-      count: passage.latinWitnesses.length,
+      count: passage.latinWitnesses.filter((row) => !row.aggregate).length,
     },
     {
       key: "versions",
       shortLabel: "Versions",
       label: "Versional support records",
-      count: passage.versionalWitnesses.length,
+      count: passage.versionalWitnesses.filter((row) => !row.aggregate).length,
     },
     {
       key: "fathers",
@@ -77,7 +82,9 @@ function evidenceSegments(passage: Passage): EvidenceSegment[] {
       shortLabel: "Competing",
       label: "Competing reading records",
       count: passage.evidenceAgainst.filter(
-        (record) => !record.direction || record.direction.startsWith("AGAINST"),
+        (record) =>
+          !record.aggregate &&
+          isCompetingEvidenceDirection(record.direction),
       ).length,
     },
     {
@@ -85,14 +92,17 @@ function evidenceSegments(passage: Passage): EvidenceSegment[] {
       shortLabel: "Other",
       label: "Other or qualified reading records",
       count: passage.evidenceAgainst.filter(
-        (record) => record.direction && !record.direction.startsWith("AGAINST"),
+        (record) =>
+          !record.aggregate &&
+          isRelatedEvidenceDirection(record.direction),
       ).length,
     },
     {
       key: "printed",
       shortLabel: "Printed",
       label: "Printed-edition records",
-      count: passage.printedWitnesses?.length ?? 0,
+      count:
+        passage.printedWitnesses?.filter((row) => !row.aggregate).length ?? 0,
     },
   ];
 }
@@ -114,7 +124,15 @@ function buildBrief(passages: Passage[]) {
       `KJV text: “${passage.kjvText}”`,
       `Reading catalogued by the site: ${passage.readingSupported}`,
       `Variant issue: ${passage.variantIssue}`,
-      `Earliest KJV-supporting evidence: ${passage.earliestSupport?.[0]?.statement ?? "See full dossier"}`,
+      `Earliest KJV-supporting evidence: ${
+        passage.earliestSupport
+          ?.map((record) =>
+            record.label
+              ? `${record.label}: ${record.statement}`
+              : record.statement,
+          )
+          .join(" | ") ?? "See full dossier"
+      }`,
       `Evidence represented: ${breakdown}`,
       `Full dossier: ${window.location.origin}/passages/${passage.slug}`,
     ].join("\n");
@@ -386,7 +404,15 @@ export function ResearchDesk({ passages }: ResearchDeskProps) {
                     <strong>{passage.reference}</strong>
                     <small>{passage.title}</small>
                   </span>
-                  <em>{passage.earliestSupport?.[0]?.statement}</em>
+                  <em>
+                    {passage.earliestSupport
+                      ?.map((record) =>
+                        record.label
+                          ? `${record.label}: ${record.statement}`
+                          : record.statement,
+                      )
+                      .join(" · ")}
+                  </em>
                 </button>
               );
             })}
@@ -550,7 +576,7 @@ export function ResearchDesk({ passages }: ResearchDeskProps) {
                         ))}
                       </tr>
                       <tr>
-                        <th scope="row">Editorial conclusion</th>
+                        <th scope="row">Evidence assessment</th>
                         {selectedPassages.map((passage) => (
                           <td key={passage.slug}>{passage.shortSummary}</td>
                         ))}

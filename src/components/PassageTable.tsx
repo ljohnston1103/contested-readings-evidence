@@ -37,7 +37,18 @@ export function PassageTable({ passages }: PassageTableProps) {
                   {passage.readingSupported}
                 </td>
                 <td className="max-w-sm px-5 py-4 align-top font-bold leading-6 text-ink-900 dark:text-white">
-                  {passage.earliestSupport?.[0]?.statement}
+                  <div className="grid gap-2">
+                    {passage.earliestSupport?.map((record, index) => (
+                      <p key={`${passage.id}-table-earliest-${index}`}>
+                        {record.label && (
+                          <span className="text-archive-teal dark:text-teal-200">
+                            {record.label}:{" "}
+                          </span>
+                        )}
+                        {record.statement}
+                      </p>
+                    ))}
+                  </div>
                 </td>
                 <td className="px-5 py-4 align-top">
                   <TagBadge tone="teal">
@@ -47,7 +58,8 @@ export function PassageTable({ passages }: PassageTableProps) {
                 <td className="px-5 py-4 align-top text-ink-700 dark:text-ink-100/75">
                   {[
                     passage.greekSupportWitnesses.length ? "Greek" : "",
-                    passage.latinWitnesses.length || passage.versionalWitnesses.length
+                    passage.latinWitnesses.length ||
+                    passage.versionalWitnesses.length
                       ? "Versions"
                       : "",
                     passage.patristicWitnesses.length ? "Fathers" : "",

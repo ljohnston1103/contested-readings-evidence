@@ -26,9 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     ...displayedPassages.map((passage) => ({
       url: `${baseUrl}/passages/${passage.slug}`,
-      lastModified: passage.lastVerified
-        ? new Date(`${passage.lastVerified}T00:00:00.000Z`)
-        : lastModified,
+      lastModified,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),

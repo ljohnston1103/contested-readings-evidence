@@ -1,10 +1,15 @@
 import type { PatristicWitness } from "@/data/types";
+import { evidenceDirectionRole } from "@/data/evidenceDirection";
 
 type PatristicQuoteCardProps = {
   witness: PatristicWitness;
 };
 
 function relationshipLabel(witness: PatristicWitness) {
+  const directionalRole = evidenceDirectionRole(witness.reading);
+  if (directionalRole === "opposes") return "Competing witness";
+  if (directionalRole === "supports") return "Supporting witness";
+
   switch (witness.relationship) {
     case "explicit_quote":
       return "Exact reading";

@@ -1,6 +1,19 @@
 import { passages } from "./passages";
+import {
+  evidenceDirectionRole,
+  isAgainstKjvDirection,
+} from "./evidenceDirection";
+import { parseEvidenceDate } from "./evidenceDates";
 import { applyKjvForwardCorrections } from "./kjvForwardCorrections";
 import type { Passage, PatristicWitness, TimelineEvent, Witness } from "./types";
+import {
+  greekWitnessCatalog,
+  resolveGreekWitness,
+  resolveVersionWitness,
+  versionWitnessCatalog,
+  type GreekCorpus,
+  type WitnessCatalogEntry,
+} from "./witnessCatalog";
 
 export const allPassages = passages.map(applyKjvForwardCorrections).sort(
   (a, b) => a.biblicalOrder - b.biblicalOrder,
@@ -111,14 +124,31 @@ export function dedupeWitnessRows(rows: Witness[]) {
 }
 
 export function publicPatristicWitnesses(passage: Passage) {
-  return passage.patristicWitnesses.filter((witness) => {
-    const text = normalize(
-      `${witness.author ?? witness.source} ${witness.date} ${witness.workSection ?? ""} ${witness.quoteSummary}`,
-    );
-    if (/editorial placeholder|verification pending|unverified draft/.test(text)) return false;
-    if (normalize(witness.source) === "patristic witnesses") return false;
-    return true;
-  });
+  return passage.patristicWitnesses
+    .filter((witness) => {
+      const name = normalize(witness.author ?? witness.source);
+      const text = normalize(
+        `${name} ${witness.date} ${witness.workSection ?? ""} ${witness.quoteSummary}`,
+      );
+      if (/editorial placeholder|verification pending|unverified draft/.test(text)) return false;
+      if (
+        name === "patristic witnesses" ||
+        /^(?:related patristic references|later ecclesiastical use|later greek commentators|liturgical ecclesiastical use)$/.test(
+          name,
+        )
+      ) {
+        return false;
+      }
+      return true;
+    })
+    .map((witness) => ({
+      ...witness,
+      region:
+        witness.region &&
+        !/^(?:supporting|opposing|related|mixed)\b/iu.test(witness.region)
+          ? witness.region
+          : undefined,
+    }));
 }
 
 function baseWitnessName(name: string) {
@@ -141,6 +171,26 @@ function baseWitnessName(name: string) {
   return canonicalNames[normalized] ?? normalized;
 }
 
+function greekCorpusForBook(book: string): GreekCorpus {
+  if (["Matthew", "Mark", "Luke", "John"].includes(book)) return "gospels";
+  if (book === "Acts") return "acts";
+  if (book === "Revelation") return "revelation";
+  if (
+    [
+      "James",
+      "1 Peter",
+      "2 Peter",
+      "1 John",
+      "2 John",
+      "3 John",
+      "Jude",
+    ].includes(book)
+  ) {
+    return "catholic";
+  }
+  return "paul";
+}
+
 function isAggregateWitness(name: string) {
   return /percent|manuscripts|majority|lectionaries|tradition|witnesses|copies|representatives|system|some manuscripts|some northern|some old latin|most coptic|most latin|one latin|two latin|three latin/i.test(
     name,
@@ -153,11 +203,26 @@ function shortSiglum(name: string) {
 }
 
 function classifyManuscript(name: string) {
-  if (/papyrus/i.test(name)) return "Papyrus";
-  if (/codex/i.test(name)) return "Major codex / uncial";
-  if (/minuscule|GA/i.test(name)) return "Minuscule";
+  if (/papyrus|\bP\d+(?:\/P\d+)?\b/i.test(name)) return "Papyrus";
   if (/uncial/i.test(name)) return "Uncial";
+  if (/minuscule/i.test(name)) return "Minuscule";
   if (/family/i.test(name)) return "Manuscript family";
+  if (
+    /^codex\s+(?:[a-z]|delta|theta|xi|sigma|phi|psi|pi|gamma|lambda|\u2135|\u0394|\u0398|\u039E|\u03A3|\u03A6|\u03A8|\u03A0|\u0393|\u039B)\b/iu.test(
+      name,
+    )
+  ) {
+    return "Uncial";
+  }
+  if (
+    /codex\s+(?:sinaiticus|alexandrinus|vaticanus|ephraemi|bezae|washingtonianus|koridethi|regius|laudianus|claromontanus|coislinianus|augien(?:sis)?|boernerianus|sangermanensis)/i.test(
+      name,
+    )
+  ) {
+    return "Major codex / uncial";
+  }
+  if (/\(GA\s+0\d{2,3}\)/i.test(name)) return "Uncial";
+  if (/codex/i.test(name) || /\bGA\s+\d+/i.test(name)) return "Minuscule";
   return "Greek witness";
 }
 
@@ -165,6 +230,7 @@ type WitnessRole = "supports" | "opposes";
 
 const namedSigla: Record<string, string> = {
   "ℵ": "Codex Sinaiticus",
+  א: "Codex Sinaiticus",
   A: "Codex Alexandrinus",
   B: "Codex Vaticanus",
   C: "Codex Ephraemi Rescriptus",
@@ -172,6 +238,9 @@ const namedSigla: Record<string, string> = {
   W: "Codex Washingtonianus",
   Θ: "Codex Koridethi",
 };
+
+const compactSiglumPattern =
+  /^(?:(?:P\d+(?:\/P\d+)?)|(?:f\d+(?:-(?:part|except-\d+))?)|(?:0?\d{1,4})|(?:ℵ|א|[A-ZΔΘΣΨΦΞ]))(?:\*vid|c\/mg|cvid|vid|txt|mg|supp|\*|c|S|s|[123])?$/u;
 
 function compactGreekTokens(value: string) {
   if (/codex|papyrus|minuscule|uncial|\bGA\b|family/i.test(value)) return [];
@@ -183,14 +252,16 @@ function compactGreekTokens(value: string) {
     .map((token) => token.replace(/^[“”"'`]+|[.“”"'`]+$/g, ""))
     .filter(Boolean)
     .filter((token) => !/^(?:Maj|Byz|Lect|K\/Byz)$/i.test(token))
-    .filter((token) =>
-      /^(?:P\d+(?:\/P\d+)?|ℵ|[A-ZΔΘΣΨΦΞ]|f\d+(?:-[A-Za-z0-9]+)*|0?\d{1,4})(?:[A-Za-z*]+(?:\/[A-Za-z*]+)?)?$/.test(
-        token,
-      ),
-    );
+    .filter((token) => compactSiglumPattern.test(token));
 }
 
-function compactWitnessName(token: string) {
+function compactWitnessName(token: string, corpus: GreekCorpus) {
+  const resolved = resolveGreekWitness(token, corpus);
+  if (resolved) {
+    return resolved.qualifier
+      ? `${resolved.displayName} — ${token}`
+      : resolved.displayName;
+  }
   if (/^P\d/i.test(token)) {
     const papyrusNumber = token.match(/^P(\d+)/i)?.[1];
     return `Papyrus ${papyrusNumber}, ${token}`;
@@ -202,6 +273,163 @@ function compactWitnessName(token: string) {
   return `${namedSigla[baseSiglum] ?? `Codex ${baseSiglum}`}, ${token}`;
 }
 
+const namedCodexCandidates: Array<[RegExp, string]> = [
+  [/\bSinaiticus\b/iu, "01"],
+  [/\bAlexandrinus\b/iu, "02"],
+  [/\bVaticanus\b/iu, "03"],
+  [/\bEphraemi(?:\s+Rescriptus)?\b/iu, "04"],
+  [/\bBezae\b/iu, "D"],
+  [/\bWashingtonianus\b/iu, "W"],
+  [/\bKoridethi\b/iu, "Θ"],
+  [/\bRegius\b/iu, "L"],
+  [/\bSangallensis\b/iu, "Δ"],
+  [/\bRossanensis\b/iu, "Σ"],
+  [/\bBeratinus\b/iu, "Φ"],
+  [/\bZacynthius\b/iu, "Ξ"],
+  [/\bAthous\s+Lavrensis\b/iu, "Ψ"],
+  [/\bClaromontanus\b/iu, "D"],
+  [/\bBoernerianus\b/iu, "G"],
+  [/\bAugiensis\b/iu, "F"],
+  [/\bLaudianus\b/iu, "E"],
+  [/\bPorphyrianus\b/iu, "P"],
+  [/\bMosquensis\b/iu, "K"],
+  [/\bCyprius\b/iu, "K"],
+  [/\bMonacensis\b/iu, "X"],
+  [/\bPetropolitanus\s+Purpureus\b/iu, "N"],
+  [/\bGuelferbytanus\b/iu, "P"],
+  [/\bDublinensis\b/iu, "Z"],
+  [/\bBorgianus\b/iu, "T"],
+];
+
+const writtenSigla: Array<[RegExp, string]> = [
+  [/\bDelta\b/iu, "Δ"],
+  [/\bTheta\b/iu, "Θ"],
+  [/\bSigma\b/iu, "Σ"],
+  [/\bPsi\b/iu, "Ψ"],
+  [/\bPhi\b/iu, "Φ"],
+  [/\bXi\b/iu, "Ξ"],
+];
+
+type CanonicalManuscriptIdentity = {
+  key: string;
+  name: string;
+  siglum: string;
+  date?: string;
+};
+
+function candidateSiglum(name: string) {
+  const baseName = name.split(/\s+—\s+/u, 1)[0].trim();
+  const parentheticalGa = baseName.match(
+    /\(GA\s+((?:P\d+(?:\/P\d+)?)|(?:0?\d{1,4}))\)/iu,
+  );
+  if (parentheticalGa) return parentheticalGa[1];
+
+  const leadingGa = baseName.match(
+    /\bGA\s+((?:P\d+(?:\/P\d+)?)|(?:0?\d{1,4}))\b/iu,
+  );
+  if (leadingGa) return leadingGa[1];
+
+  const papyrus = baseName.match(/\bPapyrus\s+(\d+)\b/iu);
+  if (papyrus) return `P${papyrus[1]}`;
+
+  const minuscule = baseName.match(/\bMinuscule\s+(\d+)\b/iu);
+  if (minuscule) return minuscule[1];
+
+  const uncial = baseName.match(/\bUncial\s+(0\d{2,3})\b/iu);
+  if (uncial) return uncial[1];
+
+  const family = baseName.match(
+    /\b(?:Manuscript\s+)?Family\s+(\d+)\b/iu,
+  );
+  if (family) return `f${family[1]}`;
+
+  for (const [pattern, siglum] of namedCodexCandidates) {
+    if (pattern.test(baseName)) return siglum;
+  }
+  for (const [pattern, siglum] of writtenSigla) {
+    if (pattern.test(baseName)) return siglum;
+  }
+
+  const trailingSiglum = baseName.match(
+    /,\s*((?:P\d+(?:\/P\d+)?)|(?:f\d+)|(?:0?\d{1,4})|(?:ℵ|א|[A-ZΔΘΣΨΦΞ])(?:\*vid|c\/mg|cvid|vid|txt|mg|supp|\*|c|S|s|[123])?)$/u,
+  );
+  if (trailingSiglum) return trailingSiglum[1];
+
+  const codexLetter = baseName.match(
+    /^Codex\s+(ℵ|א|[A-ZΔΘΣΨΦΞ])(?:\b|\s|,|$)/u,
+  );
+  return codexLetter?.[1];
+}
+
+function fallbackGaDisplay(siglum: string) {
+  if (/^P\d/iu.test(siglum)) {
+    const papyrusNumber = siglum.match(/^P(\d+)/iu)?.[1] ?? siglum;
+    return `Papyrus ${papyrusNumber} (GA ${siglum.toUpperCase()})`;
+  }
+  if (/^f\d/iu.test(siglum)) {
+    const familyNumber = siglum.match(/^f(\d+)/iu)?.[1] ?? siglum;
+    return `Family ${familyNumber} (${siglum.toLowerCase()})`;
+  }
+  if (/^0\d{2,3}$/u.test(siglum)) {
+    return `Uncial ${siglum} (GA ${siglum})`;
+  }
+  if (/^\d{1,4}$/u.test(siglum)) {
+    return `Minuscule ${siglum} (GA ${siglum})`;
+  }
+  return "";
+}
+
+function canonicalManuscriptIdentity(
+  name: string,
+  passage: Passage,
+): CanonicalManuscriptIdentity | undefined {
+  const corpus = greekCorpusForBook(passage.book);
+  const siglum = candidateSiglum(name);
+  if (siglum) {
+    const directCatalogKey = siglum
+      .replace(/^p/iu, "P")
+      .replace(/^f/iu, "f");
+    const catalogEntry =
+      greekWitnessCatalog[directCatalogKey] ??
+      resolveGreekWitness(siglum, corpus);
+    if (catalogEntry?.kind === "greek-tradition") return undefined;
+    if (catalogEntry) {
+      return {
+        key: `catalog:${catalogEntry.key}`,
+        name: catalogEntry.displayName,
+        siglum: `GA ${catalogEntry.key}`,
+        date: catalogEntry.date.replace(
+          /\s+\(base manuscript; later hand not separately dated\)$/iu,
+          "",
+        ),
+      };
+    }
+
+    const normalizedSiglum = siglum
+      .replace(/(?:\*vid|c\/mg|cvid|vid|txt|mg|supp|\*|c|S|s)$/u, "")
+      .replace(/^(ℵ|א|[A-ZΔΘΣΨΦΞ])[123]$/u, "$1")
+      .replace(/^p/iu, "P")
+      .replace(/^f/iu, "f");
+    const gaDisplay = fallbackGaDisplay(normalizedSiglum);
+    if (gaDisplay) {
+      return {
+        key: `ga:${normalizedSiglum}`,
+        name: gaDisplay,
+        siglum: `GA ${normalizedSiglum}`,
+      };
+    }
+  }
+
+  const fallbackName = baseWitnessName(name.split(/\s+—\s+/u, 1)[0]);
+  const key = normalize(fallbackName);
+  if (!key) return undefined;
+  return {
+    key: `name:${key}`,
+    name: fallbackName,
+    siglum: shortSiglum(fallbackName),
+  };
+}
+
 function collectGreekWitnesses(role: WitnessRole) {
   const rows: Array<{ passage: Passage; witness: Witness; role: WitnessRole }> = [];
   for (const passage of displayedPassages) {
@@ -211,27 +439,29 @@ function collectGreekWitnesses(role: WitnessRole) {
       if (
         role === "opposes" &&
         witness.direction &&
-        !witness.direction.startsWith("AGAINST")
+        !isAgainstKjvDirection(witness.direction)
       ) {
         continue;
       }
 
+      if (isAggregateWitness(witness.witness)) continue;
+
       const compactTokens = compactGreekTokens(witness.witness);
       if (compactTokens.length) {
+        const corpus = greekCorpusForBook(passage.book);
         for (const token of compactTokens) {
           rows.push({
             passage,
             role,
             witness: {
               ...witness,
-              witness: compactWitnessName(token),
+              witness: compactWitnessName(token, corpus),
             },
           });
         }
         continue;
       }
 
-      if (isAggregateWitness(witness.witness)) continue;
       if (!/codex|papyrus|minuscule|uncial|GA|family/i.test(witness.witness)) continue;
       rows.push({ passage, witness, role });
     }
@@ -244,8 +474,18 @@ export type ManuscriptProfile = {
   siglum: string;
   date: string;
   category: string;
-  supports: Array<{ passage: Passage; notes: string[]; labels: string[] }>;
-  opposes: Array<{ passage: Passage; notes: string[]; labels: string[] }>;
+  supports: Array<{
+    passage: Passage;
+    dates: string[];
+    notes: string[];
+    labels: string[];
+  }>;
+  opposes: Array<{
+    passage: Passage;
+    dates: string[];
+    notes: string[];
+    labels: string[];
+  }>;
 };
 
 function witnessLabel(witness: Witness) {
@@ -270,37 +510,47 @@ function addManuscriptEvidence(
   const existing = target.find((item) => item.passage.id === passage.id);
   const label = witnessLabel(witness);
   if (existing) {
+    if (witness.date && !existing.dates.includes(witness.date)) {
+      existing.dates.push(witness.date);
+    }
     if (label && !existing.labels.includes(label)) existing.labels.push(label);
-    if (!existing.notes.includes(witness.note)) existing.notes.push(witness.note);
+    if (witness.note && !existing.notes.includes(witness.note)) {
+      existing.notes.push(witness.note);
+    }
     return;
   }
 
   target.push({
     passage,
+    dates: witness.date ? [witness.date] : [],
     labels: label ? [label] : [],
-    notes: [witness.note],
+    notes: witness.note ? [witness.note] : [],
   });
 }
 
 export function buildManuscriptIndex(): ManuscriptProfile[] {
   const map = new Map<string, ManuscriptProfile>();
   for (const row of [...collectGreekWitnesses("supports"), ...collectGreekWitnesses("opposes")]) {
-    const name = baseWitnessName(row.witness.witness);
-    const existing = map.get(name);
+    const identity = canonicalManuscriptIdentity(
+      row.witness.witness,
+      row.passage,
+    );
+    if (!identity) continue;
+    const existing = map.get(identity.key);
     const profile =
       existing ??
       ({
-        name,
-        siglum: shortSiglum(name),
-        date: row.witness.date,
-        category: classifyManuscript(name),
+        name: identity.name,
+        siglum: identity.siglum,
+        date: identity.date ?? row.witness.date,
+        category: classifyManuscript(identity.name),
         supports: [],
         opposes: [],
       } satisfies ManuscriptProfile);
 
     const target = row.role === "supports" ? profile.supports : profile.opposes;
     addManuscriptEvidence(target, row.passage, row.witness);
-    map.set(name, profile);
+    map.set(identity.key, profile);
   }
 
   return Array.from(map.values()).sort((a, b) => {
@@ -313,16 +563,31 @@ export function buildManuscriptIndex(): ManuscriptProfile[] {
 }
 
 function fatherBaseName(source: string) {
-  return source
+  const base = source
     .replace(/,.*$/, "")
     .replace(/\s+\(possible\)$/i, "")
     .trim();
+  const aliases: Record<string, string> = {
+    Ambrose: "Ambrose of Milan",
+    "Ambrose of Milan": "Ambrose of Milan",
+    Basil: "Basil of Caesarea",
+    "Basil of Caesarea": "Basil of Caesarea",
+    Chrysostom: "John Chrysostom",
+    "John Chrysostom": "John Chrysostom",
+    Eusebius: "Eusebius of Caesarea",
+    "Eusebius of Caesarea": "Eusebius of Caesarea",
+    "Didache 8": "Didache",
+    Diatessaron: "Tatian / Diatessaron",
+    Tatian: "Tatian / Diatessaron",
+    "Tatian / Diatessaron tradition": "Tatian / Diatessaron",
+  };
+  return aliases[base] ?? base;
 }
 
 const fatherRegions: Record<string, string> = {
-  Ambrose: "Milan",
+  "Ambrose of Milan": "Milan",
   Augustine: "North Africa",
-  Chrysostom: "Constantinople",
+  "John Chrysostom": "Constantinople",
   Cyprian: "North Africa",
   Irenaeus: "Gaul",
   Jerome: "Bethlehem",
@@ -335,8 +600,21 @@ export type FatherProfile = {
   name: string;
   dateRange: string;
   region: string;
-  passages: Array<{ passage: Passage; witness: PatristicWitness }>;
+  passages: Array<{
+    passage: Passage;
+    witness: PatristicWitness;
+    role: "supports" | "opposes" | "related";
+  }>;
 };
+
+function patristicRole(
+  witness: PatristicWitness,
+): FatherProfile["passages"][number]["role"] {
+  const role = evidenceDirectionRole(witness.reading);
+  if (role === "opposes") return "opposes";
+  if (role === "supports") return "supports";
+  return "related";
+}
 
 export function buildFatherIndex(): FatherProfile[] {
   const map = new Map<string, FatherProfile>();
@@ -350,10 +628,14 @@ export function buildFatherIndex(): FatherProfile[] {
         ({
           name,
           dateRange: witness.date,
-          region: witness.region ?? fatherRegions[name] ?? "Region not specified",
+          region: witness.region ?? fatherRegions[name] ?? "",
           passages: [],
         } satisfies FatherProfile);
-      profile.passages.push({ passage, witness });
+      profile.passages.push({
+        passage,
+        witness,
+        role: patristicRole(witness),
+      });
       map.set(name, profile);
     }
   }
@@ -364,69 +646,415 @@ export type VersionProfile = {
   name: string;
   language: string;
   date: string;
-  supports: Array<{ passage: Passage; notes: string[] }>;
-  opposes: Array<{ passage: Passage; notes: string[] }>;
+  dateStart?: number;
+  dateEnd?: number;
+  aggregate?: boolean;
+  supports: Array<{ passage: Passage; dates: string[]; notes: string[] }>;
+  opposes: Array<{ passage: Passage; dates: string[]; notes: string[] }>;
+  related: Array<{ passage: Passage; dates: string[]; notes: string[] }>;
 };
 
-const versionCatalog: Array<Omit<VersionProfile, "supports" | "opposes">> = [
-  { name: "Old Latin", language: "Latin", date: "c. AD 150 to 400" },
-  { name: "Vulgate", language: "Latin", date: "c. AD 383 onward" },
-  { name: "Syriac Peshitta", language: "Syriac", date: "early centuries / c. AD 400s onward" },
-  { name: "Syriac Harclean", language: "Syriac", date: "AD 616" },
-  { name: "Sinaitic Syriac", language: "Syriac", date: "c. AD 300s to 400s" },
-  { name: "Curetonian Syriac", language: "Syriac", date: "c. AD 400s" },
-  { name: "Sahidic Coptic", language: "Coptic", date: "c. AD 300s to 400s" },
-  { name: "Bohairic Coptic", language: "Coptic", date: "early centuries" },
-  { name: "Gothic Version", language: "Gothic", date: "c. AD 350" },
-  { name: "Armenian", language: "Armenian", date: "c. AD 400 onward" },
-  { name: "Georgian", language: "Georgian", date: "c. AD 400s onward" },
-  { name: "Ethiopic", language: "Ethiopic", date: "c. AD 500s onward" },
-  { name: "Slavonic", language: "Old Church Slavonic", date: "medieval" },
-];
+type VersionEvidenceRole = "supports" | "opposes" | "related";
 
-function versionMatches(witness: Witness, versionName: string) {
-  const haystack = normalize(`${witness.witness} ${witness.note}`);
-  const needle = normalize(versionName);
-  if (needle === "old latin") return /old latin|latin tradition|latin copies/.test(haystack);
-  if (needle === "vulgate") return /vulgate/.test(haystack);
-  if (needle === "armenian") return /armenian/.test(haystack);
-  if (needle === "georgian") return /georgian/.test(haystack);
-  if (needle === "ethiopic") return /ethiopic/.test(haystack);
-  if (needle === "slavonic") return /slavonic/.test(haystack);
-  return haystack.includes(needle);
+type CanonicalVersionIdentity = {
+  key: string;
+  name: string;
+  language: string;
+  date?: string;
+  dateStart?: number;
+  dateEnd?: number;
+  aggregate?: boolean;
+};
+
+type VersionAccumulator = {
+  identity: CanonicalVersionIdentity;
+  dates: Set<string>;
+  observedStart?: number;
+  observedEnd?: number;
+  supports: VersionProfile["supports"];
+  opposes: VersionProfile["opposes"];
+  related: VersionProfile["related"];
+};
+
+const versionCatalogEntries = Object.values(versionWitnessCatalog).filter(
+  (entry) =>
+    entry.kind === "latin-manuscript" ||
+    entry.kind === "version-manuscript" ||
+    entry.kind === "version-tradition",
+);
+
+function normalizeVersionLabel(value: string) {
+  return value
+    .normalize("NFKC")
+    .toLocaleLowerCase("en")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
 }
 
-function addVersionEvidence(target: VersionProfile["supports"], passage: Passage, note: string) {
+function isVersionCatalogEntry(
+  entry: WitnessCatalogEntry | undefined,
+): entry is WitnessCatalogEntry {
+  return Boolean(
+    entry &&
+      (entry.kind === "latin-manuscript" ||
+        entry.kind === "version-manuscript" ||
+        entry.kind === "version-tradition"),
+  );
+}
+
+function catalogLanguage(entry: WitnessCatalogEntry, witness: Witness) {
+  const label = normalizeVersionLabel(entry.displayName);
+  if (witness.kind === "latin" || /\b(?:latin|vulgate)\b/u.test(label)) {
+    return "Latin";
+  }
+  if (witness.kind === "syriac" || /\bsyriac\b/u.test(label)) return "Syriac";
+  if (
+    witness.kind === "coptic" ||
+    /\b(?:coptic|bohairic|sahidic|faiyumic|maeotic)\b/u.test(label)
+  ) {
+    return "Coptic";
+  }
+  if (/\barmenian\b/u.test(label)) return "Armenian";
+  if (/\bgeorgian\b/u.test(label)) return "Georgian";
+  if (/\bgothic\b/u.test(label)) return "Gothic";
+  if (/\bethiopic\b/u.test(label)) return "Ethiopic";
+  if (/\bslavonic\b/u.test(label)) return "Old Church Slavonic";
+  if (/\barabic\b/u.test(label)) return "Arabic";
+  return "Other ancient version";
+}
+
+function fallbackLanguage(witness: Witness) {
+  if (witness.kind === "latin") return "Latin";
+  if (witness.kind === "syriac") return "Syriac";
+  if (witness.kind === "coptic") return "Coptic";
+
+  const label = normalizeVersionLabel(witness.witness);
+  if (/\b(?:latin|vulgate)\b/u.test(label)) return "Latin";
+  if (/\b(?:syriac|peshitta|harklean|harclean|philoxenian)\b/u.test(label)) {
+    return "Syriac";
+  }
+  if (
+    /\b(?:coptic|bohairic|sahidic|faiyumic|middle egyptian|maeotic)\b/u.test(
+      label,
+    )
+  ) {
+    return "Coptic";
+  }
+  if (/\barmenian\b/u.test(label)) return "Armenian";
+  if (/\bgeorgian\b/u.test(label)) return "Georgian";
+  if (/\bgothic\b/u.test(label)) return "Gothic";
+  if (/\bethiopic\b/u.test(label)) return "Ethiopic";
+  if (/\bslavonic\b/u.test(label)) return "Old Church Slavonic";
+  if (/\barabic\b/u.test(label)) return "Arabic";
+  return undefined;
+}
+
+function specificCatalogEntry(
+  witness: Witness,
+  passage: Passage,
+): WitnessCatalogEntry | undefined {
+  const corpus = greekCorpusForBook(passage.book);
+  const exact = resolveVersionWitness(witness.witness, corpus);
+  if (isVersionCatalogEntry(exact)) return exact;
+
+  const label = normalizeVersionLabel(witness.witness);
+  const isNonBohairic = /\bnon bohairic\b/u.test(label);
+  const displayMatch = versionCatalogEntries
+    .map((entry) => ({
+      entry,
+      display: normalizeVersionLabel(entry.displayName),
+    }))
+    .filter(
+      ({ display }) =>
+        label === display ||
+        label.startsWith(`${display} `) ||
+        label.endsWith(` ${display}`),
+    )
+    .sort((a, b) => b.display.length - a.display.length)[0]?.entry;
+  if (displayMatch) return displayMatch;
+
+  const oldLatinPrefix = label.match(/\bold latin\s+([a-z]{1,3}\d?)\b/u);
+  const oldLatinSuffix = label.match(/\bold latin\b.*\s([a-z]{1,3}\d?)$/u);
+  const oldLatinSiglum = oldLatinPrefix?.[1] ?? oldLatinSuffix?.[1];
+  if (oldLatinSiglum) {
+    const entry = versionWitnessCatalog[`old-latin-${oldLatinSiglum}`];
+    // An explicit but uncatalogued siglum (for example r1) remains its own
+    // row-derived profile instead of being collapsed into an aggregate.
+    return isVersionCatalogEntry(entry) ? entry : undefined;
+  }
+
+  const namedKey =
+    /\bcodex fuldensis\b/u.test(label)
+      ? "vulgate-fu"
+      : /\b(?:vulgate lips4|leipzig (?:ms|manuscript) 4)\b/u.test(label)
+      ? "vulgate-lips4"
+      : /\b(?:vulgate lips5|leipzig (?:ms|manuscript) 5)\b/u.test(label)
+        ? "vulgate-lips5"
+        : /\b(?:vulgate lips6|leipzig (?:ms|manuscript) 6)\b/u.test(label)
+          ? "vulgate-lips6"
+          : /\b(?:vulgate harl|codex harleianus)\b/u.test(label)
+            ? "vulgate-harl"
+            : /\b(?:mae ?1|maeotic ?1|codex scheide)\b/u.test(label)
+      ? "maeotic-1"
+      : /\b(?:mae ?2|maeotic ?2|schøyen|schoyen)\b/u.test(label)
+        ? "maeotic-2"
+        : /\b(?:sinaitic syriac|syriac sinaitic)\b/u.test(label)
+          ? "syriac-sinaitic"
+          : /\b(?:curetonian syriac|syriac curetonian)\b/u.test(label)
+            ? "syriac-curetonian"
+            : /\b(?:christian palestinian syriac|palestinian syriac)\b/u.test(
+                  label,
+                )
+              ? "palestinian-syriac"
+              : /\bdiatessaron\b/u.test(label)
+                ? "syriac-diatessaron"
+                : /\bphiloxenian\b/u.test(label)
+                  ? "syriac-philoxenian"
+                  : /\b(?:harklean|harclean)\b/u.test(label)
+                    ? "syriac-harklean"
+                    : /\bpeshitta\b/u.test(label)
+                      ? "syriac-peshitta"
+                      : /\bbohairic[\s-]*g\b/u.test(label)
+                        ? "bohairic-g"
+                        : /\bbohairic\b/u.test(label) && !isNonBohairic
+                          ? corpus === "revelation"
+                            ? "bohairic-revelation"
+                            : "bohairic"
+                          : /\bsahidic\b/u.test(label)
+                            ? "sahidic"
+                            : /\bfaiyumic\b/u.test(label)
+                              ? "faiyumic"
+                              : /\barmenian[\s-]*c\b/u.test(label)
+                                ? "armenian-c"
+                                : /\barmenian[\s-]*m\b/u.test(label)
+                                  ? "armenian-m"
+                                  : /\bgeorgian[\s-]*ii\b/u.test(label)
+                                    ? "georgian-ii"
+                                    : /\bslavonic[\s-]*b\b/u.test(label)
+                                      ? "slavonic-b"
+                                      : /\barabic[\s-]*w\b/u.test(label)
+                                        ? "arabic-w"
+                                        : /\barabic[\s-]*s\b/u.test(label)
+                                          ? "arabic-s"
+                                          : /\barabic[\s-]*e\b/u.test(label)
+                                            ? "arabic-e"
+                                            : undefined;
+  if (namedKey) {
+    const entry = versionWitnessCatalog[namedKey];
+    if (isVersionCatalogEntry(entry)) return entry;
+  }
+
+  return undefined;
+}
+
+function aggregateCatalogEntry(
+  witness: Witness,
+): WitnessCatalogEntry | undefined {
+  const label = normalizeVersionLabel(witness.witness);
+  const key =
+    /\bold latin\b.*\bvulgate\b|\bvulgate\b.*\bold latin\b/u.test(label)
+      ? "old-latin-vulgate"
+      : /\bold latin\b/u.test(label)
+        ? "old-latin-tradition"
+        : /\bvulgate\b/u.test(label)
+          ? "vulgate-tradition"
+          : /\bsyriac\b/u.test(label)
+            ? "syriac-tradition"
+            : /\b(?:coptic|middle egyptian)\b/u.test(label)
+              ? "coptic-tradition"
+              : /\barmenian\b/u.test(label)
+                ? "armenian"
+                : /\bgeorgian\b/u.test(label)
+                  ? "georgian"
+                  : /\bgothic\b/u.test(label)
+                    ? "gothic"
+                    : /\bethiopic\b/u.test(label)
+                      ? "ethiopic"
+                      : /\bslavonic\b/u.test(label)
+                        ? "slavonic"
+                        : /\barabic\b/u.test(label)
+                          ? "arabic"
+                            : witness.kind === "latin" && witness.aggregate
+                            ? "latin-tradition"
+                            : witness.kind === "syriac" && witness.aggregate
+                              ? "syriac-tradition"
+                              : witness.kind === "coptic" && witness.aggregate
+                                ? "coptic-tradition"
+                                : undefined;
+  const entry = key ? versionWitnessCatalog[key] : undefined;
+  return isVersionCatalogEntry(entry) ? entry : undefined;
+}
+
+function canonicalVersionIdentity(
+  witness: Witness,
+  passage: Passage,
+): CanonicalVersionIdentity | undefined {
+  const label = normalizeVersionLabel(witness.witness);
+  const specific = specificCatalogEntry(witness, passage);
+  const explicitUncataloguedOldLatin =
+    /\bold latin\s+[a-z]{1,3}\d?\b/u.test(label) && !specific;
+  const entry =
+    specific ??
+    (explicitUncataloguedOldLatin
+      ? undefined
+      : aggregateCatalogEntry(witness));
+  if (entry) {
+    return {
+      key: `catalog:${entry.key}`,
+      name: entry.displayName,
+      language: catalogLanguage(entry, witness),
+      date: entry.date,
+      dateStart: entry.dateStart,
+      dateEnd: entry.dateEnd,
+      aggregate: entry.aggregate,
+    };
+  }
+
+  const language = fallbackLanguage(witness);
+  if (!language || !label) return undefined;
+  return {
+    key: `row:${language}:${label}`,
+    name: witness.witness.trim(),
+    language,
+    aggregate: witness.aggregate,
+  };
+}
+
+function versionEvidenceRole(
+  witness: Witness,
+  listRole: "support" | "competing",
+): VersionEvidenceRole {
+  const role = evidenceDirectionRole(witness.direction);
+  if (role === "opposes") return "opposes";
+  if (role === "supports") return "supports";
+  if (role === "related") return "related";
+  return listRole === "support" ? "supports" : "opposes";
+}
+
+function addVersionEvidence(
+  target: VersionProfile["supports"],
+  passage: Passage,
+  witness: Witness,
+) {
   const existing = target.find((item) => item.passage.id === passage.id);
   if (existing) {
-    if (!existing.notes.includes(note)) existing.notes.push(note);
+    if (witness.date && !existing.dates.includes(witness.date)) {
+      existing.dates.push(witness.date);
+    }
+    if (witness.note && !existing.notes.includes(witness.note)) {
+      existing.notes.push(witness.note);
+    }
     return;
   }
 
-  target.push({ passage, notes: [note] });
+  target.push({
+    passage,
+    dates: witness.date ? [witness.date] : [],
+    notes: witness.note ? [witness.note] : [],
+  });
+}
+
+function observeVersionDate(accumulator: VersionAccumulator, witness: Witness) {
+  if (witness.date.trim()) accumulator.dates.add(witness.date.trim());
+  const parsed = parseEvidenceDate(witness.date);
+  const start = witness.dateStart ?? parsed?.start;
+  const end = witness.dateEnd ?? parsed?.end;
+  if (start !== undefined) {
+    accumulator.observedStart =
+      accumulator.observedStart === undefined
+        ? start
+        : Math.min(accumulator.observedStart, start);
+  }
+  if (end !== undefined) {
+    accumulator.observedEnd =
+      accumulator.observedEnd === undefined
+        ? end
+        : Math.max(accumulator.observedEnd, end);
+  }
+}
+
+function observedVersionDate(accumulator: VersionAccumulator) {
+  const dates = Array.from(accumulator.dates);
+  if (dates.length === 1) return dates[0];
+  if (
+    accumulator.observedStart !== undefined &&
+    accumulator.observedEnd !== undefined
+  ) {
+    return accumulator.observedStart === accumulator.observedEnd
+      ? `AD ${accumulator.observedStart}`
+      : `AD ${accumulator.observedStart}–${accumulator.observedEnd} (range represented by the listed witness rows)`;
+  }
+  return dates.join("; ");
 }
 
 export function buildVersionIndex(): VersionProfile[] {
-  return versionCatalog.map((version) => {
-    const profile: VersionProfile = { ...version, supports: [], opposes: [] };
-    for (const passage of displayedPassages) {
-      for (const witness of [...passage.versionalWitnesses, ...passage.latinWitnesses]) {
-        if (
-          versionMatches(witness, version.name) &&
-          !/omit|does not contain|no known|no strong|shorter|against/i.test(witness.note)
-        ) {
-          addVersionEvidence(profile.supports, passage, witness.note);
-        }
-      }
-      for (const witness of passage.evidenceAgainst) {
-        if (witness.direction && !witness.direction.startsWith("AGAINST")) continue;
-        if (versionMatches(witness, version.name) || (version.language === "Coptic" && witness.kind === "coptic")) {
-          addVersionEvidence(profile.opposes, passage, witness.note);
-        }
-      }
+  const map = new Map<string, VersionAccumulator>();
+
+  for (const passage of displayedPassages) {
+    const rows: Array<{
+      witness: Witness;
+      listRole: "support" | "competing";
+    }> = [
+      ...passage.latinWitnesses.map((witness) => ({
+        witness,
+        listRole: "support" as const,
+      })),
+      ...passage.versionalWitnesses.map((witness) => ({
+        witness,
+        listRole: "support" as const,
+      })),
+      ...passage.evidenceAgainst
+        .filter((witness) =>
+          ["latin", "syriac", "coptic", "version"].includes(
+            witness.kind ?? "",
+          ),
+        )
+        .map((witness) => ({
+          witness,
+          listRole: "competing" as const,
+        })),
+    ];
+
+    for (const { witness, listRole } of rows) {
+      const identity = canonicalVersionIdentity(witness, passage);
+      if (!identity) continue;
+      const accumulator =
+        map.get(identity.key) ??
+        ({
+          identity,
+          dates: new Set<string>(),
+          supports: [],
+          opposes: [],
+          related: [],
+        } satisfies VersionAccumulator);
+
+      observeVersionDate(accumulator, witness);
+      const role = versionEvidenceRole(witness, listRole);
+      addVersionEvidence(accumulator[role], passage, witness);
+      map.set(identity.key, accumulator);
     }
-    return profile;
-  });
+  }
+
+  return Array.from(map.values())
+    .map((accumulator): VersionProfile => ({
+      name: accumulator.identity.name,
+      language: accumulator.identity.language,
+      date: accumulator.identity.date ?? observedVersionDate(accumulator),
+      dateStart:
+        accumulator.identity.dateStart ?? accumulator.observedStart,
+      dateEnd: accumulator.identity.dateEnd ?? accumulator.observedEnd,
+      aggregate: accumulator.identity.aggregate,
+      supports: accumulator.supports,
+      opposes: accumulator.opposes,
+      related: accumulator.related,
+    }))
+    .sort(
+      (a, b) =>
+        (a.dateStart ?? Number.POSITIVE_INFINITY) -
+          (b.dateStart ?? Number.POSITIVE_INFINITY) ||
+        a.language.localeCompare(b.language) ||
+        a.name.localeCompare(b.name),
+    );
 }
 
 export function hasTag(passage: Passage, tag: string) {
@@ -448,22 +1076,7 @@ export function hasTag(passage: Passage, tag: string) {
  * decade block. Returns {0, 0} when no year can be found.
  */
 export function parseYearRange(dateLabel: string): { start: number; end: number } {
-  const tokens = dateLabel.match(/\d{3,4}s?/g);
-  if (!tokens || !tokens.length) return { start: 0, end: 0 };
-
-  const parsed = tokens.map((token) => {
-    const fuzzy = /s$/.test(token);
-    const value = Number.parseInt(token, 10);
-    return { start: value, end: fuzzy ? value + 99 : value };
-  });
-
-  let start = Math.min(...parsed.map((p) => p.start));
-  let end = Math.max(...parsed.map((p) => p.end));
-
-  if (/\bbefore\b/i.test(dateLabel)) start = Math.max(1, start - 40);
-  if (/\bafter\b/i.test(dateLabel)) end += 40;
-
-  return { start, end: Math.max(start, end) };
+  return parseEvidenceDate(dateLabel) ?? { start: 0, end: 0 };
 }
 
 export type TimelineCategory =
@@ -573,8 +1186,12 @@ function pushTimelineEntry(
   side: TimelineSide,
   note: string,
   index: number,
+  dateStart?: number,
+  dateEnd?: number,
 ) {
-  const { start, end } = parseYearRange(date);
+  const parsed = parseYearRange(date);
+  const start = dateStart ?? parsed.start;
+  const end = dateEnd ?? parsed.end;
   if (start <= 0) return;
   list.push({
     id: `${passage.slug}-${source}-${index}`,
@@ -595,28 +1212,38 @@ export function buildFullTimeline(): FullTimelineEntry[] {
   const entries: FullTimelineEntry[] = [];
 
   for (const passage of displayedPassages) {
-    passage.greekSupportWitnesses.forEach((witness, i) =>
-      pushTimelineEntry(entries, passage, "greek-support", witness.witness, witness.date, "greek", "support", witness.note, i),
-    );
-    passage.latinWitnesses.forEach((witness, i) =>
-      pushTimelineEntry(entries, passage, "latin-support", witness.witness, witness.date, "latin", "support", witness.note, i),
-    );
-    passage.versionalWitnesses.forEach((witness, i) =>
-      pushTimelineEntry(
-        entries,
-        passage,
-        "versional-support",
-        witness.witness,
-        witness.date,
-        classifyWitnessCategory(witness),
-        "support",
-        witness.note,
-        i,
-      ),
-    );
-    (passage.printedWitnesses ?? []).forEach((witness, i) =>
-      pushTimelineEntry(entries, passage, "printed-support", witness.witness, witness.date, "printed", "support", witness.note, i),
-    );
+    passage.greekSupportWitnesses
+      .filter((witness) => !witness.aggregate && !witness.dateUncertain)
+      .forEach((witness, i) =>
+        pushTimelineEntry(entries, passage, "greek-support", witness.witness, witness.date, "greek", "support", witness.note, i, witness.dateStart, witness.dateEnd),
+      );
+    passage.latinWitnesses
+      .filter((witness) => !witness.aggregate)
+      .forEach((witness, i) =>
+        pushTimelineEntry(entries, passage, "latin-support", witness.witness, witness.date, "latin", "support", witness.note, i, witness.dateStart, witness.dateEnd),
+      );
+    passage.versionalWitnesses
+      .filter((witness) => !witness.aggregate)
+      .forEach((witness, i) =>
+        pushTimelineEntry(
+          entries,
+          passage,
+          "versional-support",
+          witness.witness,
+          witness.date,
+          classifyWitnessCategory(witness),
+          "support",
+          witness.note,
+          i,
+          witness.dateStart,
+          witness.dateEnd,
+        ),
+      );
+    (passage.printedWitnesses ?? [])
+      .filter((witness) => !witness.aggregate)
+      .forEach((witness, i) =>
+        pushTimelineEntry(entries, passage, "printed-support", witness.witness, witness.date, "printed", "support", witness.note, i, witness.dateStart, witness.dateEnd),
+      );
     publicPatristicWitnesses(passage).forEach((witness, i) =>
       pushTimelineEntry(
         entries,
@@ -625,13 +1252,25 @@ export function buildFullTimeline(): FullTimelineEntry[] {
         witness.author ?? witness.source,
         witness.date,
         "patristic",
-        witness.reading?.startsWith("AGAINST") ? "oppose" : "support",
+        patristicRole(witness) === "opposes" ? "oppose" : "support",
         witness.quoteSummary,
         i,
+        witness.dateStart,
+        witness.dateEnd,
       ),
     );
-    passage.evidenceAgainst.forEach((witness, i) => {
-      if (witness.direction && !witness.direction.startsWith("AGAINST")) return;
+    passage.evidenceAgainst
+      .filter(
+        (witness) =>
+          !witness.aggregate && !witness.dateUncertain,
+      )
+      .forEach((witness, i) => {
+      if (
+        witness.direction &&
+        !isAgainstKjvDirection(witness.direction)
+      ) {
+        return;
+      }
       pushTimelineEntry(
         entries,
         passage,
@@ -642,8 +1281,10 @@ export function buildFullTimeline(): FullTimelineEntry[] {
         "oppose",
         witness.note,
         i,
+        witness.dateStart,
+        witness.dateEnd,
       );
-    });
+      });
     passage.timeline.forEach((event, i) =>
       pushTimelineEntry(
         entries,
@@ -713,6 +1354,7 @@ export type ConstellationLeaf = {
   detail: string;
   supports: Passage[];
   opposes: Passage[];
+  related: Passage[];
 };
 
 export type ConstellationBranch = {
@@ -763,14 +1405,26 @@ export function buildWitnessConstellation(): ConstellationBranch[] {
 
   for (const father of buildFatherIndex()) {
     const branch = fatherBranch(father.region);
-    const passages = uniquePassages(father.passages.map((item) => item.passage));
     map.get(branch)!.push({
       id: `father-${father.name}`,
       name: father.name,
       kind: "father",
       detail: `${father.dateRange} · ${father.region}`,
-      supports: passages,
-      opposes: [],
+      supports: uniquePassages(
+        father.passages
+          .filter((item) => item.role === "supports")
+          .map((item) => item.passage),
+      ),
+      opposes: uniquePassages(
+        father.passages
+          .filter((item) => item.role === "opposes")
+          .map((item) => item.passage),
+      ),
+      related: uniquePassages(
+        father.passages
+          .filter((item) => item.role === "related")
+          .map((item) => item.passage),
+      ),
     });
   }
 
@@ -783,6 +1437,7 @@ export function buildWitnessConstellation(): ConstellationBranch[] {
       detail: `${version.language} · ${version.date}`,
       supports: uniquePassages(version.supports.map((item) => item.passage)),
       opposes: uniquePassages(version.opposes.map((item) => item.passage)),
+      related: uniquePassages(version.related.map((item) => item.passage)),
     });
   }
 
@@ -797,6 +1452,7 @@ export function buildWitnessConstellation(): ConstellationBranch[] {
       detail: `${majorityPassages.length} passages with majority Greek support`,
       supports: majorityPassages,
       opposes: [],
+      related: [],
     });
   }
 

@@ -1,4 +1,12 @@
 import correctionsData from "./kjv-forward.generated.json";
+import { parseEvidenceDate, sortWitnessRows } from "./evidenceDates";
+import {
+  resolveGreekWitness,
+  resolveVersionWitness,
+  type GreekCorpus,
+  type ResolvedGreekWitness,
+  type WitnessCatalogEntry,
+} from "./witnessCatalog";
 import type {
   EarliestSupport,
   EvidenceRelationship,
@@ -65,123 +73,6 @@ const commonReferences: ReferenceEntry[] = [
   },
 ];
 
-function groupedDate(groupPrefix: string) {
-  const match = corrections.groupedDates.find((entry) =>
-    entry.group.startsWith(groupPrefix),
-  );
-  if (!match) throw new Error(`Missing grouped public date for ${groupPrefix}`);
-  return match.publicDate;
-}
-
-const wave2PublicDates: Record<
-  string,
-  { greek?: string[]; versions?: string[] }
-> = {
-  "matthew-1-25": {
-    greek: [groupedDate("Matthew 1:25 — Greek group")],
-    versions: [groupedDate("Matthew 1:25 — Latin and Syriac group")],
-  },
-  "matthew-5-22": {
-    greek: [groupedDate("Matthew 5:22 — Greek group")],
-    versions: [groupedDate("Matthew 5:22 — versional group")],
-  },
-  "matthew-5-44": {
-    greek: [groupedDate("Matthew 5:44 — Greek group")],
-    versions: [groupedDate("Matthew 5:44 — versional group")],
-  },
-  "matthew-19-16-17": {
-    greek: [
-      groupedDate("Matthew 19:16–17 — Greek groups"),
-      groupedDate("Matthew 19:16–17 — Greek groups"),
-    ],
-    versions: [groupedDate("Matthew 19:16–17 — versional group")],
-  },
-  "matthew-27-35": {
-    greek: [groupedDate("Matthew 27:35 — Greek group")],
-    versions: [groupedDate("Matthew 27:35 — versional group")],
-  },
-  "mark-1-2": {
-    greek: [groupedDate("Mark 1:2 — Greek group")],
-    versions: [groupedDate("Mark 1:2 — versional group")],
-  },
-  "mark-10-24": {
-    greek: [groupedDate("Mark 10:24 — Greek group")],
-    versions: [groupedDate("Mark 10:24 — versional group")],
-  },
-  "luke-2-14": {
-    greek: [groupedDate("Luke 2:14 — Greek group")],
-    versions: [groupedDate("Luke 2:14 — versional group")],
-  },
-  "luke-2-33": {
-    greek: [groupedDate("Luke 2:33 — Greek group")],
-    versions: [groupedDate("Luke 2:33 — versional group")],
-  },
-  "luke-4-4": {
-    greek: [groupedDate("Luke 4:4 — Greek group")],
-    versions: [groupedDate("Luke 4:4 — versional group")],
-  },
-  "luke-24-6": {
-    greek: [groupedDate("Luke 24:6 — Greek group")],
-    versions: [groupedDate("Luke 24:6 — Latin group")],
-  },
-  "john-3-13": {
-    greek: [groupedDate("John 3:13 — Greek group")],
-    versions: [groupedDate("John 3:13 — versional group")],
-  },
-  "acts-20-28": {
-    greek: [groupedDate("Acts 20:28 — Greek “God” group")],
-    versions: [groupedDate("Acts 20:28 — Vulgate and Syriac group")],
-  },
-  "romans-14-10": {
-    greek: [groupedDate("Romans 14:10 — Greek “Christ” group")],
-    versions: [groupedDate("Romans 14:10 — versional group")],
-  },
-  "1-corinthians-15-47": {
-    greek: [groupedDate("1 Corinthians 15:47 — Greek “the Lord” group")],
-    versions: [groupedDate("1 Corinthians 15:47 — versional group")],
-  },
-  "ephesians-3-9": {
-    greek: [
-      groupedDate("Ephesians 3:9 — “fellowship” group"),
-      groupedDate("Ephesians 3:9 — “by Jesus Christ” Greek group"),
-    ],
-    versions: [groupedDate("Ephesians 3:9 — Syriac Harklean")],
-  },
-  "1-john-4-3": {
-    greek: [
-      groupedDate("1 John 4:3 — exact KJV-family Greek group"),
-    ],
-  },
-  "revelation-1-8": {
-    greek: [
-      groupedDate("Revelation 1:8 — “beginning and ending” Greek group"),
-      "",
-    ],
-    versions: [
-      groupedDate("Revelation 1:8 — “saith the Lord” versional group"),
-      groupedDate("Revelation 1:8 — “saith the Lord” versional group"),
-    ],
-  },
-  "revelation-1-11": {
-    greek: [groupedDate("Revelation 1:11 — exact Greek expansion group")],
-  },
-  "revelation-16-5": {
-    greek: ["", ""],
-    versions: [
-      groupedDate("Revelation 16:5 — “O Lord” versional group"),
-      groupedDate("Revelation 16:5 — related future-tense evidence"),
-    ],
-  },
-  "revelation-22-19": {
-    greek: [""],
-    versions: [
-      groupedDate(
-        "Revelation 22:19 — “book of life” versional/patristic group",
-      ),
-    ],
-  },
-};
-
 function inferRelationship(row: Witness): EvidenceRelationship {
   if (row.relationship) return row.relationship;
   if (row.direction?.includes("RELATED")) return "related";
@@ -205,6 +96,14 @@ function isNegativeSupport(row: Witness) {
 }
 
 function isVagueDate(date: string) {
+  if (
+    /\bonward\b|early centuries|medieval period|archetype traced earlier|none known|modern forgery|later correction|uncertain date|date unknown/iu.test(
+      date,
+    )
+  ) {
+    return true;
+  }
+  if (parseEvidenceDate(date)) return false;
   return (
     !date.trim() ||
     /^(?:ancient|early|later|medieval|byzantine|latin tradition|church fathers)/iu.test(
@@ -216,56 +115,743 @@ function isVagueDate(date: string) {
   );
 }
 
-function fallbackDate(row: Witness, passage: Passage) {
-  const text = `${row.witness} ${row.note}`;
-  if (/Harklean|Harclean/iu.test(text)) return "AD 616";
-  if (/Peshitta/iu.test(text)) return "Early fifth century";
-  if (/Gothic/iu.test(text)) return "c. AD 350";
-  if (/Old Latin|Latin/iu.test(text)) return "Fourth century onward";
-  if (/Vulgate/iu.test(text)) return "c. AD 382–405";
-  if (/Coptic|Bohairic|Sahidic/iu.test(text)) return "Fourth century onward";
-  if (/Armenian/iu.test(text)) return "Fifth century onward";
-  if (/lectionar/iu.test(text)) return "Sixth century onward";
-  if (/Byzantine|Majority/iu.test(text)) return "Sixth century onward";
-  const earliest = earliestBySlug.get(passage.slug);
+type PublicDate = {
+  label: string;
+  start: number;
+  end: number;
+};
+
+const clarifiedAggregateNames: Readonly<Record<string, string>> = {
+  "early syriac": "Early Syriac versional tradition (aggregate)",
+  "early coptic": "Early Coptic versional tradition (aggregate)",
+  "early important vulgate witnesses":
+    "Early Vulgate manuscripts omitting the Comma (aggregate)",
+  "old latin tradition": "Old Latin tradition (aggregate)",
+  "greek manuscript majority": "Greek manuscript majority (aggregate)",
+};
+
+function isAggregateEvidenceRow(row: Witness) {
+  const label = row.witness.normalize("NFKC").trim();
   return (
-    earliest?.statement.split(" — ")[0]?.trim() ||
-    "Date documented in the curated evidence record"
+    row.kind === "summary" ||
+    /^(?:approximately\s+)?\d[\d,+.%]*\s+(?:greek\s+)?manuscripts?\b/iu.test(
+      label,
+    ) ||
+    /^(?:all|most|many|some|other|remaining|additional|two|three|one|hundreds of)\b/iu.test(
+      label,
+    ) ||
+    /\b(?:majority|family \d+|lectionaries|lectionary system|witnesses|manuscripts|copies|representatives|textual tradition|manuscript tradition|liturgical tradition)\b/iu.test(
+      label,
+    ) ||
+    (/\btradition\b/iu.test(label) &&
+      !/\b(?:codex|ephrem)\b/iu.test(label))
   );
 }
 
-function dateSupportingRows(
-  rows: Witness[],
-  passage: Passage,
-  publicDates: string[] | undefined,
-) {
-  return rows.map((row, index) => ({
-    ...row,
-    date:
-      publicDates?.[index] ||
-      (isVagueDate(row.date) ? fallbackDate(row, passage) : row.date),
-    relationship: inferRelationship(row),
-  }));
+function publicEvidenceNote(note: string) {
+  return note
+    .replace(
+      /Marginal Comma;\s*do not present the manuscript’s [^.;]+ as the date of the addition/iu,
+      "Marginal Comma. The base-manuscript date is not the date of the later marginal addition",
+    )
+    .replace(
+      /early Latin support should not be treated as if every Old Latin witness uniformly contains/iu,
+      "early Latin support does not imply that every Old Latin witness uniformly contains",
+    )
+    .replace(
+      /;\s*retain the disputed-date\/evidence qualification\.?/giu,
+      ". Its date and evidential status remain disputed.",
+    )
+    .replace(/;\s*place under competing evidence\.?/giu, ".")
+    .replace(/\s+\./gu, ".")
+    .trim();
 }
 
-function moveNegativeRows(
-  passage: Passage,
-  rows: Witness[],
-  competing: Witness[],
-) {
-  const support: Witness[] = [];
-  for (const row of rows) {
-    if (isNegativeSupport(row)) {
-      competing.push({
-        ...row,
-        direction: "AGAINST_KJV",
-        relationship: "related",
-      });
-    } else {
-      support.push(row);
+function joinPublicNotes(notes: Array<string | undefined>) {
+  return notes
+    .map((note) => note?.trim())
+    .filter((note): note is string => Boolean(note))
+    .reduce((joined, note) => {
+      if (!joined) return note;
+      return `${joined}${/[.!?;:]$/u.test(joined) ? " " : ". "}${note}`;
+    }, "");
+}
+
+/**
+ * Honest public ranges for aggregate traditions and undated correction hands
+ * already present in the original 30 dossiers. These are deliberately broad:
+ * an aggregate tradition is not a single manuscript, and a corrector must not
+ * be assigned the date of an unrelated early witness in the same passage.
+ */
+function legacyPublicDate(row: Witness): PublicDate | undefined {
+  const text = `${row.witness} ${row.date}`.normalize("NFKC");
+
+  if (/Harklean|Harclean/iu.test(text)) {
+    return { label: "AD 616", start: 616, end: 616 };
+  }
+  if (/Curetonian Syriac/iu.test(text)) {
+    return { label: "Fifth century", start: 401, end: 500 };
+  }
+  if (/Sinaitic Syriac/iu.test(text)) {
+    return {
+      label: "Late fourth to early fifth century",
+      start: 367,
+      end: 433,
+    };
+  }
+  if (/Syriac Peshitta/iu.test(text)) {
+    return {
+      label: "Early fifth–sixteenth centuries (versional manuscript tradition)",
+      start: 401,
+      end: 1600,
+    };
+  }
+  if (/Palestinian Syriac|Christian Palestinian Aramaic/iu.test(text)) {
+    return {
+      label: "c. AD 500–1200 (manuscript tradition)",
+      start: 500,
+      end: 1200,
+    };
+  }
+  if (/Gothic/iu.test(text)) {
+    return { label: "c. AD 350", start: 350, end: 350 };
+  }
+  if (/Old Latin|early Latin transmission/iu.test(text)) {
+    return {
+      label: "c. AD 200–500 (Old Latin tradition)",
+      start: 200,
+      end: 500,
+    };
+  }
+  if (
+    /\bLatin\b/iu.test(text) &&
+    !/Old Latin|Vulgate/iu.test(text)
+  ) {
+    return {
+      label: "c. AD 300–1500 (Latin manuscript tradition)",
+      start: 300,
+      end: 1500,
+    };
+  }
+  if (/Vulgate/iu.test(text)) {
+    return {
+      label: "c. AD 382–1500 (Vulgate manuscript tradition)",
+      start: 382,
+      end: 1500,
+    };
+  }
+  if (/Bohairic|Sahidic|Coptic|Middle Egyptian/iu.test(text)) {
+    return {
+      label: "c. AD 300–1500 (Coptic manuscript tradition)",
+      start: 300,
+      end: 1500,
+    };
+  }
+  if (/Armenian/iu.test(text)) {
+    return {
+      label: "c. AD 400–1500 (Armenian manuscript tradition)",
+      start: 400,
+      end: 1500,
+    };
+  }
+  if (/Georgian/iu.test(text)) {
+    return {
+      label: "c. AD 400–1500 (Georgian manuscript tradition)",
+      start: 400,
+      end: 1500,
+    };
+  }
+  if (/Ethiopic/iu.test(text)) {
+    return {
+      label: "c. AD 500–1500 (Ethiopic manuscript tradition)",
+      start: 500,
+      end: 1500,
+    };
+  }
+  if (/Slavonic/iu.test(text)) {
+    return {
+      label: "c. AD 900–1500 (Old Church Slavonic tradition)",
+      start: 900,
+      end: 1500,
+    };
+  }
+  if (/Codex Sinaiticus.*(?:correction|corrector)/iu.test(text)) {
+    return {
+      label:
+        "After c. AD 330–360; correction hand not independently dated here",
+      start: 330,
+      end: 1000,
+    };
+  }
+  if (/Codex Alexandrinus.*(?:correction|corrector)/iu.test(text)) {
+    return {
+      label:
+        "After c. AD 400–450; correction hand not independently dated here",
+      start: 400,
+      end: 1000,
+    };
+  }
+  if (/Codex (?:Ephraemi|Bezae).*(?:correction|corrector)/iu.test(text)) {
+    return {
+      label:
+        "After the fifth-century manuscript; correction hand not independently dated here",
+      start: 401,
+      end: 1000,
+    };
+  }
+  if (/lectionar/iu.test(text)) {
+    return {
+      label: "c. AD 500–1500 (lectionary manuscript tradition)",
+      start: 500,
+      end: 1500,
+    };
+  }
+  if (/Byzantine|Majority/iu.test(text)) {
+    return {
+      label: "c. AD 500–1500 (Byzantine manuscript tradition)",
+      start: 500,
+      end: 1500,
+    };
+  }
+  if (/\bFamily 1\b/iu.test(text)) {
+    return {
+      label: "Tenth–fourteenth centuries (extant family members)",
+      start: 901,
+      end: 1400,
+    };
+  }
+  if (/\bFamily 13\b/iu.test(text)) {
+    return {
+      label: "Eleventh–fifteenth centuries (extant family members)",
+      start: 1001,
+      end: 1500,
+    };
+  }
+  if (/Textus Receptus|Erasmus/iu.test(text)) {
+    return {
+      label: "AD 1516–1894 (printed Textus Receptus editions)",
+      start: 1516,
+      end: 1894,
+    };
+  }
+  if (/medieval to early modern/iu.test(text)) {
+    return { label: "c. AD 500–1700", start: 500, end: 1700 };
+  }
+  if (/early to medieval|early centuries|early AD|early medieval/iu.test(text)) {
+    return { label: "c. AD 200–1500", start: 200, end: 1500 };
+  }
+  if (/medieval|later ecclesiastical tradition/iu.test(text)) {
+    return { label: "c. AD 500–1500", start: 500, end: 1500 };
+  }
+  return undefined;
+}
+
+function normalizeWitnessDate(row: Witness): Witness {
+  const existing = parseEvidenceDate(row.date);
+  const catalogEntry = resolveVersionWitness(row.witness);
+  const normalizedName = normalizedWitnessIdentity(row.witness);
+  const clarifiedWitness =
+    clarifiedAggregateNames[normalizedName] ?? row.witness;
+  const isClarifiedAggregate = clarifiedWitness !== row.witness;
+  const hasStructuredDate =
+    Number.isFinite(row.dateStart) || Number.isFinite(row.dateEnd);
+  const contributionDate: PublicDate | undefined =
+    normalizedName === "ga 429 margin"
+      ? {
+          label: row.date,
+          start: 1523,
+          end: 1900,
+        }
+      : normalizedName === "ga 177 margin"
+        ? {
+            label: row.date,
+            start: 1785,
+            end: 1785,
+          }
+        : normalizedName === "ga 221 margin"
+          ? {
+              label: row.date,
+              start: 1855,
+              end: 1900,
+            }
+          : normalizedName === "ga 88 margin"
+            ? {
+                label: row.date,
+                start: 1201,
+                end: 1900,
+              }
+            : normalizedName === "ga 636 margin"
+              ? {
+                  label: row.date,
+                  start: 1401,
+                  end: 1900,
+                }
+              : undefined;
+  let replacement =
+    !hasStructuredDate && isVagueDate(row.date)
+      ? legacyPublicDate(row)
+      : undefined;
+  if (
+    !replacement &&
+    existing &&
+    /\b(?:correction|corrector|margin|marginal)\b/iu.test(row.witness) &&
+    !/\bfirst hand\b/iu.test(row.witness) &&
+    !/base manuscript|not independently dated|later addition/iu.test(row.date)
+  ) {
+    replacement = {
+      label: `${row.date.replace(/\s*\/\s*(?:later )?correction$/iu, "")} (base manuscript; later hand not independently dated)`,
+      start: existing.start,
+      end: Math.max(existing.end, 1600),
+    };
+  }
+  const catalogDate = catalogEntry
+    ? {
+        label: catalogEntry.date,
+        start: catalogEntry.dateStart,
+        end: catalogEntry.dateEnd,
+      }
+    : undefined;
+  const range = catalogDate ?? contributionDate ?? replacement ?? existing;
+  const finalDate =
+    catalogDate?.label ??
+    contributionDate?.label ??
+    replacement?.label ??
+    row.date;
+  const dateUncertain =
+    row.dateUncertain ??
+    ((normalizedName === "ga 88 margin" ||
+      normalizedName === "ga 636 margin" ||
+      /not independently dated|not separately dated|uncertain date/iu.test(
+        finalDate,
+      )) &&
+      /\b(?:correction|corrector|margin|marginal|supplement)\b/iu.test(
+        `${row.witness} ${row.note}`,
+      ));
+
+  return {
+    ...row,
+    witness: clarifiedWitness,
+    date: finalDate,
+    dateStart: catalogDate?.start ?? row.dateStart ?? range?.start,
+    dateEnd: catalogDate?.end ?? row.dateEnd ?? range?.end,
+    dateSource: row.dateSource ?? catalogEntry?.dateSource,
+    dateSourceUrl: row.dateSourceUrl ?? catalogEntry?.dateSourceUrl,
+    dateUncertain,
+    aggregate:
+      row.aggregate === true ||
+      catalogEntry?.aggregate === true ||
+      isClarifiedAggregate ||
+      isAggregateEvidenceRow(row),
+    note: publicEvidenceNote(row.note),
+    relationship: inferRelationship(row),
+  };
+}
+
+const legacyGroupedWitnesses: Readonly<Record<string, readonly string[]>> = {
+  "other old latin witnesses c g1 f l q r1 aur": [
+    "Old Latin c",
+    "Old Latin g1",
+    "Old Latin f",
+    "Old Latin l",
+    "Old Latin q",
+    "Old Latin r1",
+    "Old Latin aur",
+  ],
+  "old latin e ff1": ["Old Latin e", "Old Latin ff1"],
+  "sinaitic syriac peshitta palestinian syriac": [
+    "Syriac Sinaitic",
+    "Syriac Peshitta",
+    "Palestinian Syriac",
+  ],
+  "old latin h p": ["Old Latin h", "Old Latin p"],
+  "syriac peshitta harclean uncertain apparatus note": [
+    "Syriac Peshitta",
+    "Syriac Harklean",
+  ],
+  "latin vulgate": ["Old Latin tradition", "Vulgate tradition"],
+};
+
+const uncataloguedLegacyWitnesses: Readonly<
+  Record<string, WitnessCatalogEntry>
+> = {
+  "old latin r1": {
+    key: "old-latin-r1",
+    displayName: "Old Latin r¹ (Codex Usserianus Primus)",
+    date: "Seventh century",
+    dateStart: 601,
+    dateEnd: 700,
+    aggregate: false,
+    kind: "latin-manuscript",
+    dateSource: "University of Birmingham ITSEE, Old Latin Gospel Manuscripts",
+    dateSourceUrl: "https://itseeweb.cal.bham.ac.uk/vetuslatina/GospelMSS/",
+  },
+  "old latin p": {
+    key: "old-latin-p",
+    displayName: "Old Latin p",
+    date: "Fifth–thirteenth centuries (broad siglum range)",
+    dateStart: 401,
+    dateEnd: 1300,
+    aggregate: false,
+    kind: "latin-manuscript",
+    dateSource: "University of Birmingham ITSEE, Old Latin sigla concordance",
+    dateSourceUrl: "https://itseeweb.cal.bham.ac.uk/vetuslatina/sigla/",
+  },
+};
+
+function normalizedWitnessIdentity(value: string) {
+  return value
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function evidenceKindForLegacyEntry(
+  entry: WitnessCatalogEntry,
+): Witness["kind"] {
+  if (entry.kind === "latin-manuscript") return "latin";
+  if (entry.kind === "printed-edition") return "printed";
+  if (/syriac|peshitta|harklean|harclean|palestinian/iu.test(entry.displayName)) {
+    return "syriac";
+  }
+  if (/coptic|sahidic|bohairic/iu.test(entry.displayName)) return "coptic";
+  return "version";
+}
+
+function greekCorpusForBook(book: string): GreekCorpus {
+  if (["Matthew", "Mark", "Luke", "John"].includes(book)) return "gospels";
+  if (book === "Acts") return "acts";
+  if (book === "Revelation") return "revelation";
+  if (
+    [
+      "James",
+      "1 Peter",
+      "2 Peter",
+      "1 John",
+      "2 John",
+      "3 John",
+      "Jude",
+    ].includes(book)
+  ) {
+    return "catholic";
+  }
+  return "paul";
+}
+
+type LegacyGreekSiglum = {
+  lookup: string;
+  publicLabel: string;
+};
+
+const properCodexSigla: Readonly<Record<string, string>> = {
+  sinaiticus: "\u2135",
+  alexandrinus: "A",
+  vaticanus: "B",
+  "ephraemi rescriptus": "C",
+  ephraemi: "C",
+  bezae: "D",
+  claromontanus: "D",
+  laudianus: "E",
+  washingtonianus: "W",
+  koridethi: "\u0398",
+  porphyrianus: "P",
+  boernerianus: "G",
+  dublinensis: "Z",
+};
+
+const writtenGreekSigla: Readonly<Record<string, string>> = {
+  delta: "\u0394",
+  theta: "\u0398",
+  xi: "\u039E",
+  sigma: "\u03A3",
+  phi: "\u03A6",
+  psi: "\u03A8",
+  pi: "\u03A0",
+  gamma: "\u0393",
+  lambda: "\u039B",
+};
+
+function contributionQualifier(label: string) {
+  if (/\bfirst hand\b/iu.test(label)) return "*";
+  if (/\b(?:correction|corrector|corrected|later correction)\b/iu.test(label)) {
+    return "c";
+  }
+  if (/\b(?:margin|marginal)\b/iu.test(label)) return "mg";
+  if (/\btext\b/iu.test(label)) return "txt";
+  if (/\bvid\b/iu.test(label)) return "vid";
+  return "";
+}
+
+function writtenSiglum(token: string) {
+  return writtenGreekSigla[token.toLowerCase()] ?? token;
+}
+
+function qualifyLegacySiglum(
+  base: string,
+  label: string,
+  publicLabel?: string,
+): LegacyGreekSiglum {
+  const contribution = contributionQualifier(label);
+  const explicitSuffix =
+    base.match(/(?:c|mg|txt|vid)$/iu) ??
+    base.match(/^(?:ℵ|[A-ZΔΘΞΣΦΨΠΓΛ])[123*]$/u);
+  const lookup =
+    explicitSuffix || base === "Ws"
+      ? base
+      : `${base}${contribution}`;
+  const displayLabel =
+    publicLabel && contribution && !explicitSuffix
+      ? `${publicLabel}${contribution}`
+      : publicLabel;
+  return { lookup, publicLabel: displayLabel ?? lookup };
+}
+
+/**
+ * Recover an apparatus siglum from the prose-style labels used by the
+ * original 30 passage dossiers. This intentionally handles one named witness
+ * at a time; aggregate statements such as "Greek manuscript majority" remain
+ * aggregate rows and are not mechanically split.
+ */
+function legacyGreekSiglum(label: string): LegacyGreekSiglum | undefined {
+  const normalized = label.normalize("NFKC").trim();
+  if (
+    /\b(?:majority|manuscripts|relocating the passage|commentary)\b/iu.test(
+      normalized,
+    ) ||
+    /\bfirst hand and later correction group\b/iu.test(normalized)
+  ) {
+    return undefined;
+  }
+
+  const gaParenthetical = normalized.match(/\(GA\s+([^)]{1,20})\)/iu);
+  if (gaParenthetical?.[1]) {
+    const siglum = gaParenthetical[1].trim();
+    return qualifyLegacySiglum(siglum, normalized);
+  }
+
+  const ga = normalized.match(/\bGA\s+(P?\d+(?:\/P?\d+)?)/iu);
+  if (ga?.[1]) {
+    return qualifyLegacySiglum(ga[1], normalized);
+  }
+
+  const minuscule = normalized.match(/\bMinuscule\s+(\d+)/iu);
+  if (minuscule?.[1]) {
+    return qualifyLegacySiglum(minuscule[1], normalized);
+  }
+
+  const uncial = normalized.match(/\bUncial\s+(0\d+)/iu);
+  if (uncial?.[1]) {
+    return qualifyLegacySiglum(uncial[1], normalized);
+  }
+
+  const papyrus = normalized.match(/\bPapyrus\s+(\d+)/iu);
+  if (papyrus?.[1]) {
+    return qualifyLegacySiglum(`P${papyrus[1]}`, normalized);
+  }
+
+  const family = normalized.match(
+    /^Family\s+(\d+)(?:\s+core representatives)?$/iu,
+  );
+  if (family?.[1]) {
+    return qualifyLegacySiglum(`f${family[1]}`, normalized);
+  }
+
+  if (!/^Codex\b/iu.test(normalized)) return undefined;
+  if (/\bWashingtonianus supplement\b/iu.test(normalized)) {
+    return { lookup: "Ws", publicLabel: "Ws" };
+  }
+
+  const commaTail = normalized.match(/,\s*([^,]+)$/u)?.[1]?.trim();
+  if (commaTail) {
+    const tailSiglum = commaTail.match(
+      /^([A-Z\u2135\u0394\u0398\u039E\u03A3\u03A6\u03A8](?:[123*]|[bc]|mg|txt|vid)?|Delta|Theta|Xi|Sigma|Phi|Psi|Pi|Gamma|Lambda)\b/iu,
+    )?.[1];
+    if (tailSiglum) {
+      const publicLabel = writtenSiglum(tailSiglum);
+      // Lettered corrector hands such as Db are not separate codices. Resolve
+      // them through the base manuscript's generic corrector record while
+      // retaining the apparatus hand label in the public name.
+      const lookup = /[b]$/u.test(publicLabel)
+        ? `${publicLabel.slice(0, -1)}c`
+        : publicLabel;
+      return qualifyLegacySiglum(lookup, normalized, publicLabel);
     }
   }
-  return support;
+
+  for (const [properName, siglum] of Object.entries(properCodexSigla)) {
+    if (
+      new RegExp(
+        `\\bCodex\\s+${properName.replaceAll(" ", "\\s+")}\\b`,
+        "iu",
+      ).test(normalized)
+    ) {
+      return qualifyLegacySiglum(siglum, normalized);
+    }
+  }
+
+  const simpleCodex = normalized.match(
+    /^Codex\s+([A-Z]|Delta|Theta|Xi|Sigma|Phi|Psi|Pi|Gamma|Lambda)(?:\b|,)/iu,
+  )?.[1];
+  if (!simpleCodex) return undefined;
+  return qualifyLegacySiglum(writtenSiglum(simpleCodex), normalized);
+}
+
+function laterContributionIsUndated(
+  resolved: ResolvedGreekWitness,
+) {
+  return (
+    resolved.qualifier === "corrector" ||
+    resolved.qualifier === "corrector-probable" ||
+    resolved.qualifier === "corrector-or-margin" ||
+    resolved.qualifier === "margin" ||
+    resolved.qualifier === "supplement" ||
+    resolved.qualifier === "numbered-corrector"
+  );
+}
+
+function publicLegacyGreekName(
+  resolved: ResolvedGreekWitness,
+  publicSiglum: string,
+) {
+  if (
+    resolved.key === publicSiglum ||
+    resolved.displayName.includes(`GA ${publicSiglum}`)
+  ) {
+    return resolved.displayName;
+  }
+  return `${resolved.displayName} \u2014 ${publicSiglum}`;
+}
+
+function normalizeLegacyGreekWitness(
+  row: Witness,
+  corpus: GreekCorpus,
+): Witness {
+  const isNamedFamily =
+    /^Family\s+\d+(?:\s+core representatives)?$/iu.test(
+      row.witness.normalize("NFKC").trim(),
+    );
+  if (
+    row.kind !== "greek-manuscript" ||
+    (row.dateSource &&
+      Number.isFinite(row.dateStart) &&
+      Number.isFinite(row.dateEnd)) ||
+    (isAggregateEvidenceRow(row) && !isNamedFamily)
+  ) {
+    return row;
+  }
+
+  const siglum = legacyGreekSiglum(row.witness);
+  if (!siglum) return row;
+  const resolved = resolveGreekWitness(siglum.lookup, corpus);
+  if (!resolved) return row;
+
+  const resolvedNote =
+    resolved.qualifier === "margin" &&
+    /\b(?:base-manuscript date|catalog date|not independently dated)\b/iu.test(
+      row.note,
+    )
+      ? undefined
+      : resolved.qualifier === "margin" && /\bmargin(?:al)?\b/iu.test(row.note)
+        ? resolved.note?.replace(/^This is a marginal reading\.\s*/iu, "")
+      : resolved.note;
+  const notes = [row.note, resolvedNote].filter(
+    (note, index, all): note is string =>
+      Boolean(note) && all.indexOf(note) === index,
+  );
+
+  return {
+    ...row,
+    witness: publicLegacyGreekName(resolved, siglum.publicLabel),
+    date: resolved.date,
+    dateStart: resolved.dateStart,
+    dateEnd: resolved.dateEnd,
+    dateUncertain:
+      row.dateUncertain ?? laterContributionIsUndated(resolved),
+    dateSource: resolved.dateSource,
+    dateSourceUrl: resolved.dateSourceUrl,
+    note: joinPublicNotes(notes),
+    aggregate: resolved.aggregate,
+  };
+}
+
+function expandLegacyGroupedWitness(row: Witness): Witness[] {
+  const members =
+    legacyGroupedWitnesses[normalizedWitnessIdentity(row.witness)];
+  if (!members) return [row];
+
+  return members.map((member) => {
+    const key = normalizedWitnessIdentity(member);
+    const entry =
+      resolveVersionWitness(member) ?? uncataloguedLegacyWitnesses[key];
+    if (!entry) {
+      throw new Error(`Missing legacy witness date for ${member}`);
+    }
+    return {
+      ...row,
+      witness: entry.displayName,
+      date: entry.date,
+      dateStart: entry.dateStart,
+      dateEnd: entry.dateEnd,
+      dateSource: entry.dateSource,
+      dateSourceUrl: entry.dateSourceUrl,
+      kind: evidenceKindForLegacyEntry(entry),
+      aggregate: entry.aggregate,
+      note: joinPublicNotes([row.note, entry.note]),
+    };
+  });
+}
+
+function normalizeWitnessRows(rows: Witness[], book: string) {
+  const corpus = greekCorpusForBook(book);
+  const seen = new Set<string>();
+  return sortWitnessRows(
+    rows
+      .flatMap(expandLegacyGroupedWitness)
+      .map((row) => normalizeLegacyGreekWitness(row, corpus))
+      .map(normalizeWitnessDate),
+  ).filter((row) => {
+    const key = [
+      row.witness.normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(),
+      row.unitId ?? row.unitLabel ?? row.unit ?? "",
+      row.direction ?? "",
+      row.kind ?? "",
+    ].join("|");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function normalizePatristicRows(rows: PatristicWitness[]) {
+  return rows
+    .map((witness, index) => {
+      const existing = parseEvidenceDate(witness.date);
+      const replacement = isVagueDate(witness.date)
+        ? legacyPublicDate({
+            witness: witness.author ?? witness.source,
+            date: witness.date,
+            note: witness.quoteSummary,
+            kind: "patristic",
+          })
+        : undefined;
+      const range = replacement ?? existing;
+      return {
+        witness: {
+          ...witness,
+          date: replacement?.label ?? witness.date,
+          dateStart: witness.dateStart ?? range?.start,
+          dateEnd: witness.dateEnd ?? range?.end,
+        },
+        index,
+        start: witness.dateStart ?? range?.start ?? Number.POSITIVE_INFINITY,
+        end: witness.dateEnd ?? range?.end ?? Number.POSITIVE_INFINITY,
+      };
+    })
+    .sort(
+      (a, b) =>
+        a.start - b.start || a.end - b.end || a.index - b.index,
+    )
+    .map(({ witness }) => witness);
 }
 
 function earliestSupportFor(passage: Passage): EarliestSupport[] {
@@ -301,7 +887,7 @@ function earliestSupportFor(passage: Passage): EarliestSupport[] {
         statement:
           "Late fourth century — Chrysostom, mixed exposition; sixth century or later — Greek correction D²; AD 616 — Syriac Harklean.",
         earliestGreek:
-          "Sixth century or later — D², retaining the correction qualification.",
+          "Sixth century or later — D², a correcting hand rather than the original scribe.",
       },
     ];
   }
@@ -391,8 +977,24 @@ function earliestSupportFor(passage: Passage): EarliestSupport[] {
 
   return [
     {
-      statement: curated.statement,
-      earliestGreek: curated.earliestGreek,
+      statement: curated.statement
+        .replace(
+          /P45vid supports “prayer and fasting”; retain the vid qualification\./u,
+          "P45vid probably supports “prayer and fasting”; vid marks an uncertain reading.",
+        )
+        .replace(
+          /with a correction detail preserved in the evidence row\./iu,
+          "with support attributed to a correcting hand.",
+        ),
+      earliestGreek: curated.earliestGreek
+        ?.replace(
+          /the Claromontanus correction must retain its later-correction qualification\./iu,
+          "the Claromontanus reading belongs to a later correcting hand.",
+        )
+        .replace(
+          /with a correction detail preserved in the evidence row\./iu,
+          "with support attributed to a correcting hand.",
+        ),
     },
   ];
 }
@@ -412,6 +1014,11 @@ function oneJohnFiveSevenRows(passage: Passage) {
     ...row,
     direction: "AGAINST_KJV",
   }));
+  const competingLatinNames = new Set(
+    competingLatin.map((row) =>
+      row.witness.normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(),
+    ),
+  );
 
   const greekSupportWitnesses = corrections.oneJohnFiveSeven.greekManuscripts.map(
     (row): Witness => ({
@@ -444,6 +1051,18 @@ function oneJohnFiveSevenRows(passage: Passage) {
       relationship: "printed",
     }),
   );
+  const inheritedPrinted = (passage.printedWitnesses ?? []).filter(
+    (row) =>
+      !/Douay|Clementine|King James/iu.test(row.witness) &&
+      !isVagueDate(row.date),
+  );
+  const competingPrinted = inheritedPrinted
+    .filter(isNegativeSupport)
+    .map((row): Witness => ({
+      ...row,
+      direction: "AGAINST_KJV",
+      relationship: "printed",
+    }));
 
   return {
     ...passage,
@@ -452,14 +1071,26 @@ function oneJohnFiveSevenRows(passage: Passage) {
     versionalWitnesses: [],
     patristicWitnesses,
     printedWitnesses: [
-      ...(passage.printedWitnesses ?? []).filter(
-        (row) =>
-          !/Douay|Clementine|King James/iu.test(row.witness) &&
-          !isVagueDate(row.date),
-      ),
+      ...inheritedPrinted.filter((row) => !isNegativeSupport(row)),
       ...reception,
     ],
-    evidenceAgainst: [...passage.evidenceAgainst, ...competingLatin],
+    evidenceAgainst: [
+      ...passage.evidenceAgainst.filter((row) => {
+        const name = row.witness
+          .normalize("NFKC")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, " ")
+          .trim();
+        return !Array.from(competingLatinNames).some(
+          (curatedName) =>
+            name === curatedName ||
+            name.includes(curatedName) ||
+            curatedName.includes(name),
+        );
+      }),
+      ...competingLatin,
+      ...competingPrinted,
+    ],
   };
 }
 
@@ -470,109 +1101,8 @@ function withEditorialConclusion(passage: Passage) {
   return `${passage.shortSummary} Oldest & Best retains the KJV reading while presenting the competing witnesses separately below.`;
 }
 
-function groupedWitnessNote(row: Witness) {
-  const kind =
-    row.kind === "latin"
-      ? "Latin"
-      : row.kind === "syriac"
-        ? "Syriac"
-        : row.kind === "coptic"
-          ? "Coptic"
-          : row.kind === "version"
-            ? "versional"
-            : row.kind === "printed"
-              ? "printed-edition"
-              : "Greek";
-  return `Individually listed from the catalogued ${kind} witness group for this reading.`;
-}
-
-function expandLanguageGroup(value: string) {
-  const clean = value
-    .replace(/^(?:much of|broad|most|some|part of|portions of|the)\s+/iu, "")
-    .replace(/\b(?:include|includes|support|supports|omit|omits|read|reads)\b.*$/iu, "")
-    .replace(/[.;]+$/u, "")
-    .trim();
-
-  const slashGroup = clean.match(
-    /^(Syriac|Coptic|Vulgate|Old Latin)\s+([\p{L}\d*.-]+(?:\/[\p{L}\d*.-]+)+)$/iu,
-  );
-  if (slashGroup) {
-    return slashGroup[2]
-      .split("/")
-      .map((name) => `${slashGroup[1]} ${name}`);
-  }
-
-  const siglaGroup = clean.match(
-    /^(Old Latin|Vulgate)\s+((?:[a-z]+\d*(?:,\d+)?\s*){2,})$/iu,
-  );
-  if (siglaGroup) {
-    return siglaGroup[2]
-      .trim()
-      .split(/\s+/u)
-      .map((siglum) => `${siglaGroup[1]} ${siglum}`);
-  }
-
-  return [clean];
-}
-
-function splitGroupedWitnesses(rows: Witness[]) {
-  return rows.flatMap((row) => {
-    const list = row.witness
-      .replaceAll("`", "")
-      .replace(/\band some others.*$/iu, "")
-      .replace(/\bwithin .+$/iu, "")
-      .replace(/\balthough .+$/iu, "")
-      .replace(/[.;]+$/u, "")
-      .trim();
-
-    if (row.kind !== "greek-manuscript") {
-      const looksGrouped =
-        /,\s*[^,]+,\s*/u.test(list) ||
-        /\b(?:Latin|Vulgate|Syriac|Coptic|Sahidic|Bohairic|Armenian|Georgian|Ethiopic|Gothic|Slavonic|Arabic)[^.;]*(?:,|\band\b|\/)[^.;]+/iu.test(
-          list,
-        );
-      if (!looksGrouped) return [row];
-
-      const witnesses = list
-        .split(/\s*,\s*|\s*,?\s+and\s+/iu)
-        .flatMap(expandLanguageGroup)
-        .map((witness) => witness.trim())
-        .filter(
-          (witness) =>
-            witness &&
-            !/^(?:additional|another|other|several|some|most|wider|broader)\b/iu.test(
-              witness,
-            ),
-        );
-
-      if (witnesses.length < 2) return [row];
-      return witnesses.map((witness) => ({
-        ...row,
-        witness,
-        note: groupedWitnessNote(row),
-      }));
-    }
-
-    const greekList = list.replaceAll(",", " ");
-    const tokens = greekList.split(/\s+/u).filter(Boolean);
-    const siglumPattern =
-      /^(?:[\p{Lu}ℵΔΘΣΦΨ][\p{L}\d*/-]*|P\d+|0\d{2,3}|f\d+(?:-part)?|Maj|Byz|𝔓\d+|\d+[a-z]?|[a-z]\d+)$/u;
-    const sigla = tokens.filter((token) => siglumPattern.test(token));
-
-    if (tokens.length < 3 || sigla.length / tokens.length < 0.8) return [row];
-
-    return sigla.map((witness) => ({
-      ...row,
-      witness: witness.replace(/\.$/u, ""),
-      note: groupedWitnessNote(row),
-    }));
-  });
-}
-
 export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
   const copy = copyBySlug.get(sourcePassage.slug);
-  const publicDates = wave2PublicDates[sourcePassage.slug];
-  let competing = [...sourcePassage.evidenceAgainst];
 
   let passage: Passage = {
     ...sourcePassage,
@@ -594,55 +1124,42 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
 
   if (passage.slug === "1-john-5-7") {
     passage = oneJohnFiveSevenRows(passage);
-    competing = [...passage.evidenceAgainst];
   }
 
-  const greekSupport = moveNegativeRows(
-    passage,
-    passage.greekSupportWitnesses,
-    competing,
-  );
-  const latinSupport = moveNegativeRows(passage, passage.latinWitnesses, competing);
-  const versionSupport = moveNegativeRows(
-    passage,
-    passage.versionalWitnesses,
-    competing,
-  );
-  const printedSupport = moveNegativeRows(
-    passage,
-    passage.printedWitnesses ?? [],
-    competing,
-  );
+  const embeddedPrinted = [
+    ...passage.greekSupportWitnesses,
+    ...passage.latinWitnesses,
+    ...passage.versionalWitnesses,
+  ].filter((row) => row.kind === "printed");
 
   return {
     ...passage,
-    greekSupportWitnesses: splitGroupedWitnesses(
-      dateSupportingRows(greekSupport, passage, publicDates?.greek),
+    greekSupportWitnesses: normalizeWitnessRows(
+      passage.greekSupportWitnesses.filter((row) => row.kind !== "printed"),
+      passage.book,
     ),
-    latinWitnesses: splitGroupedWitnesses(
-      dateSupportingRows(latinSupport, passage, publicDates?.versions),
+    latinWitnesses: normalizeWitnessRows(
+      passage.latinWitnesses.filter((row) => row.kind !== "printed"),
+      passage.book,
     ),
-    versionalWitnesses: splitGroupedWitnesses(
-      dateSupportingRows(versionSupport, passage, publicDates?.versions),
+    versionalWitnesses: normalizeWitnessRows(
+      passage.versionalWitnesses.filter((row) => row.kind !== "printed"),
+      passage.book,
     ),
-    patristicWitnesses: passage.patristicWitnesses.map((witness) => ({
-      ...witness,
-      date: isVagueDate(witness.date)
-        ? fallbackDate(
-            {
-              witness: witness.author ?? witness.source,
-              date: witness.date,
-              note: witness.quoteSummary,
-              kind: "patristic",
-            },
-            passage,
-          )
-        : witness.date,
-    })),
-    printedWitnesses: splitGroupedWitnesses(
-      dateSupportingRows(printedSupport, passage, undefined),
+    patristicWitnesses: normalizePatristicRows(
+      passage.patristicWitnesses,
     ),
-    evidenceAgainst: splitGroupedWitnesses(competing),
+    printedWitnesses: normalizeWitnessRows([
+      ...(passage.printedWitnesses ?? []),
+      ...embeddedPrinted,
+    ], passage.book),
+    evidenceAgainst: normalizeWitnessRows(
+      passage.evidenceAgainst.map((row) => ({
+        ...row,
+        direction: row.direction ?? "AGAINST_KJV",
+      })),
+      passage.book,
+    ),
     manuscriptSnapshot: {
       ...passage.manuscriptSnapshot,
       supportCategory:

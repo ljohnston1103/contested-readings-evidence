@@ -30,10 +30,10 @@ export default function FathersPage() {
           Church fathers
         </p>
         <h1 className="mt-2 font-display text-5xl font-black tracking-tight text-ink-900 dark:text-white">
-          Patristic evidence, grouped by writer.
+          Patristic evidence, grouped by source.
         </h1>
         <p className="mt-5 text-lg leading-8 text-ink-700 dark:text-ink-100/75">
-          Each card shows where the available passage evidence connects a writer to a contested reading.
+          Each card shows where the available passage evidence connects a writer or early Christian source to a contested reading.
         </p>
       </Reveal>
       </AmbientVideo>
@@ -51,9 +51,13 @@ export default function FathersPage() {
               </p>
             </div>
             <h2 className="mt-3 font-display text-3xl font-black text-ink-900 dark:text-white">{father.name}</h2>
-            <p className="mt-1 text-sm font-bold text-archive-teal dark:text-teal-200">{father.region}</p>
+            {father.region && (
+              <p className="mt-1 text-sm font-bold text-archive-teal dark:text-teal-200">
+                {father.region}
+              </p>
+            )}
             <div className="mt-5 grid gap-3">
-              {father.passages.map(({ passage, witness }) => (
+              {father.passages.map(({ passage, witness, role }) => (
                 <Link
                   key={`${passage.id}-${witness.author ?? witness.source}-${witness.workSection ?? ""}`}
                   href={`/passages/${passage.slug}`}
@@ -65,7 +69,14 @@ export default function FathersPage() {
                       {passage.reference} · {passage.title}
                     </p>
                     <p className="mt-1 text-xs font-bold leading-5 text-archive-teal dark:text-teal-200">
-                      Earliest KJV support: {passage.earliestSupport?.[0]?.statement}
+                      Evidence date: {witness.date}
+                    </p>
+                    <p className="mt-1 text-xs font-extrabold uppercase tracking-[0.12em] text-ink-600 dark:text-ink-100/70">
+                      {role === "supports"
+                        ? "Supports KJV/TR"
+                        : role === "opposes"
+                          ? "Opposes KJV/TR"
+                          : "Related or mixed evidence"}
                     </p>
                     {(witness.workSection || witness.relationship) && (
                       <p className="mt-1 text-xs font-bold text-archive-teal dark:text-teal-200">

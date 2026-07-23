@@ -1,4 +1,8 @@
 import { displayedPassages } from "@/data/derived";
+import {
+  isCompetingEvidenceDirection,
+  isRelatedEvidenceDirection,
+} from "@/data/evidenceDirection";
 import type { Passage } from "@/data/types";
 
 import {
@@ -14,16 +18,21 @@ type EvidenceAtlasProps = {
 
 function toAtlasDatum(passage: Passage): EvidenceAtlasDatum {
   const records = {
-    greek: passage.greekSupportWitnesses.length,
-    latin: passage.latinWitnesses.length,
-    versions: passage.versionalWitnesses.length,
+    greek: passage.greekSupportWitnesses.filter((row) => !row.aggregate).length,
+    latin: passage.latinWitnesses.filter((row) => !row.aggregate).length,
+    versions: passage.versionalWitnesses.filter((row) => !row.aggregate).length,
     fathers: passage.patristicWitnesses.length,
-    printed: passage.printedWitnesses?.length ?? 0,
+    printed:
+      passage.printedWitnesses?.filter((row) => !row.aggregate).length ?? 0,
     against: passage.evidenceAgainst.filter(
-      (record) => !record.direction || record.direction.startsWith("AGAINST"),
+      (record) =>
+        !record.aggregate &&
+        isCompetingEvidenceDirection(record.direction),
     ).length,
     other: passage.evidenceAgainst.filter(
-      (record) => record.direction && !record.direction.startsWith("AGAINST"),
+      (record) =>
+        !record.aggregate &&
+        isRelatedEvidenceDirection(record.direction),
     ).length,
   };
 

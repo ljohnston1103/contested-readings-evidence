@@ -444,7 +444,7 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-ink-600 dark:text-ink-100/70 sm:text-base">
             Every Greek manuscript, Latin witness, ancient version, church father, printed edition,
-            and evidence-against row in the catalog&mdash;each with its own real date range. Search a
+            and competing-evidence row in the catalog&mdash;each with a catalogued date or a transparently bounded range. Search a
             witness, filter a lane, or press play to watch the record build.
           </p>
         </div>

@@ -5,6 +5,7 @@ import { ChevronDown, LayoutGrid, Search, SearchX, Table2, X } from "lucide-reac
 import { useMemo, useState } from "react";
 
 import { hasTag, normalize, passageSearchText } from "@/data/derived";
+import { parseEvidenceDate } from "@/data/evidenceDates";
 import type { Passage } from "@/data/types";
 import { slugLabel } from "@/lib/utils";
 
@@ -32,8 +33,12 @@ const viewOptions = [
 ] as const;
 
 const earliestYear = (passage: Passage) => {
-  const match = passage.earliestSupport?.[0]?.statement.match(/\b(\d{2,4})\b/);
-  return match ? Number(match[1]) : 9999;
+  const range = parseEvidenceDate(
+    passage.earliestSupport
+      ?.map((record) => `${record.label ?? ""} ${record.statement}`)
+      .join(" ") ?? "",
+  );
+  return range?.start ?? 9999;
 };
 
 export function PassageBrowser({ passages, initialSearch = "" }: PassageBrowserProps) {

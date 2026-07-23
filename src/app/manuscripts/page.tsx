@@ -84,44 +84,54 @@ export default function ManuscriptsPage() {
                 <span>Date: {profile.date}</span>
               </div>
               <div className="mt-5 grid gap-4">
+                {profile.supports.length > 0 && (
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
                     Supports KJV/TR in
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {profile.supports.length ? (
-                      profile.supports.map((item) => (
+                    {profile.supports.map((item) => (
                         <Link key={item.passage.id} href={`/passages/${item.passage.slug}`} className="rounded-full bg-archive-teal/10 px-3 py-1 text-xs font-bold text-archive-teal dark:text-teal-200">
                           <span className="block">{passageLabel(item)}</span>
-                          <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
-                            Earliest KJV support: {item.passage.earliestSupport?.[0]?.statement}
-                          </span>
+                          {item.dates.length > 0 && (
+                            <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
+                              Evidence date: {item.dates.join("; ")}
+                            </span>
+                          )}
+                          {item.notes.length > 0 && (
+                            <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                              {item.notes.join("; ")}
+                            </span>
+                          )}
                         </Link>
-                      ))
-                    ) : (
-                      <span className="text-sm text-ink-500 dark:text-ink-100/60">No supporting examples listed yet.</span>
-                    )}
+                      ))}
                   </div>
                 </div>
+                )}
+                {profile.opposes.length > 0 && (
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700 dark:text-archive-gold">
                     Opposes KJV/TR in
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {profile.opposes.length ? (
-                      profile.opposes.map((item) => (
+                    {profile.opposes.map((item) => (
                         <Link key={item.passage.id} href={`/passages/${item.passage.slug}`} className="rounded-full bg-amber-700/10 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-100">
                           <span className="block">{passageLabel(item)}</span>
-                          <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
-                            Earliest KJV support: {item.passage.earliestSupport?.[0]?.statement}
-                          </span>
+                          {item.dates.length > 0 && (
+                            <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
+                              Evidence date: {item.dates.join("; ")}
+                            </span>
+                          )}
+                          {item.notes.length > 0 && (
+                            <span className="mt-1 block font-medium leading-5 text-ink-600 dark:text-ink-100/70">
+                              {item.notes.join("; ")}
+                            </span>
+                          )}
                         </Link>
-                      ))
-                    ) : (
-                      <span className="text-sm text-ink-500 dark:text-ink-100/60">No opposing examples listed yet.</span>
-                    )}
+                      ))}
                   </div>
                 </div>
+                )}
               </div>
             </article>
             </RevealItem>

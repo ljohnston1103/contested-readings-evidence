@@ -74,7 +74,14 @@ export function SearchBar({
                     {passage.shortSummary}
                   </span>
                   <span className="line-clamp-2 text-xs font-bold leading-5 text-archive-teal dark:text-teal-200">
-                    Earliest KJV support: {passage.earliestSupport?.[0]?.statement}
+                    Earliest KJV support:{" "}
+                    {passage.earliestSupport
+                      ?.map((record) =>
+                        record.label
+                          ? `${record.label}: ${record.statement}`
+                          : record.statement,
+                      )
+                      .join(" · ")}
                   </span>
                 </Link>
               ))

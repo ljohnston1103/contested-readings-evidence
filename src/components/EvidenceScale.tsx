@@ -12,14 +12,18 @@ export function EvidenceScale({ passage }: EvidenceScaleProps) {
       label: "Greek",
       represented:
         passage.greekSupportWitnesses.length > 0 ||
-        passage.evidenceAgainst.some((row) => row.kind === "greek-manuscript"),
+        passage.evidenceAgainst.some(
+          (row) => row.kind === "greek-manuscript",
+        ),
       icon: ScrollText,
     },
     {
       label: "Latin",
       represented:
         passage.latinWitnesses.length > 0 ||
-        passage.evidenceAgainst.some((row) => row.kind === "latin"),
+        passage.evidenceAgainst.some(
+          (row) => row.kind === "latin",
+        ),
       icon: BookText,
     },
     {

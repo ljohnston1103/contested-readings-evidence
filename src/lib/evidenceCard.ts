@@ -1,7 +1,46 @@
-import type { Passage } from "@/data/types";
+import type { Passage, PatristicWitness, Witness } from "@/data/types";
+import { isCompetingEvidenceDirection } from "@/data/evidenceDirection";
 
 const cardWidth = 1200;
 const cardHeight = 630;
+
+function normalizeCountKey(value: string) {
+  return value
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\p{S}]+/gu, " ")
+    .trim();
+}
+
+function uniqueWitnessCount(rows: Witness[]) {
+  return new Set(
+    rows.map((row) =>
+      normalizeCountKey(
+        `${row.direction ?? ""} ${row.unit ?? ""} ${row.witness} ${row.date} ${row.note}`,
+      ),
+    ),
+  ).size;
+}
+
+function uniquePatristicCount(rows: PatristicWitness[]) {
+  const publicRows = rows.filter((row) => {
+    const text = normalizeCountKey(
+      `${row.author ?? row.source} ${row.date} ${row.workSection ?? ""} ${row.quoteSummary}`,
+    );
+    return (
+      !/editorial placeholder|verification pending|unverified draft/.test(text) &&
+      normalizeCountKey(row.source) !== "patristic witnesses"
+    );
+  });
+
+  return new Set(
+    publicRows.map((row) =>
+      normalizeCountKey(
+        `${row.author ?? row.source} ${row.date} ${row.workSection ?? ""} ${row.quoteSummary}`,
+      ),
+    ),
+  ).size;
+}
 
 function wrapCanvasText(
   ctx: CanvasRenderingContext2D,
@@ -85,11 +124,26 @@ export function drawEvidenceCard(canvas: HTMLCanvasElement, passage: Passage, si
   const quoteTop = 178 + titleLines * 54 + 30;
   wrapCanvasText(ctx, `“${passage.kjvText}”`, 64, quoteTop, cardWidth - 128, 35, 4);
 
+  const competingRows = passage.evidenceAgainst.filter(
+    (row) =>
+      !row.aggregate && isCompetingEvidenceDirection(row.direction),
+  );
   const stats: Array<[string, number]> = [
-    ["Greek support", passage.greekSupportWitnesses.length],
-    ["Latin & versions", passage.latinWitnesses.length + passage.versionalWitnesses.length],
-    ["Patristic", passage.patristicWitnesses.length],
-    ["Against", passage.evidenceAgainst.length],
+    [
+      "Greek support",
+      uniqueWitnessCount(
+        passage.greekSupportWitnesses.filter((row) => !row.aggregate),
+      ),
+    ],
+    [
+      "Versional support",
+      uniqueWitnessCount([
+        ...passage.latinWitnesses.filter((row) => !row.aggregate),
+        ...passage.versionalWitnesses.filter((row) => !row.aggregate),
+      ]),
+    ],
+    ["Church fathers", uniquePatristicCount(passage.patristicWitnesses)],
+    ["Competing", uniqueWitnessCount(competingRows)],
   ];
   const statsTop = 452;
   const statWidth = (cardWidth - 128 - 3 * 16) / 4;

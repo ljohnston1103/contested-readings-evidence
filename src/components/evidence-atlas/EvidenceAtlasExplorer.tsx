@@ -256,7 +256,7 @@ export function EvidenceAtlasExplorer({
             {corpusTotal.toLocaleString()}
           </p>
           <p className="mt-1 text-xs font-black uppercase tracking-[0.16em] text-ink-600 dark:text-ink-100/60">
-            Raw evidence records
+            Catalogued witness records
           </p>
         </div>
       </div>

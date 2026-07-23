@@ -1,12 +1,22 @@
 import wave2Data from "./wave2.generated.json";
+import { sortWitnessRows } from "./evidenceDates";
 import type {
-  EvidenceKind,
   Passage,
   PatristicWitness,
   SourceLink,
   TimelineEvent,
   Witness,
 } from "./types";
+import {
+  normalizeWave2GreekRow,
+  wave2CrossLanguageWitnesses,
+  wave2PrintedWitnesses,
+} from "./wave2GreekWitnesses";
+import {
+  assertWave2VersionWitnessCoverage,
+  wave2VersionPatristicExtras,
+  wave2VersionWitnessSpecs,
+} from "./wave2VersionWitnesses";
 
 type RawSourceLink = {
   label: string;
@@ -111,60 +121,6 @@ function sourceLinks(links: RawSourceLink[]): SourceLink[] {
   }));
 }
 
-function witnessLabel(details: string) {
-  const semicolon = details.indexOf(";");
-  const verb = details.search(
-    /\b(?:read|reads|omit|omits|include|includes|support|supports|attest|attests)\b/i,
-  );
-  const boundary =
-    semicolon > 0 && verb > 0
-      ? Math.min(semicolon, verb)
-      : semicolon > 0
-        ? semicolon
-        : verb > 0
-          ? verb
-          : -1;
-
-  if (boundary > 0 && boundary <= 180) return details.slice(0, boundary).trim();
-  if (details.length <= 180) return details;
-
-  const shortened = details.slice(0, 180);
-  const lastSpace = shortened.lastIndexOf(" ");
-  return `${shortened.slice(0, lastSpace > 80 ? lastSpace : 180).trim()}…`;
-}
-
-function classifyVersionKind(details: string): EvidenceKind {
-  const text = details.toLowerCase();
-  const hasLatin = /old latin|vulgate|latin/.test(text);
-  const hasSyriac = /syriac|peshitta|harklean|harclean|curetonian/.test(text);
-  const hasCoptic = /coptic|sahidic|bohairic/.test(text);
-  const languageGroups = [hasLatin, hasSyriac, hasCoptic].filter(Boolean).length;
-
-  if (languageGroups > 1) return "version";
-  if (hasLatin) return "latin";
-  if (hasSyriac) return "syriac";
-  if (hasCoptic) return "coptic";
-  return "version";
-}
-
-function evidenceRowToWitness(
-  row: RawEvidenceRow,
-  kind: EvidenceKind,
-): Witness {
-  return {
-    witness: witnessLabel(row.details),
-    date: "",
-    note: row.details,
-    kind,
-    direction: row.direction,
-    unit: row.section,
-    confidence: row.confidence,
-    source: row.sourceLabel,
-    sourceUrl: row.sourceUrl ?? undefined,
-    lastVerified: row.lastVerified,
-  };
-}
-
 function inferTimelineType(label: string): TimelineEvent["type"] {
   const text = label.toLowerCase();
   if (/king james|\bkjv\b|geneva|tyndale/.test(text)) return "reformation-bible";
@@ -191,9 +147,22 @@ function inferTimelineType(label: string): TimelineEvent["type"] {
 
 function disputedUnitText(passage: RawPassage) {
   const units = passage.disputedUnits.map((unit, index) =>
-    passage.disputedUnits.length > 1 ? `${index + 1}. ${unit.text}` : unit.text,
+    passage.disputedUnits.length > 1
+      ? `${index + 1}. ${publicUnitLabel(unit.text)}`
+      : publicUnitLabel(unit.text),
   );
-  return [passage.disputedUnitsIntro, ...units].filter(Boolean).join("\n");
+  const intro = passage.disputedUnitsIntro?.replace(
+    "Three textual families must be represented:",
+    "Three textual families are distinguished:",
+  );
+  return [intro, ...units].filter(Boolean).join("\n");
+}
+
+function publicUnitLabel(label: string) {
+  return label.replace(
+    /A separate reading in P46 has πνευματικός \(“spiritual”\) and must not be described as the ordinary short text\./u,
+    "P46 separately reads πνευματικός (“spiritual”); this is a distinct third reading.",
+  );
 }
 
 function snapshotGroups(snapshot: Record<string, string>) {
@@ -219,18 +188,105 @@ function mapPassage(raw: RawPassage): Passage {
   const latinWitnesses: Witness[] = [];
   const versionalWitnesses: Witness[] = [];
   const evidenceAgainst: Witness[] = [];
+  const printedWitnesses: Witness[] = [];
 
-  for (const row of raw.evidence.greek) {
-    const witness = evidenceRowToWitness(row, "greek-manuscript");
-    if (row.directionClass === "FOR_KJV") greekSupportWitnesses.push(witness);
+  for (const [rowIndex, row] of raw.evidence.greek.entries()) {
+    for (const witness of normalizeWave2GreekRow(
+      raw.slug,
+      raw.book,
+      rowIndex,
+      { ...row, unitLabel: publicUnitLabel(row.unitLabel) },
+    )) {
+      const supportsKjv =
+        /FOR_KJV/u.test(witness.direction ?? "") &&
+        !/AGAINST/u.test(witness.direction ?? "");
+      if (witness.kind === "printed") {
+        if (supportsKjv) printedWitnesses.push(witness);
+        else evidenceAgainst.push(witness);
+      } else if (supportsKjv) {
+        greekSupportWitnesses.push(witness);
+      } else {
+        evidenceAgainst.push(witness);
+      }
+    }
+  }
+
+  for (const [rowIndex, sourceRow] of raw.evidence.versions.entries()) {
+    const spec = wave2VersionWitnessSpecs[raw.slug]?.[rowIndex];
+    if (!spec) {
+      throw new Error(
+        `Missing curated version witnesses for ${raw.slug} row ${rowIndex}`,
+      );
+    }
+
+    for (const item of spec.witnesses) {
+      const directionClass = item.directionClass ?? spec.directionClass;
+      const direction = item.direction ?? spec.direction;
+      const unitId = item.unit ?? spec.unit ?? sourceRow.unit;
+      const unitLabel =
+        publicUnitLabel(
+          raw.disputedUnits.find((unit) => unit.id === unitId)?.text ??
+            sourceRow.unitLabel,
+        );
+      const witness: Witness = {
+        witness: item.witness,
+        date: item.date,
+        dateStart: item.dateStart,
+        dateEnd: item.dateEnd,
+        dateSource: /wave2\.generated\.json/iu.test(item.dateSource)
+          ? sourceRow.sourceLabel
+          : item.dateSource,
+        dateSourceUrl:
+          item.dateSourceUrl ??
+          (/wave2\.generated\.json/iu.test(item.dateSource)
+            ? sourceRow.sourceUrl ?? undefined
+            : undefined),
+        note: item.note,
+        kind: item.kind,
+        direction,
+        unitId,
+        unitLabel,
+        unit: unitLabel,
+        confidence: sourceRow.confidence,
+        source: sourceRow.sourceLabel,
+        sourceUrl: sourceRow.sourceUrl ?? undefined,
+        lastVerified: sourceRow.lastVerified,
+        relationship:
+          item.relationship ??
+          (item.kind === "printed"
+            ? "printed"
+            : directionClass === "FOR_KJV"
+              ? "versional"
+              : directionClass === "OTHER"
+                ? "mixed"
+                : "related"),
+        aggregate: item.aggregate,
+      };
+
+      if (directionClass === "FOR_KJV") {
+        if (item.kind === "printed") printedWitnesses.push(witness);
+        else if (item.kind === "latin") latinWitnesses.push(witness);
+        else versionalWitnesses.push(witness);
+      } else {
+        evidenceAgainst.push(witness);
+      }
+    }
+  }
+
+  for (const witness of wave2PrintedWitnesses[raw.slug] ?? []) {
+    const supportsKjv =
+      /FOR_KJV/u.test(witness.direction ?? "") &&
+      !/AGAINST/u.test(witness.direction ?? "");
+    if (supportsKjv) printedWitnesses.push(witness);
     else evidenceAgainst.push(witness);
   }
 
-  for (const row of raw.evidence.versions) {
-    const kind = classifyVersionKind(row.details);
-    const witness = evidenceRowToWitness(row, kind);
-    if (row.directionClass === "FOR_KJV") {
-      if (kind === "latin") latinWitnesses.push(witness);
+  for (const witness of wave2CrossLanguageWitnesses[raw.slug] ?? []) {
+    if (
+      /FOR_KJV/u.test(witness.direction ?? "") &&
+      !/AGAINST/u.test(witness.direction ?? "")
+    ) {
+      if (witness.kind === "latin") latinWitnesses.push(witness);
       else versionalWitnesses.push(witness);
     } else {
       evidenceAgainst.push(witness);
@@ -250,6 +306,44 @@ function mapPassage(raw: RawPassage): Passage {
     sourceUrl: father.sourceUrl ?? undefined,
     lastVerified: father.lastVerified,
   }));
+
+  const patristicIdentity = new Set(
+    patristicWitnesses.map((witness) =>
+      `${witness.author ?? witness.source}|${witness.workSection ?? ""}`
+        .normalize("NFKC")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim(),
+    ),
+  );
+  for (const extras of Object.values(
+    wave2VersionPatristicExtras[raw.slug] ?? {},
+  )) {
+    for (const extra of extras) {
+      const key = `${extra.author ?? extra.source}|${extra.workSection ?? ""}`
+        .normalize("NFKC")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+      if (patristicIdentity.has(key)) continue;
+      patristicIdentity.add(key);
+      patristicWitnesses.push({
+        source: extra.source,
+        author: extra.author,
+        date: extra.date,
+        dateStart: extra.dateStart,
+        dateEnd: extra.dateEnd,
+        workSection: extra.workSection,
+        reading: extra.reading,
+        relationship: extra.relationship,
+        quoteSummary: extra.quoteSummary,
+        confidence: extra.confidence,
+        sourceCitation: extra.sourceCitation,
+        sourceUrl: extra.sourceUrl,
+        lastVerified: raw.lastVerified,
+      });
+    }
+  }
 
   const snapshot = snapshotGroups(raw.snapshot);
   const links = sourceLinks(raw.entrySources);
@@ -280,11 +374,12 @@ function mapPassage(raw: RawPassage): Passage {
         ? [snapshot.opposition]
         : evidenceAgainst.map((row) => row.witness),
     },
-    greekSupportWitnesses,
-    latinWitnesses,
-    versionalWitnesses,
+    greekSupportWitnesses: sortWitnessRows(greekSupportWitnesses),
+    latinWitnesses: sortWitnessRows(latinWitnesses),
+    versionalWitnesses: sortWitnessRows(versionalWitnesses),
     patristicWitnesses,
-    evidenceAgainst,
+    evidenceAgainst: sortWitnessRows(evidenceAgainst),
+    printedWitnesses: sortWitnessRows(printedWitnesses),
     timeline: raw.timeline.map((event) => ({
       date: event.date,
       label: event.label,
@@ -293,6 +388,8 @@ function mapPassage(raw: RawPassage): Passage {
     sources: links.map((source) => source.label),
   };
 }
+
+assertWave2VersionWitnessCoverage();
 
 if (rawWave2Data.passageCount !== 21 || rawWave2Data.passages.length !== 21) {
   throw new Error("Wave 2 must contain exactly 21 passages.");
