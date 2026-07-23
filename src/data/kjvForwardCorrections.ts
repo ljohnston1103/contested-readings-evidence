@@ -470,18 +470,91 @@ function withEditorialConclusion(passage: Passage) {
   return `${passage.shortSummary} Oldest & Best retains the KJV reading while presenting the competing witnesses separately below.`;
 }
 
-function splitGroupedGreekWitnesses(rows: Witness[]) {
-  return rows.flatMap((row) => {
-    if (row.kind !== "greek-manuscript") return [row];
+function groupedWitnessNote(row: Witness) {
+  const kind =
+    row.kind === "latin"
+      ? "Latin"
+      : row.kind === "syriac"
+        ? "Syriac"
+        : row.kind === "coptic"
+          ? "Coptic"
+          : row.kind === "version"
+            ? "versional"
+            : row.kind === "printed"
+              ? "printed-edition"
+              : "Greek";
+  return `Individually listed from the catalogued ${kind} witness group for this reading.`;
+}
 
+function expandLanguageGroup(value: string) {
+  const clean = value
+    .replace(/^(?:much of|broad|most|some|part of|portions of|the)\s+/iu, "")
+    .replace(/\b(?:include|includes|support|supports|omit|omits|read|reads)\b.*$/iu, "")
+    .replace(/[.;]+$/u, "")
+    .trim();
+
+  const slashGroup = clean.match(
+    /^(Syriac|Coptic|Vulgate|Old Latin)\s+([\p{L}\d*.-]+(?:\/[\p{L}\d*.-]+)+)$/iu,
+  );
+  if (slashGroup) {
+    return slashGroup[2]
+      .split("/")
+      .map((name) => `${slashGroup[1]} ${name}`);
+  }
+
+  const siglaGroup = clean.match(
+    /^(Old Latin|Vulgate)\s+((?:[a-z]+\d*(?:,\d+)?\s*){2,})$/iu,
+  );
+  if (siglaGroup) {
+    return siglaGroup[2]
+      .trim()
+      .split(/\s+/u)
+      .map((siglum) => `${siglaGroup[1]} ${siglum}`);
+  }
+
+  return [clean];
+}
+
+function splitGroupedWitnesses(rows: Witness[]) {
+  return rows.flatMap((row) => {
     const list = row.witness
       .replaceAll("`", "")
       .replace(/\band some others.*$/iu, "")
       .replace(/\bwithin .+$/iu, "")
+      .replace(/\balthough .+$/iu, "")
       .replace(/[.;]+$/u, "")
-      .replaceAll(",", " ")
       .trim();
-    const tokens = list.split(/\s+/u).filter(Boolean);
+
+    if (row.kind !== "greek-manuscript") {
+      const looksGrouped =
+        /,\s*[^,]+,\s*/u.test(list) ||
+        /\b(?:Latin|Vulgate|Syriac|Coptic|Sahidic|Bohairic|Armenian|Georgian|Ethiopic|Gothic|Slavonic|Arabic)[^.;]*(?:,|\band\b|\/)[^.;]+/iu.test(
+          list,
+        );
+      if (!looksGrouped) return [row];
+
+      const witnesses = list
+        .split(/\s*,\s*|\s*,?\s+and\s+/iu)
+        .flatMap(expandLanguageGroup)
+        .map((witness) => witness.trim())
+        .filter(
+          (witness) =>
+            witness &&
+            !/^(?:additional|another|other|several|some|most|wider|broader)\b/iu.test(
+              witness,
+            ),
+        );
+
+      if (witnesses.length < 2) return [row];
+      return witnesses.map((witness) => ({
+        ...row,
+        witness,
+        note: groupedWitnessNote(row),
+      }));
+    }
+
+    const greekList = list.replaceAll(",", " ");
+    const tokens = greekList.split(/\s+/u).filter(Boolean);
     const siglumPattern =
       /^(?:[\p{Lu}ℵΔΘΣΦΨ][\p{L}\d*/-]*|P\d+|0\d{2,3}|f\d+(?:-part)?|Maj|Byz|𝔓\d+|\d+[a-z]?|[a-z]\d+)$/u;
     const sigla = tokens.filter((token) => siglumPattern.test(token));
@@ -491,10 +564,7 @@ function splitGroupedGreekWitnesses(rows: Witness[]) {
     return sigla.map((witness) => ({
       ...row,
       witness: witness.replace(/\.$/u, ""),
-      note:
-        row.note === row.witness
-          ? `Individually listed from the catalogued Greek witness group for this reading.`
-          : row.note,
+      note: groupedWitnessNote(row),
     }));
   });
 }
@@ -546,18 +616,14 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
 
   return {
     ...passage,
-    greekSupportWitnesses: splitGroupedGreekWitnesses(
+    greekSupportWitnesses: splitGroupedWitnesses(
       dateSupportingRows(greekSupport, passage, publicDates?.greek),
     ),
-    latinWitnesses: dateSupportingRows(
-      latinSupport,
-      passage,
-      publicDates?.versions,
+    latinWitnesses: splitGroupedWitnesses(
+      dateSupportingRows(latinSupport, passage, publicDates?.versions),
     ),
-    versionalWitnesses: dateSupportingRows(
-      versionSupport,
-      passage,
-      publicDates?.versions,
+    versionalWitnesses: splitGroupedWitnesses(
+      dateSupportingRows(versionSupport, passage, publicDates?.versions),
     ),
     patristicWitnesses: passage.patristicWitnesses.map((witness) => ({
       ...witness,
@@ -573,8 +639,10 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
           )
         : witness.date,
     })),
-    printedWitnesses: dateSupportingRows(printedSupport, passage, undefined),
-    evidenceAgainst: splitGroupedGreekWitnesses(competing),
+    printedWitnesses: splitGroupedWitnesses(
+      dateSupportingRows(printedSupport, passage, undefined),
+    ),
+    evidenceAgainst: splitGroupedWitnesses(competing),
     manuscriptSnapshot: {
       ...passage.manuscriptSnapshot,
       supportCategory:

@@ -95,7 +95,7 @@ export function EvidenceTable({
                   </span>
                 </td>
                 <td className="px-5 py-4 text-ink-600 dark:text-ink-100/70">
-                  <span className="inline-flex rounded-full bg-ink-900 px-3 py-1.5 text-xs font-black text-white dark:bg-archive-gold dark:text-ink-900">
+                  <span className="inline-flex rounded-lg border-2 border-archive-gold/60 bg-archive-gold/15 px-3 py-1.5 text-xs font-black tracking-wide text-amber-900 shadow-[0_2px_0_rgba(180,135,35,0.18)] dark:border-archive-gold/70 dark:bg-archive-gold/15 dark:text-amber-100">
                     {row.date}
                   </span>
                 </td>

@@ -30,7 +30,7 @@ export function PatristicQuoteCard({ witness }: PatristicQuoteCardProps) {
         <h3 className="font-display text-2xl font-black text-ink-900 dark:text-white">
           {witness.author ?? witness.source}
         </h3>
-        <span className="rounded-full border border-archive-gold/35 bg-white/55 px-3 py-1 text-xs font-black text-ink-700 dark:bg-white/10 dark:text-ink-100">
+        <span className="rounded-lg border-2 border-archive-gold/60 bg-archive-gold/15 px-3 py-1.5 text-xs font-black tracking-wide text-amber-900 shadow-[0_2px_0_rgba(180,135,35,0.18)] dark:border-archive-gold/70 dark:bg-archive-gold/15 dark:text-amber-100">
           {witness.date}
         </span>
       </div>
