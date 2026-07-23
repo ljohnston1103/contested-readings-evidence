@@ -97,7 +97,7 @@ export function FilterSidebar({
           <Tags className="h-4 w-4 text-archive-teal dark:text-teal-200" aria-hidden="true" />
           Evidence tags
         </p>
-        <div className="mt-3 grid gap-2">
+        <div className="mt-3 grid max-h-[28rem] gap-2 overflow-y-auto pr-1">
           {tagOptions.map((tag) => (
             <label
               key={tag}

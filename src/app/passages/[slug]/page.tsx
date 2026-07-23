@@ -1,4 +1,4 @@
-import { BookOpenCheck, GitCompare, Quote } from "lucide-react";
+import { AlertTriangle, BookOpenCheck, GitCompare, Quote, ScrollText } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -27,6 +27,9 @@ export async function generateMetadata({ params }: PassagePageProps): Promise<Me
   return {
     title: `${passage.reference}: ${passage.title}`,
     description: passage.shortSummary,
+    alternates: {
+      canonical: `/passages/${passage.slug}`,
+    },
   };
 }
 
@@ -72,6 +75,17 @@ export default async function PassagePage({ params }: PassagePageProps) {
                 {passage.variantIssue}
               </p>
             </div>
+            {passage.disputedUnit && (
+              <div className="rounded-3xl border border-ink-100 bg-white/70 p-5 transition duration-300 hover:border-archive-teal/40 dark:border-white/10 dark:bg-white/5">
+                <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em] text-ink-500 dark:text-ink-100/60">
+                  <ScrollText className="h-4 w-4 text-archive-teal dark:text-teal-200" aria-hidden="true" />
+                  Disputed unit
+                </p>
+                <p className="mt-2 whitespace-pre-line break-words text-base leading-7 text-ink-700 dark:text-ink-100/75">
+                  {passage.disputedUnit}
+                </p>
+              </div>
+            )}
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
             {passage.tags.map((tag) => (
@@ -100,9 +114,36 @@ export default async function PassagePage({ params }: PassagePageProps) {
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/55">Support category</p>
               <p className="mt-2 font-black">{passage.supportCategory}</p>
             </div>
+            {passage.lastVerified && (
+              <div className="rounded-3xl bg-white/10 p-4 transition duration-300 hover:bg-white/15">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/55">Research status</p>
+                <p className="mt-2 text-sm font-black">Last verified {passage.lastVerified}</p>
+              </div>
+            )}
             <div className="rounded-3xl bg-white/10 p-4 transition duration-300 hover:bg-white/15">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/55">Sources used</p>
-              <p className="mt-2 text-sm leading-6">{passage.sources.join("; ")}</p>
+              {passage.sourceLinks?.length ? (
+                <ul className="mt-2 grid gap-1 text-sm leading-6">
+                  {passage.sourceLinks.map((source, index) => (
+                    <li key={`${source.label}-${index}`}>
+                      {source.url ? (
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-bold text-archive-gold hover:underline"
+                        >
+                          {source.label}
+                        </a>
+                      ) : (
+                        source.label
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm leading-6">{passage.sources.join("; ")}</p>
+              )}
             </div>
           </div>
         </div>
@@ -141,6 +182,34 @@ export default async function PassagePage({ params }: PassagePageProps) {
       <Reveal className="mt-8">
         <ManuscriptSnapshotCard passage={passage} />
       </Reveal>
+
+      {passage.cautions?.length ? (
+        <Reveal className="mt-8">
+          <section className="rounded-[2rem] border border-amber-700/20 bg-amber-50/80 p-6 shadow-card dark:border-archive-gold/20 dark:bg-archive-gold/[0.07]">
+            <p className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.22em] text-amber-800 dark:text-archive-gold">
+              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+              Research cautions
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-black text-ink-900 dark:text-white">
+              Read the evidence with these limits in view.
+            </h2>
+            <ul className="mt-5 grid gap-3">
+              {passage.cautions.map((caution, index) => (
+                <li
+                  key={`${passage.slug}-caution-${index}`}
+                  className="flex gap-3 rounded-2xl border border-amber-700/10 bg-white/70 p-4 text-sm leading-6 text-ink-700 dark:border-white/10 dark:bg-white/5 dark:text-ink-100/75"
+                >
+                  <span
+                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-700 dark:bg-archive-gold"
+                    aria-hidden="true"
+                  />
+                  <span>{caution}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </Reveal>
+      ) : null}
 
       <Reveal className="mt-8" delay={0.05}>
         <EvidenceTabs passage={passage} />

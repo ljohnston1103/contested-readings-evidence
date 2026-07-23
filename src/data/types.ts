@@ -9,11 +9,30 @@ export type EvidenceKind =
   | "printed"
   | "summary";
 
+export type EvidenceDirection =
+  | "FOR_KJV"
+  | "AGAINST_KJV"
+  | "OTHER"
+  | "QUALIFICATION"
+  | "RELATED_TO_KJV"
+  | string;
+
+export type SourceLink = {
+  label: string;
+  url?: string;
+};
+
 export type Witness = {
   witness: string;
   date: string;
   note: string;
   kind?: EvidenceKind;
+  direction?: EvidenceDirection;
+  unit?: string;
+  confidence?: string;
+  source?: string;
+  sourceUrl?: string;
+  lastVerified?: string;
 };
 
 export type PatristicWitness = {
@@ -21,6 +40,20 @@ export type PatristicWitness = {
   date: string;
   quoteSummary: string;
   region?: string;
+  author?: string;
+  workSection?: string;
+  reading?: EvidenceDirection;
+  relationship?:
+    | "explicit_quote"
+    | "close_quote"
+    | "parallel_tradition"
+    | "mixed_citation"
+    | "manuscript_report"
+    | "theological_parallel";
+  confidence?: string;
+  sourceCitation?: string;
+  sourceUrl?: string;
+  lastVerified?: string;
 };
 
 export type ManuscriptSnapshot = {
@@ -61,10 +94,14 @@ export type Passage = {
   tags: string[];
   supportCategory: string;
   shortSummary: string;
-  supportScore: number;
-  oppositionScore: number;
-  controversyScore: number;
+  supportScore?: number;
+  oppositionScore?: number;
+  controversyScore?: number;
   earliestPatristicYear?: number;
+  lastVerified?: string;
+  disputedUnit?: string;
+  cautions?: string[];
+  sourceLinks?: SourceLink[];
   manuscriptSnapshot: ManuscriptSnapshot;
   greekSupportWitnesses: Witness[];
   latinWitnesses: Witness[];

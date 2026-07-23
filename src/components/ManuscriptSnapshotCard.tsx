@@ -6,8 +6,8 @@ type ManuscriptSnapshotCardProps = {
 
 export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps) {
   const stats = [
-    ["Greek support", passage.manuscriptSnapshot.greekSupport],
-    ["Greek against", passage.manuscriptSnapshot.greekAgainst],
+    ["Support summary", passage.manuscriptSnapshot.greekSupport],
+    ["Opposition / alternatives", passage.manuscriptSnapshot.greekAgainst],
     ["Support category", passage.manuscriptSnapshot.supportCategory],
     ["Lectionary support", passage.manuscriptSnapshot.lectionarySupport ?? "Not specified"],
   ];
@@ -17,10 +17,10 @@ export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps)
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.24em] text-archive-gold">
-            Manuscript Count Snapshot
+            Evidence snapshot
           </p>
           <h2 className="mt-2 font-display text-3xl font-black text-ink-900 dark:text-white">
-            Manuscript evidence at a glance.
+            The cited evidence at a glance.
           </h2>
         </div>
         {passage.manuscriptSnapshot.percentSupport && (

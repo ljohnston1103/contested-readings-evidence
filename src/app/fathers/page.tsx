@@ -55,7 +55,7 @@ export default function FathersPage() {
             <div className="mt-5 grid gap-3">
               {father.passages.map(({ passage, witness }) => (
                 <Link
-                  key={`${passage.id}-${witness.source}`}
+                  key={`${passage.id}-${witness.author ?? witness.source}-${witness.workSection ?? ""}`}
                   href={`/passages/${passage.slug}`}
                   className="group/link flex items-start gap-3 rounded-3xl border border-ink-100 bg-ink-50/70 p-4 transition hover:-translate-y-0.5 hover:border-archive-gold/60 dark:border-white/10 dark:bg-white/5"
                 >
@@ -64,6 +64,13 @@ export default function FathersPage() {
                     <p className="text-sm font-black text-ink-900 dark:text-white">
                       {passage.reference} · {passage.title}
                     </p>
+                    {(witness.workSection || witness.relationship) && (
+                      <p className="mt-1 text-xs font-bold text-archive-teal dark:text-teal-200">
+                        {[witness.workSection, witness.relationship?.replaceAll("_", " ")]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    )}
                     <p className="mt-2 line-clamp-3 text-sm leading-6 text-ink-600 dark:text-ink-100/70">
                       {witness.quoteSummary}
                     </p>

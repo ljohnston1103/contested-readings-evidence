@@ -24,7 +24,9 @@ export function EvidenceTable({
     const needle = query.toLowerCase().trim();
     if (!needle) return uniqueRows;
     return uniqueRows.filter((row) =>
-      `${row.witness} ${row.date} ${row.note}`.toLowerCase().includes(needle),
+      `${row.direction ?? ""} ${row.unit ?? ""} ${row.witness} ${row.date} ${row.note} ${row.source ?? ""} ${row.confidence ?? ""}`
+        .toLowerCase()
+        .includes(needle),
     );
   }, [query, uniqueRows]);
 
@@ -47,6 +49,7 @@ export function EvidenceTable({
               onChange={(event) => setQuery(event.target.value)}
               className="min-w-0 rounded-2xl border border-ink-200 bg-white px-4 py-2 text-sm outline-none transition focus:border-archive-gold dark:border-white/10 dark:bg-white/5 dark:text-white"
               placeholder="Search this table"
+              aria-label={`Search ${title ?? "evidence"} table`}
             />
           )}
         </div>
@@ -64,10 +67,56 @@ export function EvidenceTable({
           </thead>
           <tbody className="divide-y divide-ink-100 dark:divide-white/10">
             {filteredRows.map((row, index) => (
-              <tr key={`${row.witness}-${index}`} className="align-top transition hover:bg-archive-gold/10 dark:hover:bg-white/5">
-                <td className="px-5 py-4 font-bold text-ink-900 dark:text-white">{row.witness}</td>
-                <td className="whitespace-nowrap px-5 py-4 text-ink-600 dark:text-ink-100/70">{row.date}</td>
-                <td className="px-5 py-4 leading-6 text-ink-700 dark:text-ink-100/75">{row.note}</td>
+              <tr
+                key={`${row.direction ?? ""}-${row.unit ?? ""}-${row.witness}-${index}`}
+                className="align-top transition hover:bg-archive-gold/10 dark:hover:bg-white/5"
+              >
+                <td className="px-5 py-4">
+                  <p className="font-bold text-ink-900 dark:text-white">{row.witness}</p>
+                  {row.direction && (
+                    <span
+                      className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] ${
+                        row.direction.startsWith("FOR")
+                          ? "bg-archive-teal/10 text-archive-teal dark:text-teal-200"
+                          : row.direction.startsWith("AGAINST")
+                            ? "bg-amber-700/10 text-amber-800 dark:text-amber-100"
+                            : "bg-ink-100 text-ink-600 dark:bg-white/10 dark:text-ink-100/70"
+                      }`}
+                    >
+                      {row.direction.replaceAll("_", " ")}
+                    </span>
+                  )}
+                </td>
+                <td className="whitespace-nowrap px-5 py-4 text-ink-600 dark:text-ink-100/70">
+                  {row.date || "—"}
+                </td>
+                <td className="px-5 py-4 leading-6 text-ink-700 dark:text-ink-100/75">
+                  {row.unit && (
+                    <p className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-archive-teal dark:text-teal-200">
+                      {row.unit}
+                    </p>
+                  )}
+                  <p>{row.note}</p>
+                  {(row.confidence || row.source || row.lastVerified) && (
+                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-ink-100 pt-3 text-xs font-semibold text-ink-500 dark:border-white/10 dark:text-ink-100/55">
+                      {row.confidence && <span>Confidence: {row.confidence}</span>}
+                      {row.lastVerified && <span>Verified: {row.lastVerified}</span>}
+                      {row.source &&
+                        (row.sourceUrl ? (
+                          <a
+                            href={row.sourceUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-black text-archive-blue hover:underline dark:text-teal-200"
+                          >
+                            Source: {row.source}
+                          </a>
+                        ) : (
+                          <span>Source: {row.source}</span>
+                        ))}
+                    </div>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

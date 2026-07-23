@@ -31,6 +31,7 @@ type EvidenceKey =
   | "versions"
   | "fathers"
   | "opposition"
+  | "other"
   | "printed";
 
 type EvidenceSegment = {
@@ -75,7 +76,17 @@ function evidenceSegments(passage: Passage): EvidenceSegment[] {
       key: "opposition",
       shortLabel: "Against",
       label: "Evidence-against records",
-      count: passage.evidenceAgainst.length,
+      count: passage.evidenceAgainst.filter(
+        (record) => !record.direction || record.direction.startsWith("AGAINST"),
+      ).length,
+    },
+    {
+      key: "other",
+      shortLabel: "Other",
+      label: "Other or qualified reading records",
+      count: passage.evidenceAgainst.filter(
+        (record) => record.direction && !record.direction.startsWith("AGAINST"),
+      ).length,
     },
     {
       key: "printed",
@@ -591,6 +602,7 @@ export function ResearchDesk({ passages }: ResearchDeskProps) {
                         ["versions", "Versional support records"],
                         ["fathers", "Patristic records"],
                         ["opposition", "Evidence-against records"],
+                        ["other", "Other or qualified reading records"],
                         ["printed", "Printed-edition records"],
                       ] as const).map(([key, label]) => (
                         <tr key={key}>

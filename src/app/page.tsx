@@ -29,14 +29,14 @@ const featuredReferences = [
   "Mark 16:9-20",
   "John 7:53-8:11",
   "Acts 8:37",
-  "John 5:3b-4",
-  "Matthew 17:21",
-  "Matthew 18:11",
-  "Matthew 23:14",
-  "Mark 7:16",
-  "Mark 9:44 and Mark 9:46",
-  "Mark 11:26",
-  "Mark 15:28",
+  "Matthew 5:22",
+  "Luke 2:14",
+  "John 3:13",
+  "Acts 20:28",
+  "Ephesians 3:9",
+  "1 John 4:3",
+  "Revelation 16:5",
+  "Revelation 22:19",
 ];
 
 const quickLinks = [

@@ -49,10 +49,16 @@ export function PassageBrowser({ passages, initialSearch = "" }: PassageBrowserP
       .filter((passage) => selectedTags.every((tag) => hasTag(passage, tag)))
       .filter((passage) => (needle ? passageSearchText(passage).includes(needle) : true))
       .sort((a, b) => {
-        if (sort === "support") return b.supportScore - a.supportScore;
-        if (sort === "against") return a.oppositionScore - b.oppositionScore;
+        if (sort === "support") {
+          return (b.supportScore ?? Number.NEGATIVE_INFINITY) - (a.supportScore ?? Number.NEGATIVE_INFINITY);
+        }
+        if (sort === "against") {
+          return (a.oppositionScore ?? Number.POSITIVE_INFINITY) - (b.oppositionScore ?? Number.POSITIVE_INFINITY);
+        }
         if (sort === "patristic") return (a.earliestPatristicYear ?? 9999) - (b.earliestPatristicYear ?? 9999);
-        if (sort === "controversial") return b.controversyScore - a.controversyScore;
+        if (sort === "controversial") {
+          return (b.controversyScore ?? Number.NEGATIVE_INFINITY) - (a.controversyScore ?? Number.NEGATIVE_INFINITY);
+        }
         if (sort === "alphabetical") return a.reference.localeCompare(b.reference);
         return a.biblicalOrder - b.biblicalOrder;
       });
@@ -110,6 +116,7 @@ export function PassageBrowser({ passages, initialSearch = "" }: PassageBrowserP
                 onChange={(event) => setQuery(event.target.value)}
                 className="w-full rounded-2xl border border-ink-200 bg-white py-3 pl-11 pr-4 text-sm outline-none transition focus:border-archive-gold dark:border-white/10 dark:bg-archive-navy dark:text-white"
                 placeholder="Search reference, manuscript, church father, or phrase"
+                aria-label="Search passages"
               />
             </div>
             <div className="relative">
@@ -117,6 +124,7 @@ export function PassageBrowser({ passages, initialSearch = "" }: PassageBrowserP
                 value={sort}
                 onChange={(event) => setSort(event.target.value as typeof sort)}
                 className="w-full appearance-none rounded-2xl border border-ink-200 bg-white py-3 pl-4 pr-10 text-sm font-semibold outline-none transition focus:border-archive-gold dark:border-white/10 dark:bg-archive-navy dark:text-white"
+                aria-label="Sort passages"
               >
                 {sortOptions.map(([value, label]) => (
                   <option key={value} value={value}>

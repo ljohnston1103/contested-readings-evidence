@@ -33,13 +33,22 @@ function rotatePoint(x: number, y: number, angleDeg: number) {
 export function EvidenceScale({ passage }: EvidenceScaleProps) {
   const shouldReduceMotion = useReducedMotion();
 
+  const supportingPatristicRecords = passage.patristicWitnesses.filter(
+    (witness) => !witness.reading || witness.reading.startsWith("FOR"),
+  ).length;
+  const opposingPatristicRecords = passage.patristicWitnesses.filter((witness) =>
+    witness.reading?.startsWith("AGAINST"),
+  ).length;
   const supportCount =
     passage.greekSupportWitnesses.length +
     passage.latinWitnesses.length +
     passage.versionalWitnesses.length +
-    passage.patristicWitnesses.length +
+    supportingPatristicRecords +
     (passage.printedWitnesses?.length ?? 0);
-  const againstCount = passage.evidenceAgainst.length;
+  const againstCount =
+    passage.evidenceAgainst.filter(
+      (witness) => !witness.direction || witness.direction.startsWith("AGAINST"),
+    ).length + opposingPatristicRecords;
   const total = supportCount + againstCount || 1;
   const tiltDeg = shouldReduceMotion ? 0 : ((againstCount - supportCount) / total) * maxTiltDeg;
 

@@ -6,3 +6,9 @@ out/
 .vercel/
 preview-artifacts/
 .codex-dev.*.log
+.codex-start.*.log
+.open-next/
+.sites-build/
+.wrangler/
+dist/
+*.site.tar.gz

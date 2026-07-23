@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -6,14 +7,52 @@ import { ScrollProgress } from "@/components/ScrollProgress";
 
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: {
-    default: "Evidence Atlas | Contested Bible Readings",
-    template: "%s | Evidence Atlas",
-  },
-  description:
-    "A modern evidence database for contested New Testament readings, Greek manuscripts, ancient versions, and patristic witnesses.",
-};
+const siteTitle = "Oldest & Best | Manuscript Evidence Database";
+const siteDescription =
+  "Explore 51 contested New Testament readings through Greek manuscripts, ancient versions, patristic witnesses, and transparent evidence notes.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const requestHeaders = await headers();
+  const host =
+    requestHeaders.get("x-forwarded-host") ??
+    requestHeaders.get("host") ??
+    "oldestandbest.com";
+  const protocol =
+    requestHeaders.get("x-forwarded-proto") ??
+    (host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
+  const requestBase = `${protocol}://${host}`;
+  const socialImage = `${requestBase}/og.png`;
+
+  return {
+    metadataBase: new URL(requestBase),
+    title: {
+      default: siteTitle,
+      template: "%s | Oldest & Best",
+    },
+    description: siteDescription,
+    openGraph: {
+      type: "website",
+      title: siteTitle,
+      description: siteDescription,
+      url: requestBase,
+      siteName: "Oldest & Best",
+      images: [
+        {
+          url: socialImage,
+          width: 1200,
+          height: 630,
+          alt: "Oldest & Best Manuscript Evidence Database — 51 contested New Testament readings",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteTitle,
+      description: siteDescription,
+      images: [socialImage],
+    },
+  };
+}
 
 export default function RootLayout({
   children,

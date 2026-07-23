@@ -19,7 +19,12 @@ function toAtlasDatum(passage: Passage): EvidenceAtlasDatum {
     versions: passage.versionalWitnesses.length,
     fathers: passage.patristicWitnesses.length,
     printed: passage.printedWitnesses?.length ?? 0,
-    against: passage.evidenceAgainst.length,
+    against: passage.evidenceAgainst.filter(
+      (record) => !record.direction || record.direction.startsWith("AGAINST"),
+    ).length,
+    other: passage.evidenceAgainst.filter(
+      (record) => record.direction && !record.direction.startsWith("AGAINST"),
+    ).length,
   };
 
   return {

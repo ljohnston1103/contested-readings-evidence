@@ -16,6 +16,10 @@ function formatScore(value: number) {
 }
 
 export function SupportComparisonBar({ passage }: SupportComparisonBarProps) {
+  if (passage.supportScore === undefined || passage.oppositionScore === undefined) {
+    return null;
+  }
+
   const support = Math.max(0, Math.min(100, passage.supportScore));
   const against = Math.max(0, Math.min(100, passage.oppositionScore));
   const total = support + against || 1;

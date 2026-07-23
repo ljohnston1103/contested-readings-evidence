@@ -11,7 +11,8 @@ type EvidenceRecordKey =
   | "versions"
   | "fathers"
   | "printed"
-  | "against";
+  | "against"
+  | "other";
 
 type AtlasMeasure = "all" | EvidenceRecordKey;
 
@@ -40,6 +41,7 @@ const recordKeys: EvidenceRecordKey[] = [
   "fathers",
   "printed",
   "against",
+  "other",
 ];
 
 const measureMeta: Record<
@@ -83,10 +85,16 @@ const measureMeta: Record<
     pale: "rgba(190, 18, 60, 0.14)",
   },
   against: {
-    shortLabel: "Against field",
-    label: "Evidence-against array records",
+    shortLabel: "Against",
+    label: "Directionally opposing evidence records",
     color: "#475569",
     pale: "rgba(71, 85, 105, 0.14)",
+  },
+  other: {
+    shortLabel: "Other",
+    label: "Other or qualified reading records",
+    color: "#64748b",
+    pale: "rgba(100, 116, 139, 0.14)",
   },
 };
 
@@ -594,8 +602,8 @@ export function EvidenceAtlasExplorer({
               </dl>
               <p className="mt-4 flex items-start gap-2 text-xs leading-5 text-ink-500 dark:text-ink-100/50">
                 <Asterisk className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                “Against field” is the database’s mixed evidence-against array; it may
-                contain manuscripts, versions, or patristic records.
+                Against records are directionally opposed; “Other” preserves related,
+                qualified, and third readings without flattening them into either side.
               </p>
             </div>
           </motion.div>

@@ -10,7 +10,12 @@ const eslintConfig = [
   {
     ignores: [
       ".next/**",
+      ".next-stale-*/**",
+      ".open-next/**",
+      ".sites-build/**",
+      ".wrangler/**",
       "backups/**",
+      "dist/**",
       "node_modules/**",
       "preview-artifacts/**",
       "next-env.d.ts",

@@ -775,6 +775,7 @@
 .root [data-segment="versions"] { --segment-color: #0f766e; }
 .root [data-segment="fathers"] { --segment-color: #7b4f96; }
 .root [data-segment="opposition"] { --segment-color: #9d3b35; }
+.root [data-segment="other"] { --segment-color: #64748b; }
 .root [data-segment="printed"] { --segment-color: #6b7280; }
 
 .fingerprintBar [data-segment] {

@@ -1,4 +1,5 @@
 import type { Passage, PatristicWitness, TimelineEvent, Witness } from "./types";
+import { wave2Passages } from "./wave2Passages";
 
 const w = (
   witness: string,
@@ -2698,4 +2699,5 @@ export const passages: Passage[] = [
     ],
     sources: standardSources,
   },
+  ...wave2Passages,
 ];

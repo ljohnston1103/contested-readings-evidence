@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BookText,
+  CircleEllipsis,
   Globe,
   Globe2,
   History,
@@ -35,6 +36,7 @@ const tabs = [
   { label: "Other Versions", icon: Globe2 },
   { label: "Church Fathers", icon: UserRound },
   { label: "Evidence Against", icon: ShieldAlert },
+  { label: "Other Readings", icon: CircleEllipsis },
   { label: "Timeline", icon: History },
 ] as const;
 
@@ -73,6 +75,12 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
   }, [visiblePatristicWitnesses]);
   const syriac = earlyVersions.filter(isSyriac);
   const otherVersions = earlyVersions.filter((row) => !isLatin(row) && !isSyriac(row));
+  const opposingEvidence = passage.evidenceAgainst.filter(
+    (row) => !row.direction || row.direction.startsWith("AGAINST"),
+  );
+  const otherReadings = passage.evidenceAgainst.filter(
+    (row) => row.direction && !row.direction.startsWith("AGAINST"),
+  );
 
   return (
     <section className="grid gap-5">
@@ -127,11 +135,11 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               <div className="rounded-3xl bg-ink-50 p-4 dark:bg-white/5">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400">Greek support</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400">Support snapshot</p>
                 <p className="mt-2 font-black text-ink-900 dark:text-white">{passage.manuscriptSnapshot.greekSupport}</p>
               </div>
               <div className="rounded-3xl bg-ink-50 p-4 dark:bg-white/5">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400">Against</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400">Opposition snapshot</p>
                 <p className="mt-2 font-black text-ink-900 dark:text-white">{passage.manuscriptSnapshot.greekAgainst}</p>
               </div>
               <div className="rounded-3xl bg-ink-50 p-4 dark:bg-white/5">
@@ -143,7 +151,22 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
             </div>
           </div>
           <div className="grid gap-5">
-            <SupportComparisonBar passage={passage} />
+            {passage.supportScore !== undefined && passage.oppositionScore !== undefined ? (
+              <SupportComparisonBar passage={passage} />
+            ) : (
+              <div className="rounded-[2rem] border border-archive-gold/25 bg-archive-gold/10 p-5 shadow-card dark:border-archive-gold/20">
+                <p className="text-sm font-black uppercase tracking-[0.22em] text-archive-gold">
+                  Qualitative evidence profile
+                </p>
+                <h3 className="mt-1 font-display text-2xl font-black text-ink-900 dark:text-white">
+                  Principal witnesses, not a census.
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-ink-700 dark:text-ink-100/75">
+                  This research records the direction and qualifications of the cited witnesses
+                  without converting the list into a percentage or inferred manuscript total.
+                </p>
+              </div>
+            )}
             <EvidenceScale passage={passage} />
           </div>
         </div>
@@ -195,7 +218,11 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
       )}
 
       {activeTab === "Evidence Against" && (
-        <EvidenceTable title="Evidence Against the KJV/TR Reading" rows={passage.evidenceAgainst} />
+        <EvidenceTable title="Evidence Against the KJV/TR Reading" rows={opposingEvidence} />
+      )}
+
+      {activeTab === "Other Readings" && (
+        <EvidenceTable title="Other Readings and Qualifications" rows={otherReadings} />
       )}
 
       {activeTab === "Timeline" && <Timeline events={passage.timeline} />}

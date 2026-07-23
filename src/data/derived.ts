@@ -13,7 +13,7 @@ export const variantTypes = Array.from(
   new Set(displayedPassages.flatMap((passage) => passage.variantType)),
 ).sort();
 
-export const tagOptions = [
+const preferredTagOptions = [
   "Major omitted passage",
   "Short omitted phrase",
   "Doctrinal variant",
@@ -28,6 +28,15 @@ export const tagOptions = [
   "Not majority Greek support",
 ];
 
+const allTagOptions = Array.from(
+  new Set(displayedPassages.flatMap((passage) => passage.tags)),
+).sort((a, b) => a.localeCompare(b));
+
+export const tagOptions = [
+  ...preferredTagOptions,
+  ...allTagOptions.filter((tag) => !preferredTagOptions.includes(tag)),
+];
+
 export function normalize(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
@@ -40,14 +49,34 @@ export function passageSearchText(passage: Passage) {
       passage.readingSupported,
       passage.kjvText,
       passage.variantIssue,
+      passage.disputedUnit ?? "",
+      passage.cautions?.join(" ") ?? "",
       passage.tags.join(" "),
       passage.variantType.join(" "),
       passage.manuscriptSnapshot.mainEvidenceAgainst.join(" "),
-      passage.greekSupportWitnesses.map((item) => `${item.witness} ${item.note}`).join(" "),
-      passage.latinWitnesses.map((item) => `${item.witness} ${item.note}`).join(" "),
-      passage.versionalWitnesses.map((item) => `${item.witness} ${item.note}`).join(" "),
-      passage.patristicWitnesses.map((item) => `${item.source} ${item.quoteSummary}`).join(" "),
-      passage.evidenceAgainst.map((item) => `${item.witness} ${item.note}`).join(" "),
+      passage.greekSupportWitnesses
+        .map((item) => `${item.direction ?? ""} ${item.unit ?? ""} ${item.witness} ${item.note} ${item.source ?? ""}`)
+        .join(" "),
+      passage.latinWitnesses
+        .map((item) => `${item.direction ?? ""} ${item.unit ?? ""} ${item.witness} ${item.note} ${item.source ?? ""}`)
+        .join(" "),
+      passage.versionalWitnesses
+        .map((item) => `${item.direction ?? ""} ${item.unit ?? ""} ${item.witness} ${item.note} ${item.source ?? ""}`)
+        .join(" "),
+      passage.patristicWitnesses
+        .map(
+          (item) =>
+            `${item.author ?? item.source} ${item.workSection ?? ""} ${item.reading ?? ""} ${item.relationship ?? ""} ${item.quoteSummary} ${item.sourceCitation ?? ""}`,
+        )
+        .join(" "),
+      passage.printedWitnesses
+        ?.map((item) => `${item.direction ?? ""} ${item.witness} ${item.note} ${item.source ?? ""}`)
+        .join(" ") ?? "",
+      passage.evidenceAgainst
+        .map((item) => `${item.direction ?? ""} ${item.unit ?? ""} ${item.witness} ${item.note} ${item.source ?? ""}`)
+        .join(" "),
+      passage.timeline.map((item) => `${item.date} ${item.label}`).join(" "),
+      passage.sourceLinks?.map((item) => item.label).join(" ") ?? "",
     ].join(" "),
   );
 }
@@ -71,7 +100,9 @@ export function formatEntryCount(count: number) {
 export function dedupeWitnessRows(rows: Witness[]) {
   const seen = new Set<string>();
   return rows.filter((row) => {
-    const key = normalize(`${row.witness} ${row.date} ${row.note} ${row.kind ?? ""}`);
+    const key = normalize(
+      `${row.direction ?? ""} ${row.unit ?? ""} ${row.witness} ${row.date} ${row.note} ${row.kind ?? ""}`,
+    );
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -80,7 +111,9 @@ export function dedupeWitnessRows(rows: Witness[]) {
 
 export function publicPatristicWitnesses(passage: Passage) {
   return passage.patristicWitnesses.filter((witness) => {
-    const text = normalize(`${witness.source} ${witness.date} ${witness.quoteSummary}`);
+    const text = normalize(
+      `${witness.author ?? witness.source} ${witness.date} ${witness.workSection ?? ""} ${witness.quoteSummary}`,
+    );
     if (/editorial placeholder|verification pending|unverified draft/.test(text)) return false;
     if (normalize(witness.source) === "patristic witnesses") return false;
     return true;
@@ -114,7 +147,7 @@ function isAggregateWitness(name: string) {
 }
 
 function shortSiglum(name: string) {
-  const match = name.match(/,\s*([A-Z][A-Za-z0-9 ]{0,16})$/);
+  const match = name.match(/,\s*([^,]{1,24})$/);
   return match?.[1] ?? "";
 }
 
@@ -129,12 +162,74 @@ function classifyManuscript(name: string) {
 
 type WitnessRole = "supports" | "opposes";
 
+const namedSigla: Record<string, string> = {
+  "ℵ": "Codex Sinaiticus",
+  A: "Codex Alexandrinus",
+  B: "Codex Vaticanus",
+  C: "Codex Ephraemi Rescriptus",
+  D: "Codex D",
+  W: "Codex Washingtonianus",
+  Θ: "Codex Koridethi",
+};
+
+function compactGreekTokens(value: string) {
+  if (/codex|papyrus|minuscule|uncial|\bGA\b|family/i.test(value)) return [];
+
+  return value
+    .replace(/\/Byz\b/g, "")
+    .replace(/[(),;:[\]]/g, " ")
+    .split(/\s+/)
+    .map((token) => token.replace(/^[“”"'`]+|[.“”"'`]+$/g, ""))
+    .filter(Boolean)
+    .filter((token) => !/^(?:Maj|Byz|Lect|K\/Byz)$/i.test(token))
+    .filter((token) =>
+      /^(?:P\d+(?:\/P\d+)?|ℵ|[A-ZΔΘΣΨΦΞ]|f\d+(?:-[A-Za-z0-9]+)*|0?\d{1,4})(?:[A-Za-z*]+(?:\/[A-Za-z*]+)?)?$/.test(
+        token,
+      ),
+    );
+}
+
+function compactWitnessName(token: string) {
+  if (/^P\d/i.test(token)) {
+    const papyrusNumber = token.match(/^P(\d+)/i)?.[1];
+    return `Papyrus ${papyrusNumber}, ${token}`;
+  }
+  if (/^f\d/i.test(token)) return `Manuscript family ${token}, ${token}`;
+  if (/^\d/.test(token)) return `Minuscule ${token}, ${token}`;
+
+  const baseSiglum = token.match(/^(ℵ|[A-ZΔΘΣΨΦΞ])/)?.[1] ?? token;
+  return `${namedSigla[baseSiglum] ?? `Codex ${baseSiglum}`}, ${token}`;
+}
+
 function collectGreekWitnesses(role: WitnessRole) {
   const rows: Array<{ passage: Passage; witness: Witness; role: WitnessRole }> = [];
   for (const passage of displayedPassages) {
     const list = role === "supports" ? passage.greekSupportWitnesses : passage.evidenceAgainst;
     for (const witness of list) {
       if (witness.kind && witness.kind !== "greek-manuscript") continue;
+      if (
+        role === "opposes" &&
+        witness.direction &&
+        !witness.direction.startsWith("AGAINST")
+      ) {
+        continue;
+      }
+
+      const compactTokens = compactGreekTokens(witness.witness);
+      if (compactTokens.length) {
+        for (const token of compactTokens) {
+          rows.push({
+            passage,
+            role,
+            witness: {
+              ...witness,
+              witness: compactWitnessName(token),
+            },
+          });
+        }
+        continue;
+      }
+
       if (isAggregateWitness(witness.witness)) continue;
       if (!/codex|papyrus|minuscule|uncial|GA|family/i.test(witness.witness)) continue;
       rows.push({ passage, witness, role });
@@ -247,7 +342,7 @@ export function buildFatherIndex(): FatherProfile[] {
   for (const passage of displayedPassages) {
     for (const witness of publicPatristicWitnesses(passage)) {
       if (/not listed/i.test(witness.date)) continue;
-      const name = fatherBaseName(witness.source);
+      const name = fatherBaseName(witness.author ?? witness.source);
       const existing = map.get(name);
       const profile =
         existing ??
@@ -323,6 +418,7 @@ export function buildVersionIndex(): VersionProfile[] {
         }
       }
       for (const witness of passage.evidenceAgainst) {
+        if (witness.direction && !witness.direction.startsWith("AGAINST")) continue;
         if (versionMatches(witness, version.name) || (version.language === "Coptic" && witness.kind === "coptic")) {
           addVersionEvidence(profile.opposes, passage, witness.note);
         }
@@ -525,15 +621,16 @@ export function buildFullTimeline(): FullTimelineEntry[] {
         entries,
         passage,
         "patristic-support",
-        witness.source,
+        witness.author ?? witness.source,
         witness.date,
         "patristic",
-        "support",
+        witness.reading?.startsWith("AGAINST") ? "oppose" : "support",
         witness.quoteSummary,
         i,
       ),
     );
-    passage.evidenceAgainst.forEach((witness, i) =>
+    passage.evidenceAgainst.forEach((witness, i) => {
+      if (witness.direction && !witness.direction.startsWith("AGAINST")) return;
       pushTimelineEntry(
         entries,
         passage,
@@ -544,8 +641,8 @@ export function buildFullTimeline(): FullTimelineEntry[] {
         "oppose",
         witness.note,
         i,
-      ),
-    );
+      );
+    });
     passage.timeline.forEach((event, i) =>
       pushTimelineEntry(
         entries,

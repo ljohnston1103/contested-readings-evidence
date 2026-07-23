@@ -34,7 +34,7 @@ export function PassageCard({ passage, featured = false }: PassageCardProps) {
               {passage.title}
             </h3>
           </div>
-          <span className="rounded-full border border-archive-gold/40 bg-archive-gold/12 px-3 py-1 text-xs font-black text-ink-700 dark:text-ink-50">
+          <span className="line-clamp-2 max-w-[11rem] rounded-2xl border border-archive-gold/40 bg-archive-gold/12 px-3 py-1 text-right text-xs font-black text-ink-700 dark:text-ink-50">
             {passage.manuscriptSnapshot.percentSupport ?? passage.supportCategory.split(",")[0]}
           </span>
         </div>
@@ -45,13 +45,13 @@ export function PassageCard({ passage, featured = false }: PassageCardProps) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400">Support</p>
-              <p className="mt-1 text-sm font-black text-ink-900 dark:text-white">
+              <p className="mt-1 line-clamp-4 break-words text-sm font-black text-ink-900 dark:text-white">
                 {passage.manuscriptSnapshot.greekSupport}
               </p>
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-400">Against</p>
-              <p className="mt-1 text-sm font-black text-ink-900 dark:text-white">
+              <p className="mt-1 line-clamp-4 break-words text-sm font-black text-ink-900 dark:text-white">
                 {passage.manuscriptSnapshot.greekAgainst}
               </p>
             </div>

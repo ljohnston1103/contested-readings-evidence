@@ -44,7 +44,17 @@ export function PassageTable({ passages }: PassageTableProps) {
                   {passage.manuscriptSnapshot.greekAgainst}
                 </td>
                 <td className="px-5 py-4 align-top">
-                  <TagBadge tone={passage.supportScore > 90 ? "teal" : passage.supportScore < 30 ? "red" : "gold"}>
+                  <TagBadge
+                    tone={
+                      passage.supportScore === undefined
+                        ? "neutral"
+                        : passage.supportScore > 90
+                          ? "teal"
+                          : passage.supportScore < 30
+                            ? "red"
+                            : "gold"
+                    }
+                  >
                     {passage.supportCategory}
                   </TagBadge>
                 </td>
