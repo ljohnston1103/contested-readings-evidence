@@ -1,4 +1,5 @@
 import { RevealGroup, RevealItem } from "@/components/motion/Reveal";
+import { formatDateLabel } from "@/data/evidenceDates";
 import type { TimelineEvent } from "@/data/types";
 
 type TimelineProps = {
@@ -24,7 +25,7 @@ export function Timeline({ events }: TimelineProps) {
           <RevealItem key={`${event.date}-${index}`} className="group relative grid gap-1 pl-10">
             <span className="absolute left-[1.125rem] top-1.5 h-4 w-4 rounded-full border-2 border-white bg-archive-gold shadow-glow transition-transform duration-300 group-hover:scale-125 dark:border-archive-navy" />
             <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
-              {event.date} · {eventLabels[event.type]}
+              {formatDateLabel(event.date)} · {eventLabels[event.type]}
             </p>
             <p className="text-base font-bold leading-6 text-ink-900 dark:text-white">{event.label}</p>
           </RevealItem>

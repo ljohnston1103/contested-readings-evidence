@@ -7,6 +7,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { SearchBar } from "@/components/SearchBar";
 import { buildManuscriptIndex, displayedPassages } from "@/data/derived";
+import { formatDateLabel } from "@/data/evidenceDates";
 
 export const metadata: Metadata = {
   title: "Manuscript Witnesses",
@@ -81,7 +82,7 @@ export default function ManuscriptsPage() {
               <h2 className="mt-3 font-display text-2xl font-black text-ink-900 dark:text-white">{profile.name}</h2>
               <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-ink-500 dark:text-ink-100/60">
                 {profile.siglum && <span>Siglum: {profile.siglum}</span>}
-                <span>Date: {profile.date}</span>
+                <span>Date: {formatDateLabel(profile.date)}</span>
               </div>
               <div className="mt-5 grid gap-4">
                 {profile.supports.length > 0 && (
@@ -95,7 +96,7 @@ export default function ManuscriptsPage() {
                           <span className="block">{passageLabel(item)}</span>
                           {item.dates.length > 0 && (
                             <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
-                              Evidence date: {item.dates.join("; ")}
+                              Date: {item.dates.map(formatDateLabel).join("; ")}
                             </span>
                           )}
                           {item.notes.length > 0 && (
@@ -119,7 +120,7 @@ export default function ManuscriptsPage() {
                           <span className="block">{passageLabel(item)}</span>
                           {item.dates.length > 0 && (
                             <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
-                              Evidence date: {item.dates.join("; ")}
+                              Date: {item.dates.map(formatDateLabel).join("; ")}
                             </span>
                           )}
                           {item.notes.length > 0 && (

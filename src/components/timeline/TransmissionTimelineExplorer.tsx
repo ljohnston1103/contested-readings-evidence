@@ -13,6 +13,7 @@ import {
   type TimelineCategory,
   type TimelineSide,
 } from "@/data/derived";
+import { formatDateLabel } from "@/data/evidenceDates";
 
 type TransmissionTimelineExplorerProps = {
   entries: FullTimelineEntry[];
@@ -134,8 +135,8 @@ const TimelinePoint = memo(function TimelinePoint({ point, color, revealed, sele
       )}
       style={shapeStyle}
       aria-pressed={selected}
-      aria-label={`${entry.name}, ${entry.date}, ${sideLabels[entry.side]}, ${entry.passageReference}`}
-      title={`${entry.name} · ${entry.date}`}
+      aria-label={`${entry.name}, ${formatDateLabel(entry.date)}, ${sideLabels[entry.side]}, ${entry.passageReference}`}
+      title={`${entry.name} · ${formatDateLabel(entry.date)}`}
     />
   );
 });
@@ -715,7 +716,7 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
                     </button>
                   </div>
                   <p className="mt-2 text-xs font-bold uppercase tracking-wide text-ink-500 dark:text-ink-100/50">
-                    {selected.date}
+                    {formatDateLabel(selected.date)}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-ink-700 dark:text-ink-100/75">{selected.note}</p>
                   <Link
@@ -763,7 +764,7 @@ export function TransmissionTimelineExplorer({ entries }: TransmissionTimelineEx
                             className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-bold text-ink-700 hover:bg-archive-paper dark:text-ink-100/80 dark:hover:bg-white/10"
                           >
                             <span className="truncate">{entry.name}</span>
-                            <span className="ml-2 shrink-0 text-ink-400 dark:text-ink-100/40">{entry.date}</span>
+                            <span className="ml-2 shrink-0 text-ink-400 dark:text-ink-100/40">{formatDateLabel(entry.date)}</span>
                           </button>
                           {expanded && (
                             <div className="mt-1 rounded-lg bg-archive-paper px-2.5 py-2 dark:bg-white/5">

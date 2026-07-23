@@ -6,6 +6,7 @@ import { AmbientVideo } from "@/components/AmbientVideo";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { buildFatherIndex } from "@/data/derived";
+import { formatDateLabel } from "@/data/evidenceDates";
 
 export const metadata: Metadata = {
   title: "Church Fathers",
@@ -47,7 +48,7 @@ export default function FathersPage() {
                 <UserRound className="h-5 w-5" aria-hidden="true" />
               </span>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-archive-gold">
-                {father.dateRange}
+                {formatDateLabel(father.dateRange)}
               </p>
             </div>
             <h2 className="mt-3 font-display text-3xl font-black text-ink-900 dark:text-white">{father.name}</h2>
@@ -69,7 +70,7 @@ export default function FathersPage() {
                       {passage.reference} · {passage.title}
                     </p>
                     <p className="mt-1 text-xs font-bold leading-5 text-archive-teal dark:text-teal-200">
-                      Evidence date: {witness.date}
+                      Date: {formatDateLabel(witness.date)}
                     </p>
                     <p className="mt-1 text-xs font-extrabold uppercase tracking-[0.12em] text-ink-600 dark:text-ink-100/70">
                       {role === "supports"

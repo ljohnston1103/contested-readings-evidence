@@ -384,7 +384,7 @@ function normalizeWitnessDate(row: Witness): Witness {
               ? {
                   label: row.date,
                   start: 1401,
-                  end: 1900,
+                  end: 1500,
                 }
               : undefined;
   let replacement =
@@ -401,7 +401,7 @@ function normalizeWitnessDate(row: Witness): Witness {
     replacement = {
       label: `${row.date.replace(/\s*\/\s*(?:later )?correction$/iu, "")} (base manuscript; later hand not independently dated)`,
       start: existing.start,
-      end: Math.max(existing.end, 1600),
+      end: existing.end,
     };
   }
   const catalogDate = catalogEntry

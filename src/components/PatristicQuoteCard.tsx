@@ -1,4 +1,5 @@
 import type { PatristicWitness } from "@/data/types";
+import { evidenceYearLabel } from "@/data/evidenceDates";
 import { evidenceDirectionRole } from "@/data/evidenceDirection";
 
 type PatristicQuoteCardProps = {
@@ -35,8 +36,8 @@ export function PatristicQuoteCard({ witness }: PatristicQuoteCardProps) {
         <h3 className="font-display text-2xl font-black text-ink-900 dark:text-white">
           {witness.author ?? witness.source}
         </h3>
-        <span className="rounded-lg border-2 border-archive-gold/60 bg-archive-gold/15 px-3 py-1.5 text-xs font-black tracking-wide text-amber-900 shadow-[0_2px_0_rgba(180,135,35,0.18)] dark:border-archive-gold/70 dark:bg-archive-gold/15 dark:text-amber-100">
-          {witness.date}
+        <span className="rounded-lg border border-archive-gold/50 bg-archive-gold/10 px-3 py-1.5 text-xs font-black tracking-wide text-amber-900 dark:border-archive-gold/60 dark:bg-archive-gold/15 dark:text-amber-100">
+          {evidenceYearLabel(witness)}
         </span>
       </div>
       {witness.region && (

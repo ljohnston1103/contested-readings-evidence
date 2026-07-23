@@ -3,7 +3,7 @@ import {
   evidenceDirectionRole,
   isAgainstKjvDirection,
 } from "./evidenceDirection";
-import { parseEvidenceDate } from "./evidenceDates";
+import { formatDateLabel, parseEvidenceDate } from "./evidenceDates";
 import { applyKjvForwardCorrections } from "./kjvForwardCorrections";
 import type { Passage, PatristicWitness, TimelineEvent, Witness } from "./types";
 import {
@@ -1409,7 +1409,7 @@ export function buildWitnessConstellation(): ConstellationBranch[] {
       id: `father-${father.name}`,
       name: father.name,
       kind: "father",
-      detail: `${father.dateRange} · ${father.region}`,
+      detail: `${formatDateLabel(father.dateRange)} · ${father.region}`,
       supports: uniquePassages(
         father.passages
           .filter((item) => item.role === "supports")

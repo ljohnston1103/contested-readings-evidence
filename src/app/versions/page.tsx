@@ -6,6 +6,7 @@ import { AmbientVideo } from "@/components/AmbientVideo";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { buildVersionIndex } from "@/data/derived";
+import { formatDateLabel } from "@/data/evidenceDates";
 
 export const metadata: Metadata = {
   title: "Ancient Versions",
@@ -50,7 +51,7 @@ export default function VersionsPage() {
               </p>
             </div>
             <h2 className="mt-3 font-display text-3xl font-black text-ink-900 dark:text-white">{version.name}</h2>
-            <p className="mt-1 text-sm font-bold text-ink-500 dark:text-ink-100/60">{version.date}</p>
+            <p className="mt-1 text-sm font-bold text-ink-500 dark:text-ink-100/60">{formatDateLabel(version.date)}</p>
             <div className="mt-5 grid gap-4">
               {version.supports.length > 0 && (
               <div>
@@ -63,7 +64,7 @@ export default function VersionsPage() {
                         <span className="block">{passage.reference}</span>
                         {dates.length > 0 && (
                           <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
-                            Evidence date: {dates.join("; ")}
+                            Date: {dates.map(formatDateLabel).join("; ")}
                           </span>
                         )}
                         {notes.length > 0 && (
@@ -87,7 +88,7 @@ export default function VersionsPage() {
                         <span className="block">{passage.reference}</span>
                         {dates.length > 0 && (
                           <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
-                            Evidence date: {dates.join("; ")}
+                            Date: {dates.map(formatDateLabel).join("; ")}
                           </span>
                         )}
                         {notes.length > 0 && (
@@ -115,7 +116,7 @@ export default function VersionsPage() {
                         <span className="block">{passage.reference}</span>
                         {dates.length > 0 && (
                           <span className="mt-1 block font-extrabold leading-5 text-ink-700 dark:text-ink-100/80">
-                            Evidence date: {dates.join("; ")}
+                            Date: {dates.map(formatDateLabel).join("; ")}
                           </span>
                         )}
                         {notes.length > 0 && (

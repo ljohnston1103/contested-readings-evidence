@@ -10,6 +10,7 @@ import { ManuscriptSnapshotCard } from "@/components/ManuscriptSnapshotCard";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { NextPreviousPassageNav } from "@/components/NextPreviousPassageNav";
 import { PassageActionBar } from "@/components/PassageActionBar";
+import { PassageSourcesCard } from "@/components/PassageSourcesCard";
 import { ReferencesSection } from "@/components/ReferencesSection";
 import { TagBadge } from "@/components/TagBadge";
 import { adjacentPassages, displayedPassages, findPassage } from "@/data/derived";
@@ -150,6 +151,10 @@ export default async function PassagePage({ params }: PassagePageProps) {
             <PassageActionBar passage={passage} />
           </div>
         </section>
+      </Reveal>
+
+      <Reveal className="mt-8">
+        <PassageSourcesCard passage={passage} />
       </Reveal>
 
       <Reveal className="mt-8">

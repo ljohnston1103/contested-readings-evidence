@@ -79,6 +79,18 @@ const CNTR_MATTHEW_5_22 = "CNTR collation, Matthew 5:22";
 const CNTR_MATTHEW_5_22_URL =
   "https://greekcntr.org/collation/data/40005022.html";
 
+/**
+ * Canonical public citation label for each catalogue source URL. Display
+ * components use this so ad-hoc labels in imported rows ("Willker Matthew
+ * apparatus") collapse into the one formal citation per work.
+ */
+export const canonicalSourceLabels: Record<string, string> = {
+  [INTF_LISTE_URL]: INTF_LISTE,
+  [PALMER_REVELATION_URL]: PALMER_REVELATION,
+  [WILLKER_MATTHEW_URL]: WILLKER_MATTHEW,
+  [CNTR_MATTHEW_5_22_URL]: CNTR_MATTHEW_5_22,
+};
+
 function intfManuscriptUrl(gaNum: string) {
   return `https://ntvmr.uni-muenster.de/community/vmr/api/metadata/manuscript/get/?gaNum=${encodeURIComponent(gaNum)}&detail=1&format=json`;
 }
