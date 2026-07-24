@@ -427,9 +427,9 @@
 
 .catalogItem {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.65rem;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: start;
+  gap: 0.2rem 0.65rem;
   width: 100%;
   border: 1px solid transparent;
   border-radius: 10px;
@@ -450,6 +450,8 @@
 
 .catalogAction {
   display: grid;
+  grid-row: 1 / span 2;
+  align-self: center;
   width: 30px;
   height: 30px;
   place-items: center;
@@ -468,9 +470,15 @@
   height: 0.85rem;
 }
 
+.catalogItem > span {
+  grid-column: 2;
+  min-width: 0;
+}
+
 .catalogItem strong,
 .catalogItem small {
   display: block;
+  min-width: 0;
 }
 
 .catalogItem strong {
@@ -487,10 +495,14 @@
 }
 
 .catalogItem em {
+  grid-column: 2;
+  min-width: 0;
+  margin-top: 0.25rem;
   color: var(--desk-muted);
   font-size: 0.65rem;
   font-style: normal;
   font-weight: 750;
+  line-height: 1.45;
 }
 
 .desk {
