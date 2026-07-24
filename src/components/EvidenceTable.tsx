@@ -27,6 +27,14 @@ type EvidenceTableProps = {
 const DATE_UNCERTAIN_NOTE =
   "Added by a later hand; exactly when is not known.";
 
+// The generic "later hand" caveat is redundant when the row's own note already
+// explains that the reading is a later correction or margin addition.
+function noteExplainsLaterHand(note: string) {
+  return /later hand|not separately dated|not the date of the later|later marginal addition|not independently dated/i.test(
+    note,
+  );
+}
+
 function unitDetails(row: Witness) {
   const label = row.unitLabel?.trim() || row.unit?.trim() || "";
   const key = row.unitId?.trim() || label || "__general-evidence";
@@ -230,10 +238,10 @@ export function EvidenceTable({
                           )}
                         </td>
                         <td className="px-5 py-4 leading-6 text-ink-700 dark:text-ink-100/75">
-                          {row.note || row.dateUncertain ? (
+                          {row.note || (row.dateUncertain && !noteExplainsLaterHand(row.note)) ? (
                             <>
                               {row.note && <p>{row.note}</p>}
-                              {row.dateUncertain && (
+                              {row.dateUncertain && !noteExplainsLaterHand(row.note) && (
                                 <p className="mt-1 text-[0.78rem] font-bold leading-5 text-amber-800 dark:text-amber-200">
                                   {DATE_UNCERTAIN_NOTE}
                                 </p>

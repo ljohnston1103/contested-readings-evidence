@@ -83,8 +83,8 @@ export const passages: Passage[] = [
       w("GA 636 margin", "manuscript 1400s, later marginal addition", "Contains the Comma in the margin", "greek-manuscript"),
     ],
     latinWitnesses: [
-      w("Old Latin tradition", "early to medieval Latin transmission", "Mixed/partial support: early Latin evidence is important for the Comma, especially through later Latin witnesses and Latin Fathers, but not every Old Latin witness contains the full form", "latin"),
-      w("Later medieval Vulgate / Clementine / Douay-Rheims tradition", "medieval to early modern", "Contains the Comma in the later Vulgate tradition, with the Clementine Vulgate and Douay-Rheims preserving the later form", "latin"),
+      w("Old Latin tradition", "AD 300–1200", "Mixed/partial support: early Latin evidence is important for the Comma, especially through later Latin witnesses and Latin Fathers, but not every Old Latin witness contains the full form", "latin"),
+      w("Later medieval Vulgate / Clementine / Douay-Rheims tradition", "AD 1100–1600", "Contains the Comma in the later Vulgate tradition, with the Clementine Vulgate and Douay-Rheims preserving the later form", "latin"),
       w("Codex Speculum, m", "5th century", "Contains the Comma in Latin Scripture quotations", "latin"),
       w("Frisingensia Fragmenta, r/q", "5th to 7th century", "Contains the Comma, earthly witnesses before heavenly witnesses", "latin"),
       w("Leon Palimpsest, l", "7th century", "Contains: the Father, and the Word, and the Holy Spirit, and these three are one in Christ Jesus", "latin"),
@@ -108,7 +108,7 @@ export const passages: Passage[] = [
       w("Early Coptic", "early centuries", "No known early Coptic support", "coptic"),
       w("Early Georgian", "early centuries", "No known early Georgian support", "version"),
       w("Early Armenian", "before 1100s", "No strong early Armenian support; Armenian evidence for the Comma is later/secondary, not early Armenian support", "version"),
-      w("Later Armenian", "after 1100s", "Later/secondary support, not early Armenian support: some later Armenian witnesses contain the Comma", "version"),
+      w("Later Armenian", "after AD 1100", "Later/secondary support, not early Armenian support: some later Armenian witnesses contain the Comma", "version"),
       w("Slavonic", "later medieval / printed tradition", "Later ecclesiastical support, not early Greek-line support: some late Slavonic witnesses contain the Comma", "version"),
     ],
     patristicWitnesses: [
@@ -203,7 +203,7 @@ export const passages: Passage[] = [
       w("Codex Koridethi, Theta", "c. AD 800s", "Contains Mark 16:9-20", "greek-manuscript"),
       w("Family 13", "c. AD 1000s to 1400s", "Contains Mark 16:9-20", "greek-manuscript"),
       w("Byzantine Majority", "c. AD 500s to 1500s", "Contains Mark 16:9-20", "summary"),
-      w("Greek lectionaries", "medieval period", "Over 1,000 include Mark 16:9-20", "lectionary"),
+      w("Greek lectionaries", "AD 800–1500", "Over 1,000 include Mark 16:9-20", "lectionary"),
     ],
     latinWitnesses: [
       w("Old Latin tradition", "c. AD 150 to 400", "Generally contains Mark 16:9-20", "latin"),
@@ -232,8 +232,8 @@ export const passages: Passage[] = [
       w("Old Latin Codex Bobiensis, k", "c. AD 400s", "Has a shorter ending, not Mark 16:9-20", "latin"),
       w("Sinaitic Syriac", "c. AD 300s to 400s", "Ends Mark at 16:8", "syriac"),
       w("One Sahidic Coptic manuscript", "probably c. AD 400s", "Ends Mark at 16:8", "coptic"),
-      w("Some Armenian manuscripts", "medieval copies, older tradition possible", "Some end at Mark 16:8", "version"),
-      w("Some Georgian manuscripts", "early medieval", "Some end at Mark 16:8", "version"),
+      w("Part of the Armenian tradition", "AD 900–1400", "Some end at Mark 16:8", "version"),
+      w("Part of the Georgian tradition", "AD 500–900", "Some end at Mark 16:8", "version"),
       w("Eusebius", "c. AD 300s", "Mentions copies ending at Mark 16:8", "patristic"),
       w("Jerome", "c. AD 400", "Repeats Eusebius' statement about copies ending at Mark 16:8", "patristic"),
     ],
@@ -302,7 +302,7 @@ export const passages: Passage[] = [
       w("Minuscule 565", "c. AD 800s to 900s", "Contains the verse", "greek-manuscript"),
       w("Minuscule 1424", "c. AD 800s to 900s", "Contains the verse", "greek-manuscript"),
       w("Byzantine Majority", "c. AD 500s to 1500s", "Contains the verse", "summary"),
-      w("Lectionary system", "medieval period", "Supports inclusion", "lectionary"),
+      w("Lectionary system", "AD 800–1500", "Supports inclusion", "lectionary"),
     ],
     latinWitnesses: [
       w("Old Latin Vercellensis, a", "c. AD 300s", "Contains the verse", "latin"),
@@ -320,8 +320,8 @@ export const passages: Passage[] = [
       w("Bohairic Coptic, partial tradition", "early centuries", "Contains the verse", "coptic"),
       w("Georgian, partial tradition", "c. AD 400s onward", "Contains the verse", "version"),
       w("Armenian", "c. AD 400 onward", "Contains the verse", "version"),
-      w("Ethiopic", "early centuries onward", "Contains the verse", "version"),
-      w("Old Church Slavonic", "medieval", "Contains the verse", "version"),
+      w("Ethiopic", "AD 300 onward", "Contains the verse", "version"),
+      w("Old Church Slavonic", "AD 800–1500", "Contains the verse", "version"),
     ],
     patristicWitnesses: [
       p("Pseudo-Clement, Letters on Virginity", "c. AD 100 to 200", "This kind goeth not out but by fasting and prayer.", "Early church"),
@@ -354,8 +354,8 @@ export const passages: Passage[] = [
       w("Curetonian Syriac", "c. AD 400s", "Omits the verse", "syriac"),
       w("Palestinian Syriac", "c. AD 400s to 500s", "Omits the verse", "syriac"),
       w("Sahidic Coptic", "c. AD 300s to 400s", "Omits the verse", "coptic"),
-      w("Some Bohairic witnesses", "early to medieval", "Omit the verse", "coptic"),
-      w("Some Georgian witnesses", "c. AD 400s onward", "Omit the verse", "version"),
+      w("Part of the Bohairic Coptic tradition", "AD 300–1200", "Omit the verse", "coptic"),
+      w("Part of the Georgian tradition", "c. AD 400s onward", "Omit the verse", "version"),
     ],
     timeline: [
       t("c. AD 100 to 200", "Pseudo-Clement cites the fasting and prayer wording", "patristic"),
@@ -417,7 +417,7 @@ export const passages: Passage[] = [
       w("Minuscule 1424", "c. AD 800s to 900s", "Contains the doxology", "greek-manuscript"),
     ],
     latinWitnesses: [
-      w("Many Vulgate manuscripts", "medieval period", "Contain the doxology", "latin"),
+      w("Many Vulgate manuscripts", "AD 800–1500", "A large part of the Latin Vulgate tradition contains the doxology (the Vulgate survives in more than 10,000 manuscripts overall).", "latin"),
     ],
     versionalWitnesses: [
       w("Didache 8", "early AD 100s", "Has a doxology after the Lord's Prayer", "version"),
@@ -425,13 +425,13 @@ export const passages: Passage[] = [
       w("Syriac Harclean", "c. AD 616", "Contains the doxology", "syriac"),
       w("Gothic Version", "c. AD 350", "Contains the doxology", "version"),
       w("Armenian Version", "c. AD 400 onward", "Contains the doxology", "version"),
-      w("Eastern liturgical tradition", "early centuries onward", "Uses doxology with the Lord's Prayer", "lectionary"),
+      w("Eastern liturgical tradition", "AD 300 onward", "Uses doxology with the Lord's Prayer", "lectionary"),
     ],
     patristicWitnesses: [
       p("Didache 8", "early AD 100s", "For thine is the power and the glory for ever.", "Syria"),
       p("Apostolic Constitutions", "c. AD 380", "Uses the Lord's Prayer with doxological ending", "Syria"),
       p("Chrysostom", "c. AD 400", "Quotes the doxology as part of Matthew's Lord's Prayer", "Constantinople"),
-      p("Later Greek commentators", "medieval period", "Receive the doxology in Matthew 6:13", "Greek East"),
+      p("Later Greek commentators", "AD 800–1500", "Receive the doxology in Matthew 6:13", "Greek East"),
     ],
     evidenceAgainst: [
       w("Codex Sinaiticus", "c. AD 340 to 360", "Omits the doxology", "greek-manuscript"),
@@ -584,7 +584,7 @@ export const passages: Passage[] = [
     },
     greekSupportWitnesses: [
       w("1,495 Greek manuscripts", "AD 400s to 1500s", "Contain all or part of John 7:53-8:11", "summary"),
-      w("495 lectionaries", "medieval period", "Support the passage in church reading tradition", "lectionary"),
+      w("495 lectionaries", "AD 800–1500", "Support the passage in church reading tradition", "lectionary"),
       w("Codex Bezae, D", "c. AD 400s", "Earliest extant Greek manuscript containing the passage in John", "greek-manuscript"),
       w("Codex E", "c. AD 700s", "Contains the passage", "greek-manuscript"),
       w("Codex F", "c. AD 800s to 900s", "Contains the passage", "greek-manuscript"),
@@ -634,7 +634,7 @@ export const passages: Passage[] = [
       w("Codex N", "c. AD 500s", "Omits the passage", "greek-manuscript"),
       w("Codex T", "c. AD 400s to 500s", "Omits the passage", "greek-manuscript"),
       w("Codex W", "c. AD 400s to 500s", "Omits the passage", "greek-manuscript"),
-      w("Some manuscripts relocating the passage", "medieval", "Place it after John 7:36, John 7:44, John 7:52, John 21:25, Luke 21:38, or Luke 24:53", "greek-manuscript"),
+      w("Greek manuscripts that relocate the passage", "AD 800–1500", "Place it after John 7:36, John 7:44, John 7:52, John 21:25, Luke 21:38, or Luke 24:53", "greek-manuscript"),
     ],
     timeline: [
       t("c. AD 110 to 140", "Papias reportedly mentions a woman accused before the Lord", "patristic"),
@@ -776,7 +776,7 @@ export const passages: Passage[] = [
     ],
     latinWitnesses: [
       w("Old Latin witnesses containing the verse (aggregate)", "c. AD 300s onward", "Contain the verse", "latin"),
-      w("Later Vulgate witnesses", "medieval period", "Contain the verse", "latin"),
+      w("Later Vulgate manuscripts", "AD 800–1500", "Part of the later Latin Vulgate tradition contains the verse (the Vulgate survives in more than 10,000 manuscripts overall).", "latin"),
     ],
     versionalWitnesses: [
       w("Syriac Peshitta", "c. AD 400s onward", "Contains the verse", "syriac"),
@@ -925,7 +925,7 @@ export const passages: Passage[] = [
     greekSupportWitnesses: [
       w("1,500+ Greek manuscripts", "AD 400s to 1500s", "Contain verses 44 and 46", "summary"),
       w("Byzantine Majority", "AD 500s to 1500s", "Contains verses 44 and 46", "summary"),
-      w("Lectionaries", "medieval period", "Contain verses 44 and 46", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Contain verses 44 and 46", "lectionary"),
       w("Codex Alexandrinus, A", "c. AD 400s", "Contains verses 44 and 46", "greek-manuscript"),
       w("Codex Bezae, D", "c. AD 400s", "Contains verses 44 and 46", "greek-manuscript"),
       w("Codex K", "c. AD 800s to 900s", "Contains verses 44 and 46", "greek-manuscript"),
@@ -1131,7 +1131,7 @@ export const passages: Passage[] = [
       w("Syriac Peshitta", "c. AD 400s onward", "Contains the verse", "syriac"),
       w("Syriac Harclean", "AD 616", "Contains the verse", "syriac"),
       w("Palestinian Syriac", "c. AD 400s to 500s", "Contains the verse", "syriac"),
-      w("Some northern Coptic witnesses", "early to medieval", "Contain the verse", "coptic"),
+      w("Part of the Bohairic (northern) Coptic tradition", "AD 300–1200", "Contain the verse", "coptic"),
     ],
     patristicWitnesses: [
       p("Eusebius of Caesarea", "c. AD 300s", "Appears to know the verse and includes the cross-reference with Luke 22:37 in his canon tables", "Caesarea"),
@@ -1145,7 +1145,7 @@ export const passages: Passage[] = [
       w("Codex Bezae, D", "c. AD 400s", "Omits the verse", "greek-manuscript"),
       w("Codex X", "c. AD 900s", "Omits the verse", "greek-manuscript"),
       w("Codex Psi", "c. AD 800s", "Omits the verse", "greek-manuscript"),
-      w("Some lectionary evidence", "medieval period", "Omits the verse", "lectionary"),
+      w("Part of the Greek lectionary tradition", "AD 800–1500", "Omits the verse", "lectionary"),
       w("Two Latin witnesses", "c. AD 300s onward", "Omit the verse", "latin"),
       w("Sinaitic Syriac", "c. AD 300s to 400s", "Omits the verse", "syriac"),
       w("Most Coptic witnesses", "c. AD 300s onward", "Omit the verse", "coptic"),
@@ -1196,7 +1196,7 @@ export const passages: Passage[] = [
     greekSupportWitnesses: [
       w("1,500+ Greek manuscripts", "AD 400s to 1500s", "Contain the verse", "summary"),
       w("Byzantine Majority", "AD 500s to 1500s", "Contains the verse", "summary"),
-      w("Greek lectionaries", "medieval period", "Contain the verse", "lectionary"),
+      w("Greek lectionaries", "AD 800–1500", "Contain the verse", "lectionary"),
       w("Codex Sinaiticus", "c. AD 340 to 360", "Contains the verse", "greek-manuscript"),
       w("Codex Washingtonianus, W", "c. AD 400s to 500s", "Contains the verse", "greek-manuscript"),
       w("Codex X", "c. AD 900s", "Contains the verse", "greek-manuscript"),
@@ -1219,7 +1219,7 @@ export const passages: Passage[] = [
     versionalWitnesses: [
       w("Syriac Peshitta", "c. AD 400s onward", "Contains the verse", "syriac"),
       w("Syriac Harclean", "AD 616", "Contains the verse", "syriac"),
-      w("Some northern Coptic witnesses", "early to medieval", "Contain the verse", "coptic"),
+      w("Part of the Bohairic (northern) Coptic tradition", "AD 300–1200", "Contain the verse", "coptic"),
       w("Old Syriac Sinaitic", "c. AD 300s to 400s", "Contains the verse after verse 18", "syriac"),
       w("Old Syriac Curetonian", "c. AD 400s", "Contains the verse after verse 18", "syriac"),
     ],
@@ -1288,7 +1288,7 @@ export const passages: Passage[] = [
     greekSupportWitnesses: [
       w("1,400+ Greek manuscripts", "AD 400s to 1500s", "Contain John 5:3b-4", "summary"),
       w("Byzantine Majority", "AD 500s to 1500s", "Contains John 5:3b-4", "summary"),
-      w("Greek lectionaries", "medieval period", "Contain John 5:3b-4", "lectionary"),
+      w("Greek lectionaries", "AD 800–1500", "Contain John 5:3b-4", "lectionary"),
       w("Codex Alexandrinus, A2", "c. AD 400s", "Contains the full longer reading", "greek-manuscript"),
       w("Codex Ephraemi Rescriptus, C3", "c. AD 400s, later corrector", "Contains the full longer reading", "greek-manuscript"),
       w("Codex K", "c. AD 800s to 900s", "Contains the full longer reading", "greek-manuscript"),
@@ -1310,14 +1310,14 @@ export const passages: Passage[] = [
     ],
     latinWitnesses: [
       w("Most Latin witnesses", "c. AD 300s onward", "Contain the longer reading", "latin"),
-      w("Later Vulgate witnesses", "medieval period", "Contain the longer reading", "latin"),
+      w("Later Vulgate manuscripts", "AD 800–1500", "Part of the later Latin Vulgate tradition contains the longer reading (the Vulgate survives in more than 10,000 manuscripts overall).", "latin"),
       w("Three Latin witnesses", "c. AD 300s onward", "Contain waiting for the moving of the water, shorter form", "latin"),
     ],
     versionalWitnesses: [
       w("Syriac Peshitta", "c. AD 400s onward", "Contains the longer reading", "syriac"),
       w("Syriac Harclean", "AD 616", "Contains the longer reading", "syriac"),
       w("Palestinian Syriac", "c. AD 400s to 500s", "Contains the longer reading", "syriac"),
-      w("Some northern Coptic witnesses", "early to medieval", "Contain the longer reading", "coptic"),
+      w("Part of the Bohairic (northern) Coptic tradition", "AD 300–1200", "Contain the longer reading", "coptic"),
     ],
     patristicWitnesses: [
       p("Tertullian, De Baptismo 5", "c. AD 200", "Refers to angelic activity and healing water in connection with this passage", "North Africa"),
@@ -1422,10 +1422,10 @@ export const passages: Passage[] = [
       w("Clementine Vulgate", "AD 1592", "Contains the verse", "printed"),
     ],
     versionalWitnesses: [
-      w("Some Ethiopic witnesses", "medieval", "Contain the verse", "version"),
-      w("Some Georgian witnesses", "medieval", "Contain the verse", "version"),
-      w("Some Slavonic witnesses", "medieval", "Contain the verse", "version"),
-      w("Some Armenian witnesses", "medieval", "Contain the verse", "version"),
+      w("Part of the Ethiopic tradition", "AD 800–1500", "Contain the verse", "version"),
+      w("Part of the Georgian tradition", "AD 800–1500", "Contain the verse", "version"),
+      w("Part of the Slavonic tradition", "AD 800–1500", "Contain the verse", "version"),
+      w("Part of the Armenian tradition", "AD 800–1500", "Contain the verse", "version"),
     ],
     patristicWitnesses: [
       p("Irenaeus", "c. AD 180", "The eunuch confessed, I believe Jesus Christ to be the Son of God.", "Gaul"),
@@ -1462,7 +1462,7 @@ export const passages: Passage[] = [
       w("Minuscule 2492", "c. AD 1200s", "Omits the verse", "greek-manuscript"),
       w("Minuscule 2495", "c. AD 1300s", "Omits the verse", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Omits the verse", "summary"),
-      w("Lectionaries", "medieval period", "Omit the verse", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Omit the verse", "lectionary"),
     ],
     timeline: [
       t("c. AD 180", "Irenaeus witnesses to the eunuch's confession", "patristic"),
@@ -1511,7 +1511,7 @@ export const passages: Passage[] = [
     greekSupportWitnesses: [
       w("Hundreds of Byzantine Greek manuscripts", "AD 500s to 1500s", "Contain the verse", "summary"),
       w("Byzantine Majority", "AD 500s to 1500s", "Contains the verse", "summary"),
-      w("Greek lectionaries", "medieval period", "Contain the verse", "lectionary"),
+      w("Greek lectionaries", "AD 800–1500", "Contain the verse", "lectionary"),
       w("Codex Porphyrianus, P", "c. AD 800s", "Contains the verse", "greek-manuscript"),
       w("Minuscule 614", "c. AD 1200s", "Contains the verse", "greek-manuscript"),
       w("Minuscule 945", "c. AD 1000s", "Contains the verse", "greek-manuscript"),
@@ -1520,7 +1520,7 @@ export const passages: Passage[] = [
     ],
     latinWitnesses: [
       w("Most Latin witnesses", "c. AD 300s onward", "Contain the verse", "latin"),
-      w("Later Vulgate witnesses", "medieval period", "Contain the verse", "latin"),
+      w("Later Vulgate manuscripts", "AD 800–1500", "Part of the later Latin Vulgate tradition contains the verse (the Vulgate survives in more than 10,000 manuscripts overall).", "latin"),
     ],
     versionalWitnesses: [
       w("Harclean Syriac plus reading", "AD 616", "Contains the verse as an added reading", "syriac"),
@@ -1588,7 +1588,7 @@ export const passages: Passage[] = [
     greekSupportWitnesses: [
       w("Hundreds of Byzantine Greek manuscripts", "AD 500s to 1500s", "Contain the verse", "summary"),
       w("Byzantine Majority", "AD 500s to 1500s", "Contains the verse", "summary"),
-      w("Greek lectionaries", "medieval period", "Contain the verse", "lectionary"),
+      w("Greek lectionaries", "AD 800–1500", "Contain the verse", "lectionary"),
       w("Codex Claromontanus, D", "c. AD 500s", "Contains the verse", "greek-manuscript"),
       w("Codex Psi", "c. AD 800s", "Contains the verse", "greek-manuscript"),
       w("Minuscule 614", "c. AD 1200s", "Contains the verse", "greek-manuscript"),
@@ -1602,7 +1602,7 @@ export const passages: Passage[] = [
     ],
     latinWitnesses: [
       w("Most Latin witnesses", "c. AD 300s onward", "Contain the verse", "latin"),
-      w("Later Vulgate witnesses", "medieval period", "Contain the verse", "latin"),
+      w("Later Vulgate manuscripts", "AD 800–1500", "Part of the later Latin Vulgate tradition contains the verse (the Vulgate survives in more than 10,000 manuscripts overall).", "latin"),
     ],
     versionalWitnesses: [
       w("Syriac Harclean", "AD 616", "Contains the verse", "syriac"),
@@ -1692,7 +1692,7 @@ export const passages: Passage[] = [
       w("Minuscule 1010", "c. AD 1100s", "Supports 'prayer and fasting'", "greek-manuscript"),
       w("Minuscule 1241", "c. AD 1100s", "Supports 'prayer and fasting'", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Supports 'prayer and fasting'", "summary"),
-      w("Lectionaries", "medieval period", "Support 'prayer and fasting'", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Support 'prayer and fasting'", "lectionary"),
     ],
     latinWitnesses: [
       w("Most Old Latin witnesses", "c. AD 300s onward", "Support 'prayer and fasting'", "latin"),
@@ -1759,8 +1759,8 @@ export const passages: Passage[] = [
       w("Family 1", "c. AD 1000s to 1300s", "Supports longer traditional wording", "greek-manuscript"),
       w("Family 13", "c. AD 1000s to 1400s", "Supports longer traditional wording", "greek-manuscript"),
       w("Minuscule 700", "c. AD 1000s", "Supports longer traditional wording", "greek-manuscript"),
-      w("Byzantine Majority, partial", "AD 500s to 1500s", "Some Byzantine witnesses contain longer wording", "summary"),
-      w("Some lectionaries", "medieval period", "Contain the longer wording", "lectionary"),
+      w("Part of the Byzantine majority text", "AD 500–1500", "A large share of the roughly 5,000 later Byzantine Greek manuscripts carry the longer wording.", "summary"),
+      w("Part of the Greek lectionary tradition", "AD 800–1500", "Some of the roughly 2,300 catalogued Greek lectionaries (church service books) contain the longer wording.", "lectionary"),
     ],
     latinWitnesses: [
       w("Most Latin witnesses", "c. AD 300s onward", "Contain the longer reading", "latin"),
@@ -1770,7 +1770,7 @@ export const passages: Passage[] = [
       w("Syriac Curetonian", "c. AD 400s", "Supports the longer wording", "syriac"),
       w("Syriac Peshitta", "c. AD 400s onward", "Supports the longer wording", "syriac"),
       w("Syriac Harclean", "AD 616", "Supports the longer wording", "syriac"),
-      w("Some northern Coptic witnesses", "early to medieval", "Support the longer wording", "coptic"),
+      w("Part of the Bohairic (northern) Coptic tradition", "AD 300–1200", "Support the longer wording", "coptic"),
     ],
     patristicWitnesses: [],
     evidenceAgainst: [
@@ -1792,7 +1792,7 @@ export const passages: Passage[] = [
       w("Minuscule 892", "c. AD 800s to 900s", "Omits the longer wording", "greek-manuscript"),
       w("Minuscule 1010", "c. AD 1100s", "Omits the longer wording", "greek-manuscript"),
       w("Minuscule 1241", "c. AD 1100s", "Omits the longer wording", "greek-manuscript"),
-      w("Most lectionaries", "medieval period", "Omit the longer wording", "lectionary"),
+      w("Most lectionaries", "AD 800–1500", "Omit the longer wording", "lectionary"),
       w("Sinaitic Syriac", "c. AD 300s to 400s", "Omits the longer wording", "syriac"),
       w("Most Coptic witnesses", "c. AD 300s onward", "Omit the longer wording", "coptic"),
     ],
@@ -1860,7 +1860,7 @@ export const passages: Passage[] = [
       w("Minuscule 1010", "c. AD 1100s", "Supports fuller wording", "greek-manuscript"),
       w("Minuscule 1241", "c. AD 1100s", "Supports fuller wording", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Supports fuller traditional wording", "summary"),
-      w("Lectionaries", "medieval period", "Support fuller traditional wording", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Support fuller traditional wording", "lectionary"),
     ],
     latinWitnesses: [
       w("Most Old Latin witnesses", "c. AD 300s onward", "Support fuller wording", "latin"),
@@ -1869,10 +1869,10 @@ export const passages: Passage[] = [
       w("Syriac Curetonian", "c. AD 400s", "Supports fuller wording", "syriac"),
       w("Syriac Peshitta", "c. AD 400s onward", "Supports fuller wording", "syriac"),
       w("Syriac Harclean", "AD 616", "Supports fuller wording", "syriac"),
-      w("Some Coptic witnesses", "early to medieval", "Support fuller wording in parts", "coptic"),
+      w("Part of the Coptic tradition", "AD 300–1200", "Support fuller wording in parts", "coptic"),
     ],
     patristicWitnesses: [
-      p("Liturgical/ecclesiastical use", "early centuries onward", "Fuller Lord's Prayer wording is reflected in church and liturgical use.", "Church use"),
+      p("Liturgical/ecclesiastical use", "AD 300 onward", "Fuller Lord's Prayer wording is reflected in church and liturgical use.", "Church use"),
     ],
     evidenceAgainst: [
       w("Papyrus 75, P75", "c. AD 175 to 225", "Supports shorter form 'Father'", "greek-manuscript"),
@@ -1888,7 +1888,7 @@ export const passages: Passage[] = [
     timeline: [
       t("c. AD 175 to 225", "P75 supports the shorter form", "greek-manuscript"),
       t("c. AD 400s", "Alexandrinus, Ephraemi, Bezae, and Washingtonianus support fuller wording in parts", "greek-manuscript"),
-      t("early centuries onward", "Liturgical and ecclesiastical tradition preserves fuller Lord's Prayer wording", "patristic"),
+      t("AD 300 onward", "Liturgical and ecclesiastical tradition preserves fuller Lord's Prayer wording", "patristic"),
       t("AD 500s to 1500s", "Byzantine Majority and lectionaries support fuller traditional wording", "lectionary"),
       t("AD 1611", "King James Bible includes the fuller wording in Luke 11:2-4", "reformation-bible"),
     ],
@@ -1959,7 +1959,7 @@ export const passages: Passage[] = [
       w("Syriac Peshitta", "c. AD 400s onward", "Includes the verses", "syriac"),
       w("Syriac Harclean", "AD 616", "Includes the verses", "syriac"),
       w("Palestinian Syriac", "early medieval, older tradition", "Includes the verses", "syriac"),
-      w("Some northern Coptic witnesses", "early to medieval", "Include the verses", "coptic"),
+      w("Part of the Bohairic (northern) Coptic tradition", "AD 300–1200", "Include the verses", "coptic"),
     ],
     patristicWitnesses: [
       p("Justin Martyr", "c. AD 150 to 160", "Early witness to Christ's agony / bloody sweat tradition", "Not specified"),
@@ -1976,7 +1976,7 @@ export const passages: Passage[] = [
       w("Codex Vaticanus, B", "c. AD 325 to 350", "Omits the verses", "greek-manuscript"),
       w("Codex T", "c. AD 400s to 500s", "Omits the verses", "greek-manuscript"),
       w("Codex Washingtonianus, W", "c. AD 400s to 500s", "Omits the verses", "greek-manuscript"),
-      w("Some lectionaries", "medieval period", "Omit or relocate the verses", "lectionary"),
+      w("Part of the Greek lectionary tradition", "AD 800–1500", "Omit or relocate the verses", "lectionary"),
       w("One Old Latin witness", "c. AD 300s onward", "Omits the verses", "latin"),
       w("Sinaitic Syriac", "c. AD 300s to 400s", "Omits the verses", "syriac"),
       w("Most Coptic witnesses", "c. AD 300s onward", "Omit the verses", "coptic"),
@@ -2048,7 +2048,7 @@ export const passages: Passage[] = [
       w("Minuscule 1010", "c. AD 1100s", "Contains the verse", "greek-manuscript"),
       w("Minuscule 1241", "c. AD 1100s", "Contains the verse", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Contains the verse", "summary"),
-      w("Lectionaries", "medieval period", "Contain the verse", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Contain the verse", "lectionary"),
     ],
     latinWitnesses: [
       w("Old Latin witnesses containing the verse (aggregate)", "c. AD 300s onward", "Contain the verse", "latin"),
@@ -2136,7 +2136,7 @@ export const passages: Passage[] = [
       w("Minuscule 1010", "c. AD 1100s", "Contains the phrase", "greek-manuscript"),
       w("Minuscule 1241", "c. AD 1100s", "Contains the phrase", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Contains the phrase", "summary"),
-      w("Lectionaries", "medieval period", "Contain the phrase", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Contain the phrase", "lectionary"),
     ],
     latinWitnesses: [
       w("Old Latin witnesses containing the phrase (aggregate)", "c. AD 300s onward", "Contain the phrase", "latin"),
@@ -2221,7 +2221,7 @@ export const passages: Passage[] = [
       w("Minuscule 1010", "c. AD 1100s", "Contains the phrase", "greek-manuscript"),
       w("Minuscule 1241", "c. AD 1100s", "Contains the phrase", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Contains the phrase", "summary"),
-      w("Lectionaries", "medieval period", "Contain the phrase", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Contain the phrase", "lectionary"),
     ],
     latinWitnesses: [
       w("Old Latin witnesses containing the phrase (aggregate)", "c. AD 300s onward", "Contain the phrase", "latin"),
@@ -2307,7 +2307,7 @@ export const passages: Passage[] = [
       w("Minuscule 1010", "c. AD 1100s", "Reads 'only begotten Son'", "greek-manuscript"),
       w("Minuscule 1241", "c. AD 1100s", "Reads 'only begotten Son'", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Reads 'only begotten Son'", "summary"),
-      w("Lectionaries", "medieval period", "Read 'only begotten Son'", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Read 'only begotten Son'", "lectionary"),
     ],
     latinWitnesses: [
       w("Most Old Latin witnesses", "c. AD 300s onward", "Support Son reading", "latin"),
@@ -2334,7 +2334,7 @@ export const passages: Passage[] = [
       p("Cyril of Alexandria", "AD 376 to 444", "Strongly uses 'only-begotten God'", "Supporting 'only begotten God' or mixed evidence"),
     ],
     evidenceAgainst: [
-      w("7 Greek manuscripts", "early to medieval", "Support God readings", "summary"),
+      w("7 Greek manuscripts", "AD 300–1200", "Support God readings", "summary"),
       w("Papyrus 66, P66", "c. AD 175 to 225", "Reads 'only begotten God'", "greek-manuscript"),
       w("Papyrus 75, P75", "c. AD 175 to 225", "Reads 'only begotten God'", "greek-manuscript"),
       w("Codex Sinaiticus", "c. AD 340 to 360", "Reads 'only begotten God'", "greek-manuscript"),
@@ -2406,7 +2406,7 @@ export const passages: Passage[] = [
       w("Minuscule 1010", "c. AD 1100s", "Reads 'believeth on me'", "greek-manuscript"),
       w("Minuscule 1241", "c. AD 1100s", "Reads 'believeth on me'", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Reads 'believeth on me'", "summary"),
-      w("Lectionaries", "medieval period", "Read 'believeth on me'", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Read 'believeth on me'", "lectionary"),
     ],
     latinWitnesses: [
       w("Most Old Latin witnesses", "c. AD 300s onward", "Support 'on me'", "latin"),
@@ -2477,7 +2477,7 @@ export const passages: Passage[] = [
       w("Textus Receptus / Erasmus", "AD 1516 onward", "The fuller wording entered the printed Greek tradition through Erasmus' back-translation from Latin", "printed"),
     ],
     latinWitnesses: [
-      w("Latin Vulgate manuscripts", "medieval period", "Contain the fuller wording in some manuscripts", "latin"),
+      w("Latin Vulgate manuscripts", "AD 800–1500", "Contain the fuller wording in some manuscripts", "latin"),
     ],
     versionalWitnesses: [],
     patristicWitnesses: [
@@ -2575,7 +2575,7 @@ export const passages: Passage[] = [
       w("Minuscule 1241", "c. AD 1100s", "Contains the full clause", "greek-manuscript"),
       w("Minuscule 2495", "c. AD 1300s", "Contains the full clause", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Contains the full clause", "summary"),
-      w("Lectionaries", "medieval period", "Contain the full clause", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Contain the full clause", "lectionary"),
     ],
     latinWitnesses: [
       w("Two Old Latin witnesses containing the full clause (aggregate)", "c. AD 300s onward", "Contain the full clause", "latin"),
@@ -2642,10 +2642,10 @@ export const passages: Passage[] = [
     greekSupportWitnesses: [
       w("Minuscule 614", "c. AD 1200s", "Contains 'through his blood'", "greek-manuscript"),
       w("Minuscule 630", "c. AD 1300s", "Contains 'through his blood'", "greek-manuscript"),
-      w("Some Majority witnesses", "medieval period", "Contain 'through his blood'", "summary"),
+      w("Additional later Greek manuscripts", "AD 800–1500", "Beyond 614 and 630, a small group of other later Greek manuscripts — such as 1505 and 2464 — also contain ‘through his blood.’", "summary"),
     ],
     latinWitnesses: [
-      w("Later Vulgate witnesses", "medieval period", "Contain 'through his blood'", "latin"),
+      w("Later Vulgate manuscripts", "AD 800–1500", "Part of the later Latin Vulgate tradition contains ‘through his blood’ (the Vulgate survives in more than 10,000 manuscripts overall).", "latin"),
     ],
     versionalWitnesses: [
       w("Syriac Harclean", "AD 616", "Contains 'through his blood'", "syriac"),
@@ -2656,7 +2656,7 @@ export const passages: Passage[] = [
       w("Codex Alexandrinus, A", "c. AD 400s", "Omits 'through his blood'", "greek-manuscript"),
       w("Codex Vaticanus, B", "c. AD 325 to 350", "Omits 'through his blood'", "greek-manuscript"),
       w("Codex Ephraemi Rescriptus, C", "c. AD 400s", "Omits 'through his blood'", "greek-manuscript"),
-      w("Most Majority witnesses", "medieval period", "Omit 'through his blood'", "summary"),
+      w("Most Greek manuscripts", "AD 300–1500", "The great majority of Greek copies — including the oldest codices and roughly 5,000 later Byzantine manuscripts — omit ‘through his blood.’", "summary"),
     ],
     timeline: [
       t("c. AD 325 to 360", "Vaticanus and Sinaiticus omit 'through his blood'", "greek-manuscript"),
@@ -2716,14 +2716,14 @@ export const passages: Passage[] = [
       w("Minuscule 1881", "c. AD 1300s", "Reads 'God'", "greek-manuscript"),
       w("Minuscule 2495", "c. AD 1300s", "Reads 'God'", "greek-manuscript"),
       w("Byzantine Majority", "AD 500s to 1500s", "Reads 'God'", "summary"),
-      w("Lectionaries", "medieval period", "Read 'God'", "lectionary"),
+      w("Lectionaries", "AD 800–1500", "Read 'God'", "lectionary"),
     ],
     latinWitnesses: [],
     versionalWitnesses: [
-      w("Later Byzantine and ecclesiastical tradition", "medieval period", "Supports 'God was manifest in the flesh'", "version"),
+      w("Later Byzantine and ecclesiastical tradition", "AD 800–1500", "Supports 'God was manifest in the flesh'", "version"),
     ],
     patristicWitnesses: [
-      p("Later ecclesiastical use", "medieval period", "The 'God' reading is dominant in the Byzantine ecclesiastical tradition", "Byzantine ecclesiastical tradition"),
+      p("Later ecclesiastical use", "AD 800–1500", "The 'God' reading is dominant in the Byzantine ecclesiastical tradition", "Byzantine ecclesiastical tradition"),
     ],
     evidenceAgainst: [
       w("Codex Sinaiticus first hand", "c. AD 340 to 360", "Reads 'who'", "greek-manuscript"),
@@ -2731,8 +2731,8 @@ export const passages: Passage[] = [
       w("Codex Ephraemi first hand, C", "c. AD 400s", "Reads 'who'", "greek-manuscript"),
       w("Codex Boernerianus, G", "c. AD 800s", "Reads 'who'", "greek-manuscript"),
       w("Minuscule 33", "c. AD 800s to 900s", "Reads 'who'", "greek-manuscript"),
-      w("Palestinian Syriac", "early medieval", "Supports 'who'", "syriac"),
-      w("Syriac Peshitta / Harclean, uncertain apparatus note", "early to medieval", "Possibly supports 'who' in apparatus summaries", "syriac"),
+      w("Palestinian Syriac", "AD 500–900", "Supports 'who'", "syriac"),
+      w("Syriac Peshitta / Harclean, uncertain apparatus note", "AD 300–1200", "Possibly supports 'who' in apparatus summaries", "syriac"),
       w("Coptic witnesses", "early centuries", "Support non-'God' reading in apparatus summaries", "coptic"),
       w("Codex Claromontanus first hand, D", "c. AD 500s", "Reads 'which'", "greek-manuscript"),
       w("Latin / Vulgate", "c. AD 400 onward", "Supports 'which'", "latin"),

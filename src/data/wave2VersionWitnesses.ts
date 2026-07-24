@@ -287,7 +287,7 @@ const WITNESS_DATES = {
   },
   vulgateLips4: {
     date:
-      "medieval Leipzig Vulgate MS 4; broad 7th–15th c. range because the cited apparatus supplies no narrower date",
+      "medieval Leipzig Vulgate MS 4; broad 7th–15th c. range because the source gives only this broad range",
     dateStart: 600,
     dateEnd: 1499,
     dateSource: DATE_SOURCES.palmer,
@@ -295,7 +295,7 @@ const WITNESS_DATES = {
   },
   vulgateLips5: {
     date:
-      "medieval Leipzig Vulgate MS 5; broad 7th–15th c. range because the cited apparatus supplies no narrower date",
+      "medieval Leipzig Vulgate MS 5; broad 7th–15th c. range because the source gives only this broad range",
     dateStart: 600,
     dateEnd: 1499,
     dateSource: DATE_SOURCES.palmer,
@@ -303,7 +303,7 @@ const WITNESS_DATES = {
   },
   vulgateLips6: {
     date:
-      "medieval Leipzig Vulgate MS 6; broad 7th–15th c. range because the cited apparatus supplies no narrower date",
+      "medieval Leipzig Vulgate MS 6; broad 7th–15th c. range because the source gives only this broad range",
     dateStart: 600,
     dateEnd: 1499,
     dateSource: DATE_SOURCES.palmer,
@@ -509,7 +509,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Vulgate manuscript tradition",
         "latin",
         "vulgateTradition",
-        "Includes “firstborn”; this is a tradition-level citation, not one manuscript.",
+        "Includes “firstborn”; this cites the tradition as a group, not one manuscript.",
         aggregate,
       ),
       witness(
@@ -560,7 +560,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Non-Bohairic Coptic witnesses with the shorter form",
         "coptic",
         "copticTraditions",
-        "Coptic support outside the separately listed Bohairic strands is cited at tradition level.",
+        "Coptic support outside the separately listed Bohairic strands is cited across the tradition as a whole.",
         aggregate,
       ),
       witness(
@@ -579,21 +579,21 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Old Latin witnesses including the phrase",
         "latin",
         "oldLatinTradition",
-        "A substantial but non-unanimous part of the Old Latin tradition includes the phrase.",
+        "A large part of the Old Latin tradition (about 90 manuscripts survive overall) includes the phrase, though not every copy does.",
         aggregate,
       ),
       witness(
         "Syriac traditions including the phrase",
         "syriac",
         "syriacTraditions",
-        "The cited Syriac streams include the phrase; the apparatus row does not enumerate each manuscript.",
+        "The cited Syriac streams include the phrase; the source cites the tradition as a group rather than naming each manuscript.",
         aggregate,
       ),
       witness(
         "Coptic traditions including the phrase",
         "coptic",
         "copticTraditions",
-        "The cited Coptic evidence includes the phrase at tradition level.",
+        "The cited Coptic evidence includes the phrase across the tradition as a whole.",
         aggregate,
       ),
       witness(
@@ -884,7 +884,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Christian Palestinian Syriac witnesses",
         "syriac",
         "syriacPalestinian",
-        "Some witnesses in this tradition include the clause; the source does not claim unanimity.",
+        "Some witnesses in this tradition include the clause; not every manuscript in the tradition agrees.",
         aggregate,
       ),
       witness(
@@ -1053,7 +1053,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Syriac traditions with the qualifying phrase",
         "syriac",
         "syriacTraditions",
-        "The cited Syriac evidence supports the qualifying phrase at tradition level.",
+        "The cited Syriac evidence supports the qualifying phrase across the tradition as a whole.",
         aggregate,
       ),
       witness(
@@ -1150,7 +1150,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Old Latin witnesses reading “Joseph and his mother”",
         "latin",
         "oldLatinTradition",
-        "Old Latin support is cited at tradition level for “Joseph and his mother.”",
+        "Old Latin support is cited across the tradition as a whole for “Joseph and his mother.”",
         aggregate,
       ),
       witness(
@@ -1295,7 +1295,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Vulgate manuscript tradition",
         "latin",
         "vulgateTradition",
-        "Includes the clause at tradition level.",
+        "Includes the clause across the tradition as a whole.",
         aggregate,
       ),
     ]),
@@ -1443,7 +1443,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Armenian witnesses reading “Lord”",
         "version",
         "armenian",
-        "Supports “Lord” at tradition level; the source does not claim Armenian unanimity.",
+        "Supports “Lord” across the tradition as a whole; the source does not claim Armenian unanimity.",
         aggregate,
       ),
     ]),
@@ -1504,7 +1504,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Coptic witnesses reading “God”",
         "coptic",
         "copticTraditions",
-        "Supports “God” at tradition level.",
+        "Supports “God” across the tradition as a whole.",
         aggregate,
       ),
     ]),
@@ -1558,7 +1558,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Major early version traditions",
         "version",
         "earlyVersionTraditions",
-        "Support the οἰκονομία (“administration/stewardship”) sense rather than the KJV's “fellowship”; this is a cross-version aggregate, not one witness.",
+        "Support the οἰκονομία (“administration/stewardship”) sense rather than the KJV's “fellowship”; this counts several versions together as a group, not one witness.",
         {
           ...aggregate,
           directionClass: "AGAINST_KJV",
@@ -1580,7 +1580,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Early Latin witnesses omitting “by Jesus Christ”",
         "latin",
         "earlyLatinTradition",
-        "Most early Latin evidence omits the phrase; the apparatus summary does not enumerate individual codices.",
+        "Most early Latin evidence omits the phrase; the source cites the group rather than naming each codex.",
         aggregate,
       ),
       witness(
@@ -1594,7 +1594,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Coptic witnesses omitting “by Jesus Christ”",
         "coptic",
         "copticTraditions",
-        "Coptic evidence supports omission at tradition level.",
+        "Coptic evidence supports omission across the tradition as a whole.",
         aggregate,
       ),
     ]),
@@ -1718,7 +1718,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Coptic witnesses",
         "coptic",
         "copticTraditions",
-        "Support “beginning and end” at tradition level.",
+        "Support “beginning and end” across the tradition as a whole.",
         aggregate,
       ),
     ]),
@@ -1840,7 +1840,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Arabic Revelation tradition",
         "version",
         "arabicTradition",
-        "Supports “Lord God” at tradition level.",
+        "Supports “Lord God” across the tradition as a whole.",
         aggregate,
       ),
     ]),
