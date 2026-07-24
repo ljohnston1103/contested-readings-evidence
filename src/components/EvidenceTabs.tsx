@@ -22,9 +22,12 @@ import {
 } from "@/data/evidenceDirection";
 import type { Passage, Witness } from "@/data/types";
 
+import { patristicRowSources } from "@/lib/evidenceSources";
+
 import { EvidenceScale } from "./EvidenceScale";
 import { EvidenceTable } from "./EvidenceTable";
 import { PatristicQuoteCard } from "./PatristicQuoteCard";
+import { SourcesStrip } from "./SourcesStrip";
 import { Timeline } from "./Timeline";
 
 type EvidenceTabsProps = {
@@ -303,13 +306,19 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
           )}
 
           {activeTab === "Church Fathers" && (
-            <div className="grid gap-4 md:grid-cols-2">
-              {visiblePatristicWitnesses.map((witness, witnessIndex) => (
-                <PatristicQuoteCard
-                  key={`${witness.source}-${witness.workSection ?? ""}-${witness.date}-${witnessIndex}`}
-                  witness={witness}
-                />
-              ))}
+            <div className="grid gap-4">
+              <SourcesStrip
+                sources={patristicRowSources(visiblePatristicWitnesses)}
+                heading="Sources for the quotations in this section"
+              />
+              <div className="grid gap-4 md:grid-cols-2">
+                {visiblePatristicWitnesses.map((witness, witnessIndex) => (
+                  <PatristicQuoteCard
+                    key={`${witness.source}-${witness.workSection ?? ""}-${witness.date}-${witnessIndex}`}
+                    witness={witness}
+                  />
+                ))}
+              </div>
             </div>
           )}
 

@@ -13,6 +13,9 @@ import {
   isAgainstKjvDirection,
   isForKjvDirection,
 } from "@/data/evidenceDirection";
+import { witnessRowSources } from "@/lib/evidenceSources";
+
+import { SourcesStrip } from "./SourcesStrip";
 
 type EvidenceTableProps = {
   title?: string;
@@ -22,7 +25,7 @@ type EvidenceTableProps = {
 };
 
 const DATE_UNCERTAIN_NOTE =
-  "Later contribution; its exact date is not independently established.";
+  "Added by a later hand; exactly when is not known.";
 
 function unitDetails(row: Witness) {
   const label = row.unitLabel?.trim() || row.unit?.trim() || "";
@@ -60,6 +63,7 @@ export function EvidenceTable({
 }: EvidenceTableProps) {
   const [query, setQuery] = useState("");
   const uniqueRows = useMemo(() => dedupeWitnessRows(rows), [rows]);
+  const sources = useMemo(() => witnessRowSources(uniqueRows), [uniqueRows]);
   const filteredRows = useMemo(() => {
     const needle = query.toLowerCase().trim();
     if (!needle) return uniqueRows;
@@ -148,6 +152,11 @@ export function EvidenceTable({
               aria-label={`Search ${title ?? "evidence"} table`}
             />
           )}
+        </div>
+      )}
+      {sources.length > 0 && (
+        <div className="border-b border-ink-100 p-4 dark:border-white/10">
+          <SourcesStrip sources={sources} />
         </div>
       )}
       <div className="overflow-x-auto">

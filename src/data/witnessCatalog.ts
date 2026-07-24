@@ -363,7 +363,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: intfManuscriptUrl("032"),
     note:
-      "Ws is the later replacement text in Codex Washingtonianus for John 1:1–5:11; it is not the fourth/fifth-century main hand W.",
+      "Ws is the later replacement text in Codex Washingtonianus for John 1:1–5:11, copied to restore lost pages; it is not the fourth/fifth-century original text of the codex (W).",
   },
   {
     key: "f1",
@@ -375,7 +375,8 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     kind: "greek-family",
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
-    note: "A manuscript family, not a single witness with one production date.",
+    note:
+      "A family of about a dozen related manuscripts copied from a common ancestor (core members include minuscules 1, 118, 131, 209, and 1582). The date range covers the whole group.",
   },
   {
     key: "f13",
@@ -387,7 +388,8 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     kind: "greek-family",
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
-    note: "A manuscript family, not a single witness with one production date.",
+    note:
+      "A family of about thirteen related manuscripts (including minuscules 13, 69, 124, 346, 543, 788, and 826). The date range covers the whole group.",
   },
   {
     key: "f052",
@@ -400,7 +402,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: PALMER_REVELATION,
     dateSourceUrl: PALMER_REVELATION_URL,
     note:
-      "Palmer's f052 is the family comprising 052, 1678, 1778, and 2080; it is not GA 052 alone.",
+      "A small family of four related manuscripts of Revelation — uncial 052 together with minuscules 1678, 1778, and 2080 — not GA 052 alone. The date range covers the whole group.",
   },
   {
     key: "Maj",
@@ -413,7 +415,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
     note:
-      "Maj is an apparatus aggregate for a broad manuscript tradition, not a manuscript siglum.",
+      "“Maj” means the majority of all surviving Greek New Testament manuscripts as one group — roughly 5,000 of the approximately 5,800 catalogued copies, most written from the sixth century onward — not one individual manuscript.",
   },
   {
     key: "Byz",
@@ -426,7 +428,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
     note:
-      "Byz is an apparatus aggregate for a textual tradition, not a single dated manuscript.",
+      "“Byz” means the Byzantine text found in the great majority of surviving Greek manuscripts — roughly 5,000 of the approximately 5,800 catalogued copies — considered as one group, not one individual manuscript.",
   },
   {
     key: "Maj/Byz",
@@ -438,7 +440,8 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     kind: "greek-tradition",
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
-    note: "A combined apparatus aggregate, not an independently dated witness.",
+    note:
+      "The majority and Byzantine groups counted together — roughly 5,000 later Greek manuscripts — not one individual manuscript.",
   },
   {
     key: "Lect",
@@ -450,7 +453,8 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     kind: "greek-tradition",
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
-    note: "Lect represents multiple lectionaries rather than one manuscript.",
+    note:
+      "Not one manuscript but the whole body of Greek lectionaries — church service books that present Scripture readings for each day — of which about 2,300 are catalogued.",
   },
 ] as const;
 
@@ -630,29 +634,29 @@ function qualifierNote(
 ) {
   switch (qualifier) {
     case "first-hand":
-      return "The asterisk identifies the manuscript's first hand; the physical manuscript date applies.";
+      return "The asterisk marks what the original scribe first wrote, before any later correction. The manuscript's own date applies.";
     case "corrector":
-      return "This is a correction, later than the first hand. The catalog date is the base manuscript's date because this correcting hand is not independently dated here.";
+      return "This reading was added by a later corrector after the original scribe finished. The date shown is the manuscript's own date; exactly when the correction was made is not known.";
     case "corrector-probable":
-      return "The apparatus probably assigns this reading to a corrector. The catalog date is the base manuscript's date; the correcting hand is not independently dated here.";
+      return "This reading most likely comes from a later corrector rather than the original scribe. The date shown is the manuscript's own date; the correction itself is not separately dated.";
     case "corrector-or-margin":
-      return "The apparatus assigns this reading to a correction or margin. The catalog date is the base manuscript's date; the hand is not independently dated here.";
+      return "This reading comes from a correction or margin note added to the manuscript by a later scribe. The date shown is the original manuscript's date; exactly when the note was added is not known.";
     case "margin":
-      return "This is a marginal reading. The catalog date is the base manuscript's date; the marginal hand is not independently dated here.";
+      return "This reading stands in the manuscript's margin, written beside the main text. The date shown is the manuscript's own date; the margin note is not separately dated.";
     case "main-text":
-      return "The apparatus explicitly identifies the manuscript's main text; the physical manuscript date applies.";
+      return "This reading is the manuscript's main running text, not a margin note or correction; the manuscript's own date applies.";
     case "probable-reading":
-      return "vid marks a probable reading where the manuscript is damaged or difficult to read; it does not change the manuscript date.";
+      return "The abbreviation “vid” means the manuscript is damaged or hard to read here but most likely contains this reading. The manuscript's own date still applies.";
     case "first-hand-probable":
-      return "The apparatus probably reads this in the first hand; the physical manuscript date applies.";
+      return "The original scribe most likely wrote this reading, though the manuscript is hard to read here. The manuscript's own date applies.";
     case "supplement":
-      return "S identifies a supplementary hand replacing lost text. It is later than the base codex, but the supplement is not independently dated here.";
+      return "The letter S marks replacement pages added later where the original pages were lost. The replacement is later than the original manuscript but is not separately dated here.";
     case "numbered-corrector":
-      return `The apparatus identifies correcting hand ${qualifierText ?? ""}. The catalog date is the base manuscript's date; this correcting hand is not independently dated here.`;
+      return `This reading comes from corrector ${qualifierText ?? ""} — one of the later scribes who corrected this manuscript. The date shown is the manuscript's own date; the correction is not separately dated.`;
     case "partial-family":
-      return "Only part of the named manuscript family supports this reading; the family date span remains an aggregate.";
+      return "Only part of this family of manuscripts supports the reading; the date range still covers the whole group.";
     case "family-exception":
-      return `The apparatus cites the family with ${qualifierText ?? "an exception"}; the family date span remains an aggregate.`;
+      return `This family of manuscripts supports the reading (${qualifierText ?? "with an exception"} — the named member differs); the date range still covers the whole group.`;
     default:
       return undefined;
   }
@@ -752,7 +756,7 @@ const versionRows: readonly VersionRow[] = [
     true,
     PALMER_REVELATION,
     PALMER_REVELATION_URL,
-    "A language tradition containing multiple manuscripts and readings, not one dated witness.",
+    "A whole translation tradition, not one manuscript — about 90 Old Latin manuscripts survive (roughly 30 of them with the Gospels). The date range covers the tradition.",
   ],
   [
     "latin-tradition",
