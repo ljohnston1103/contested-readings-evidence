@@ -91,28 +91,39 @@ function isAggregateRow(row: Witness) {
   return Boolean(row.aggregate || isCollectivePrintedEdition(row));
 }
 
-/**
- * Converts deliberately broad apparatus language into a conservative public
- * range. These are reading-share estimates, not manuscript censuses; exact
- * percentages and counts already present in the record always take priority.
- */
 function evidenceScope(row: Witness) {
-  if (!isAggregateRow(row)) return "1 named witness";
+  if (!isAggregateRow(row)) return "Named witness";
   if (isCollectivePrintedEdition(row)) return "Edition group";
 
   const label = row.witness.normalize("NFKC");
   const text = `${label} ${row.note}`.normalize("NFKC");
-  const percentageRange = text.match(
-    /\b(?:approximately|about|roughly|c\.?\s*)?(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)\s*(?:percent|%)/iu,
+
+  const boundedSample = text.match(
+    /\b(\d[\d,]*)\s+(?:out\s+)?of\s+(\d[\d,]*)\b/iu,
   );
-  if (percentageRange?.[1] && percentageRange[2]) {
-    return `Approx. ${percentageRange[1]}–${percentageRange[2]}% of cited apparatus sample`;
+  if (boundedSample?.[1] && boundedSample[2]) {
+    const numerator = Number(boundedSample[1].replaceAll(",", ""));
+    const denominator = Number(boundedSample[2].replaceAll(",", ""));
+    if (denominator > 0 && numerator <= denominator) {
+      return `${boundedSample[1]} of ${boundedSample[2]} in cited set (≈${Math.round(
+        (numerator / denominator) * 100,
+      )}%)`;
+    }
+  }
+
+  const percentageRange = text.match(
+    /\b(approximately|about|roughly|c\.?\s*)?(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)\s*(?:percent|%)/iu,
+  );
+  if (percentageRange?.[2] && percentageRange[3]) {
+    const qualifier = percentageRange[1] ? "About " : "";
+    return `${qualifier}${percentageRange[2]}–${percentageRange[3]}% of cited set`;
   }
   const percentage = text.match(
-    /\b(?:approximately|about|roughly|c\.?\s*)?(\d+(?:\.\d+)?)\s*(?:percent|%)/iu,
+    /\b(approximately|about|roughly|c\.?\s*)?(\d+(?:\.\d+)?)\s*(?:percent|%)/iu,
   );
-  if (percentage?.[1]) {
-    return `Approx. ${percentage[1]}% of cited apparatus sample`;
+  if (percentage?.[2]) {
+    const qualifier = percentage[1] ? "About " : "";
+    return `${qualifier}${percentage[2]}% of cited set`;
   }
 
   const countedRange = label.match(
@@ -137,40 +148,7 @@ function evidenceScope(row: Witness) {
     return `${count} cited ${count === "1" ? "witness" : "witnesses"}`;
   }
 
-  if (
-    /\b(?:does not establish|cannot establish|should not be generalized into|must not imply|do not (?:infer|imply))\b[^.]{0,120}\b(?:percentage|majority|unanimity|corpus-wide)\b/iu.test(
-      row.note,
-    ) ||
-    /\bno\b[^.]{0,80}\b(?:numerator|denominator|reading-specific percentage|corpus-wide percentage|global percentage)\b/iu.test(
-      row.note,
-    ) ||
-    /\bnot\b[^.]{0,60}\b(?:a\s+)?(?:Latin-)?majority\b/iu.test(
-      row.note,
-    ) ||
-    /\b(?:a|one|single)\b[^.]{0,60}\bpercentage\b[^.]{0,60}\bmisleading\b/iu.test(
-      row.note,
-    )
-  ) {
-    return "Share not enumerated in the cited source";
-  }
-
-  if (/\b(?:all|entire|whole|near[- ]unanimous|virtually all)\b/iu.test(label)) {
-    return "Approx. 95–100% of cited apparatus sample";
-  }
-  if (/\b(?:most|vast majority)\b/iu.test(label)) {
-    return "Approx. 75–95% of cited apparatus sample";
-  }
-  if (/\bmajority\b/iu.test(label)) {
-    return "More than 50% of cited apparatus sample";
-  }
-  if (/\b(?:many|large part|broad(?:ly)?)\b/iu.test(label)) {
-    return "Approx. 50–90% of cited apparatus sample";
-  }
-  if (/\b(?:some|part of|subset|strand|minority)\b/iu.test(label)) {
-    return "Approx. 10–49% of cited apparatus sample";
-  }
-
-  return "Share not enumerated in the cited source";
+  return null;
 }
 
 export function EvidenceTable({
@@ -282,9 +260,9 @@ export function EvidenceTable({
       {aggregateCount > 0 && (
         <p className="border-b border-ink-100 px-5 py-3 text-xs leading-5 text-ink-500 dark:border-white/10 dark:text-ink-100/55">
           Tradition summaries appear first; named witnesses follow from oldest
-          to newest. Percentage ranges translate terms such as “most” or “many”
-          into conservative approximations for the cited apparatus sample; they
-          are not manuscript censuses.
+          to newest. A percentage appears only when the source gives a total for
+          this passage or explicitly states a percentage. Named rows are
+          examples unless a note identifies a complete collated set.
         </p>
       )}
       <div className="overflow-x-auto">
@@ -303,6 +281,7 @@ export function EvidenceTable({
               displayRows.map(({ row, range }, index) => {
                 const badge = relationshipLabel(row);
                 const aggregate = isAggregateRow(row);
+                const scope = evidenceScope(row);
                 const unit = unitDetails(row);
                 const date = displayDate(row, range);
                 return (
@@ -327,15 +306,17 @@ export function EvidenceTable({
                           Aggregate / tradition
                         </span>
                       )}
-                      <span
-                        className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[0.68rem] font-black tracking-[0.04em] ${
-                          aggregate
-                            ? "bg-archive-gold/15 text-amber-900 dark:bg-archive-gold/15 dark:text-amber-100"
-                            : "bg-archive-teal/10 text-archive-teal dark:bg-teal-200/10 dark:text-teal-200"
-                        }`}
-                      >
-                        {evidenceScope(row)}
-                      </span>
+                      {scope && (
+                        <span
+                          className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[0.68rem] font-black tracking-[0.04em] ${
+                            aggregate
+                              ? "bg-archive-gold/15 text-amber-900 dark:bg-archive-gold/15 dark:text-amber-100"
+                              : "bg-archive-teal/10 text-archive-teal dark:bg-teal-200/10 dark:text-teal-200"
+                          }`}
+                        >
+                          {scope}
+                        </span>
+                      )}
                       {badge && (
                         <span className="mt-2 ml-2 inline-flex rounded-full bg-archive-teal/10 px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-archive-teal dark:text-teal-200">
                           {badge}
