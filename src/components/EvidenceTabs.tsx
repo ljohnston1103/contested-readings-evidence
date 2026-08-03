@@ -8,12 +8,11 @@ import {
   Globe2,
   History,
   LayoutGrid,
-  Library,
   ScrollText,
   ShieldAlert,
   UserRound,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { dedupeWitnessRows, publicPatristicWitnesses } from "@/data/derived";
 import {
@@ -42,7 +41,6 @@ const tabs = [
   { label: "Syriac Witnesses", icon: Globe },
   { label: "Other Versions", icon: Globe2 },
   { label: "Church Fathers", icon: UserRound },
-  { label: "Printed Editions", icon: Library },
   { label: "Competing Reading", icon: ShieldAlert },
   { label: "Related Evidence", icon: CircleEllipsis },
   { label: "Timeline", icon: History },
@@ -136,65 +134,21 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
   const competingEvidence = useMemo(
     () =>
       passage.evidenceAgainst.filter(
-        (row) => isCompetingEvidenceDirection(row.direction),
+        (row) =>
+          row.kind !== "printed" &&
+          isCompetingEvidenceDirection(row.direction),
       ),
     [passage.evidenceAgainst],
   );
   const relatedEvidence = useMemo(
     () =>
       passage.evidenceAgainst.filter(
-        (row) => isRelatedEvidenceDirection(row.direction),
+        (row) =>
+          row.kind !== "printed" &&
+          isRelatedEvidenceDirection(row.direction),
       ),
     [passage.evidenceAgainst],
   );
-  const printedEditions = passage.printedWitnesses ?? [];
-  const visibleTabs = useMemo(
-    () =>
-      tabs.filter((tab) => {
-        switch (tab.label) {
-          case "Summary":
-            return true;
-          case "Greek Manuscripts":
-            return greekWitnesses.length > 0;
-          case "Early Versions":
-            return earlyVersions.length > 0;
-          case "Latin Witnesses":
-            return latin.length > 0;
-          case "Syriac Witnesses":
-            return syriac.length > 0;
-          case "Other Versions":
-            return otherVersions.length > 0;
-          case "Church Fathers":
-            return visiblePatristicWitnesses.length > 0;
-          case "Printed Editions":
-            return printedEditions.length > 0;
-          case "Competing Reading":
-            return competingEvidence.length > 0;
-          case "Related Evidence":
-            return relatedEvidence.length > 0;
-          case "Timeline":
-            return passage.timeline.length > 0;
-        }
-      }),
-    [
-      competingEvidence.length,
-      earlyVersions.length,
-      latin.length,
-      otherVersions.length,
-      greekWitnesses.length,
-      passage.timeline.length,
-      printedEditions.length,
-      relatedEvidence.length,
-      syriac.length,
-      visiblePatristicWitnesses.length,
-    ],
-  );
-
-  useEffect(() => {
-    if (!visibleTabs.some((tab) => tab.label === activeTab)) {
-      setActiveTab("Summary");
-    }
-  }, [activeTab, visibleTabs]);
 
   return (
     <section className="grid gap-5">
@@ -203,7 +157,7 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
         aria-label="Passage evidence"
         className="sticky top-16 z-30 flex gap-2 overflow-x-auto rounded-full border border-ink-200 bg-white/85 p-2 shadow-card backdrop-blur dark:border-white/10 dark:bg-archive-navy/85 sm:top-20"
       >
-        {visibleTabs.map((tab) => {
+        {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.label;
           return (
@@ -306,27 +260,37 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
           )}
 
           {activeTab === "Church Fathers" && (
-            <div className="grid gap-4">
-              <SourcesStrip
-                sources={patristicRowSources(visiblePatristicWitnesses)}
-                heading="Sources for the quotations in this section"
-              />
-              <div className="grid gap-4 md:grid-cols-2">
-                {visiblePatristicWitnesses.map((witness, witnessIndex) => (
-                  <PatristicQuoteCard
-                    key={`${witness.source}-${witness.workSection ?? ""}-${witness.date}-${witnessIndex}`}
-                    witness={witness}
-                  />
-                ))}
+            visiblePatristicWitnesses.length > 0 ? (
+              <div className="grid gap-4">
+                <SourcesStrip
+                  sources={patristicRowSources(visiblePatristicWitnesses)}
+                  heading="Sources for the quotations in this section"
+                />
+                <div className="grid gap-4 md:grid-cols-2">
+                  {visiblePatristicWitnesses.map((witness, witnessIndex) => (
+                    <PatristicQuoteCard
+                      key={`${witness.source}-${witness.workSection ?? ""}-${witness.date}-${witnessIndex}`}
+                      witness={witness}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-
-          {activeTab === "Printed Editions" && (
-            <EvidenceTable
-              title="Printed editions supporting the KJV reading"
-              rows={printedEditions}
-            />
+            ) : (
+              <div className="rounded-[2rem] border border-dashed border-ink-200 bg-white/70 p-8 text-center shadow-card dark:border-white/10 dark:bg-white/[0.04] sm:p-10">
+                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-archive-teal/10 text-archive-teal dark:bg-teal-200/10 dark:text-teal-200">
+                  <UserRound className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <p className="mt-4 text-xs font-black uppercase tracking-[0.2em] text-archive-teal dark:text-teal-200">
+                  Church Fathers
+                </p>
+                <h3 className="mt-2 font-display text-2xl font-black text-ink-900 dark:text-white">
+                  No passage-specific patristic witness is listed.
+                </h3>
+                <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-ink-600 dark:text-ink-100/70">
+                  This category remains in the same place on every passage so uncertain or non-specific quotations are not mistaken for direct evidence.
+                </p>
+              </div>
+            )
           )}
 
           {activeTab === "Competing Reading" && (

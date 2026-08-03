@@ -1,5 +1,9 @@
 import correctionsData from "./kjv-forward.generated.json";
 import { parseEvidenceDate, sortWitnessRows } from "./evidenceDates";
+import { latinRepresentativeWitnessesActsPaul } from "./latinRepresentativeWitnessesActsPaul";
+import { latinRepresentativeWitnessesGospelsA } from "./latinRepresentativeWitnessesGospelsA";
+import { latinRepresentativeWitnessesGospelsB } from "./latinRepresentativeWitnessesGospelsB";
+import { latinRepresentativeWitnessesGospelsC } from "./latinRepresentativeWitnessesGospelsC";
 import {
   resolveGreekWitness,
   resolveVersionWitness,
@@ -40,6 +44,29 @@ const olderConclusionBySlug = new Map(
     entry.editorialConclusion,
   ]),
 );
+
+type LatinRepresentativeRow = Readonly<
+  Pick<Witness, "witness" | "date" | "dateStart" | "dateEnd" | "note">
+>;
+
+type LatinRepresentativeWitnessSet = Readonly<{
+  rows: readonly LatinRepresentativeRow[];
+  aggregateUpdates?: Readonly<Record<string, string>>;
+  aggregateLabelUpdates?: Readonly<Record<string, string>>;
+  removeCompeting?: readonly string[];
+}>;
+
+const latinRepresentativeWitnesses: Readonly<
+  Record<string, LatinRepresentativeWitnessSet>
+> = {
+  ...latinRepresentativeWitnessesGospelsA,
+  ...latinRepresentativeWitnessesGospelsB,
+  // Luke 4:4 is already curated directly in the Wave 2 version rows, with a
+  // fuller named set and the same bounded 11/11 apparatus qualification.
+  "luke-4-4": { rows: [] },
+  ...latinRepresentativeWitnessesGospelsC,
+  ...latinRepresentativeWitnessesActsPaul,
+};
 
 const commonReferences: ReferenceEntry[] = [
   {
@@ -1101,6 +1128,85 @@ function withEditorialConclusion(passage: Passage) {
   return `${passage.shortSummary} Oldest & Best retains the KJV reading while presenting the competing witnesses separately below.`;
 }
 
+function standardizeLatinRepresentativeName(witness: string) {
+  const match = witness.match(
+    /^Codex (.+?) \(it ([^ /)]+) \/ VL \d+(?: and \d+A)?\)$/iu,
+  );
+  if (!match?.[1] || !match[2] || /Pauline Epistles/iu.test(match[1])) {
+    return witness;
+  }
+
+  const codex = match[1].replace(/, Latin column$/iu, " (Latin column)");
+  const siglum = match[2]
+    .replace(/^ff2$/iu, "ff²")
+    .replace(/^g1$/iu, "g¹")
+    .replace(/^r1$/iu, "r¹");
+  return `Old Latin ${siglum} — Codex ${codex}`;
+}
+
+function applyLatinRepresentativeWitnesses(passage: Passage): Passage {
+  const enrichment = latinRepresentativeWitnesses[passage.slug];
+  if (!enrichment) return passage;
+
+  const supportAnchor =
+    passage.latinWitnesses.find((row) => row.aggregate) ??
+    passage.latinWitnesses[0];
+  if (!supportAnchor && enrichment.rows.length > 0) {
+    throw new Error(
+      `Missing Latin support row to anchor named representatives for ${passage.slug}`,
+    );
+  }
+
+  const aggregateUpdates = enrichment.aggregateUpdates ?? {};
+  const aggregateLabelUpdates = enrichment.aggregateLabelUpdates ?? {};
+  const updateAggregateNote = (row: Witness): Witness => {
+    const replacement = aggregateUpdates[row.witness];
+    const replacementLabel = aggregateLabelUpdates[row.witness];
+    return replacement || replacementLabel
+      ? {
+          ...row,
+          witness: replacementLabel ?? row.witness,
+          note: replacement ?? row.note,
+          aggregate: true,
+        }
+      : row;
+  };
+  const updateLatinRow = (row: Witness): Witness => {
+    const updated = updateAggregateNote(row);
+    return passage.slug === "luke-23-17" &&
+      updated.witness === "Codex Bezae Latin side"
+      ? {
+          ...updated,
+          witness: "Old Latin d — Codex Bezae (Latin column)",
+          note: "Contains Luke 23:17 after verse 19.",
+        }
+      : updated;
+  };
+  const removedCompeting = new Set(enrichment.removeCompeting ?? []);
+
+  const namedRows = enrichment.rows.map(
+    (row): Witness => ({
+      ...supportAnchor,
+      ...row,
+      witness: standardizeLatinRepresentativeName(row.witness),
+      kind: "latin",
+      aggregate: false,
+      relationship: "versional",
+    }),
+  );
+
+  return {
+    ...passage,
+    latinWitnesses: [
+      ...passage.latinWitnesses.map(updateLatinRow),
+      ...namedRows,
+    ],
+    evidenceAgainst: passage.evidenceAgainst
+      .filter((row) => !removedCompeting.has(row.witness))
+      .map(updateAggregateNote),
+  };
+}
+
 export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
   const copy = copyBySlug.get(sourcePassage.slug);
 
@@ -1125,6 +1231,8 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
   if (passage.slug === "1-john-5-7") {
     passage = oneJohnFiveSevenRows(passage);
   }
+
+  passage = applyLatinRepresentativeWitnesses(passage);
 
   const embeddedPrinted = [
     ...passage.greekSupportWitnesses,

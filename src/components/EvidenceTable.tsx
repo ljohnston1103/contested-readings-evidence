@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { dedupeWitnessRows } from "@/data/derived";
 import {
@@ -22,6 +22,13 @@ type EvidenceTableProps = {
   rows: Witness[];
   columns?: [string, string, string];
   searchable?: boolean;
+};
+
+type DisplayRow = {
+  row: Witness;
+  sourceIndex: number;
+  range?: EvidenceDateRange;
+  dateUncertain: boolean;
 };
 
 const DATE_UNCERTAIN_NOTE =
@@ -63,6 +70,109 @@ function displayDate(row: Witness, range: EvidenceDateRange | undefined) {
   return formatWitnessDate(row.date, range);
 }
 
+function evidenceSpan(rows: Witness[]) {
+  const ranges = rows
+    .map((row) => witnessDateRange(row))
+    .filter((range): range is EvidenceDateRange => Boolean(range));
+  if (!ranges.length) return "Not catalogued";
+  const start = Math.min(...ranges.map((range) => range.start));
+  const end = Math.max(...ranges.map((range) => range.end));
+  return start === end ? `AD ${start}` : `AD ${start}\u2013${end}`;
+}
+
+function isCollectivePrintedEdition(row: Witness) {
+  return (
+    row.kind === "printed" &&
+    /\b(?:editions|edition series|printed tradition)\b/iu.test(row.witness)
+  );
+}
+
+function isAggregateRow(row: Witness) {
+  return Boolean(row.aggregate || isCollectivePrintedEdition(row));
+}
+
+/**
+ * Converts deliberately broad apparatus language into a conservative public
+ * range. These are reading-share estimates, not manuscript censuses; exact
+ * percentages and counts already present in the record always take priority.
+ */
+function evidenceScope(row: Witness) {
+  if (!isAggregateRow(row)) return "1 named witness";
+  if (isCollectivePrintedEdition(row)) return "Edition group";
+
+  const label = row.witness.normalize("NFKC");
+  const text = `${label} ${row.note}`.normalize("NFKC");
+  const percentageRange = text.match(
+    /\b(?:approximately|about|roughly|c\.?\s*)?(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)\s*(?:percent|%)/iu,
+  );
+  if (percentageRange?.[1] && percentageRange[2]) {
+    return `Approx. ${percentageRange[1]}–${percentageRange[2]}% of cited apparatus sample`;
+  }
+  const percentage = text.match(
+    /\b(?:approximately|about|roughly|c\.?\s*)?(\d+(?:\.\d+)?)\s*(?:percent|%)/iu,
+  );
+  if (percentage?.[1]) {
+    return `Approx. ${percentage[1]}% of cited apparatus sample`;
+  }
+
+  const countedRange = label.match(
+    /\b(\d[\d,]*)\s*(?:to|[–—-])\s*(\d[\d,]*)\s+(?:(?:principal|named|cited|Greek|Latin)\s+)*(?:manuscripts?|witnesses?|copies|lectionaries)\b/iu,
+  );
+  if (countedRange?.[1] && countedRange[2]) {
+    return `${countedRange[1]}–${countedRange[2]} cited witnesses`;
+  }
+
+  const counted = label.match(
+    /\b(\d[\d,]*(?:\+)?)\s+(?:(?:principal|named|cited|Greek|Latin)\s+)*(?:manuscripts?|witnesses?|copies|lectionaries)\b/iu,
+  );
+  if (counted?.[1]) return `${counted[1]} cited witnesses`;
+
+  const writtenCount = label.match(
+    /\b(one|two|three)\s+(?:(?:principal|named|cited|Latin|Greek)\s+)*(?:manuscripts?|witnesses?|copies)\b/iu,
+  );
+  if (writtenCount?.[1]) {
+    const count = { one: "1", two: "2", three: "3" }[
+      writtenCount[1].toLowerCase() as "one" | "two" | "three"
+    ];
+    return `${count} cited ${count === "1" ? "witness" : "witnesses"}`;
+  }
+
+  if (
+    /\b(?:does not establish|cannot establish|should not be generalized into|must not imply|do not (?:infer|imply))\b[^.]{0,120}\b(?:percentage|majority|unanimity|corpus-wide)\b/iu.test(
+      row.note,
+    ) ||
+    /\bno\b[^.]{0,80}\b(?:numerator|denominator|reading-specific percentage|corpus-wide percentage|global percentage)\b/iu.test(
+      row.note,
+    ) ||
+    /\bnot\b[^.]{0,60}\b(?:a\s+)?(?:Latin-)?majority\b/iu.test(
+      row.note,
+    ) ||
+    /\b(?:a|one|single)\b[^.]{0,60}\bpercentage\b[^.]{0,60}\bmisleading\b/iu.test(
+      row.note,
+    )
+  ) {
+    return "Share not enumerated in the cited source";
+  }
+
+  if (/\b(?:all|entire|whole|near[- ]unanimous|virtually all)\b/iu.test(label)) {
+    return "Approx. 95–100% of cited apparatus sample";
+  }
+  if (/\b(?:most|vast majority)\b/iu.test(label)) {
+    return "Approx. 75–95% of cited apparatus sample";
+  }
+  if (/\bmajority\b/iu.test(label)) {
+    return "More than 50% of cited apparatus sample";
+  }
+  if (/\b(?:many|large part|broad(?:ly)?)\b/iu.test(label)) {
+    return "Approx. 50–90% of cited apparatus sample";
+  }
+  if (/\b(?:some|part of|subset|strand|minority)\b/iu.test(label)) {
+    return "Approx. 10–49% of cited apparatus sample";
+  }
+
+  return "Share not enumerated in the cited source";
+}
+
 export function EvidenceTable({
   title,
   rows,
@@ -72,6 +182,12 @@ export function EvidenceTable({
   const [query, setQuery] = useState("");
   const uniqueRows = useMemo(() => dedupeWitnessRows(rows), [rows]);
   const sources = useMemo(() => witnessRowSources(uniqueRows), [uniqueRows]);
+  const aggregateCount = useMemo(
+    () => uniqueRows.filter(isAggregateRow).length,
+    [uniqueRows],
+  );
+  const namedCount = uniqueRows.length - aggregateCount;
+  const span = useMemo(() => evidenceSpan(uniqueRows), [uniqueRows]);
   const filteredRows = useMemo(() => {
     const needle = query.toLowerCase().trim();
     if (!needle) return uniqueRows;
@@ -81,63 +197,48 @@ export function EvidenceTable({
         .includes(needle),
     );
   }, [query, uniqueRows]);
-  const groupedRows = useMemo(() => {
-    const groups = new Map<
-      string,
-      {
-        label: string;
-        rows: Array<{
-          row: Witness;
-          sourceIndex: number;
-          range?: EvidenceDateRange;
-          dateUncertain: boolean;
-        }>;
-      }
-    >();
-
-    filteredRows.forEach((row, sourceIndex) => {
-      const unit = unitDetails(row);
-      const existing = groups.get(unit.key) ?? { label: unit.label, rows: [] };
-      existing.rows.push({
+  const displayRows = useMemo<DisplayRow[]>(
+    () =>
+      filteredRows
+      .map((row, sourceIndex) => ({
         row,
         sourceIndex,
         range: witnessDateRange(row),
         dateUncertain: Boolean(row.dateUncertain),
-      });
-      groups.set(unit.key, existing);
-    });
-
-    return Array.from(groups.values()).map((group) => {
-      const rows = group.rows.sort(
+      }))
+      .sort(
         (a, b) =>
-          Number(a.dateUncertain) - Number(b.dateUncertain) ||
+          Number(!isAggregateRow(a.row)) - Number(!isAggregateRow(b.row)) ||
           (a.range?.start ?? Number.POSITIVE_INFINITY) -
             (b.range?.start ?? Number.POSITIVE_INFINITY) ||
           (a.range?.end ?? Number.POSITIVE_INFINITY) -
             (b.range?.end ?? Number.POSITIVE_INFINITY) ||
+          Number(a.dateUncertain) - Number(b.dateUncertain) ||
           a.sourceIndex - b.sourceIndex,
-      );
-      const relationshipLabels = new Set(
-        rows.map(({ row }) => relationshipLabel(row)).filter(Boolean),
-      );
-      return {
-        ...group,
-        rows,
-        sharedRelationship:
-          relationshipLabels.size === 1
-            ? Array.from(relationshipLabels)[0]
-            : "",
-      };
-    });
-  }, [filteredRows]);
-  const showUnitHeadings = groupedRows.some(
-    (group) => group.label || group.sharedRelationship,
+      ),
+    [filteredRows],
   );
 
   if (!uniqueRows.length) {
     return (
-      <div className="rounded-3xl border border-dashed border-ink-200 p-6 text-sm text-ink-600 dark:border-white/10 dark:text-ink-100/70">
-        No witness is listed in this section.
+      <div className="overflow-hidden rounded-[2rem] border border-ink-200 bg-white/80 shadow-card dark:border-white/10 dark:bg-white/[0.05]">
+        {title && (
+          <div className="border-b border-ink-100 p-4 dark:border-white/10">
+            <h3 className="font-display text-2xl font-black text-ink-900 dark:text-white">
+              {title}
+            </h3>
+          </div>
+        )}
+        <div className="grid gap-3 border-b border-ink-100 bg-ink-50/60 p-4 dark:border-white/10 dark:bg-white/[0.025] sm:grid-cols-3">
+          <EvidenceStat label="Catalogued records" value="0" />
+          <EvidenceStat label="Named / aggregate" value="0 / 0" />
+          <EvidenceStat label="Date span" value="Not catalogued" />
+        </div>
+        <p className="p-6 text-sm leading-6 text-ink-600 dark:text-ink-100/70">
+          No passage-specific evidence is individually catalogued in this
+          section. The tab remains in the same position on every passage page
+          so comparisons follow one consistent pattern.
+        </p>
       </div>
     );
   }
@@ -167,6 +268,25 @@ export function EvidenceTable({
           <SourcesStrip sources={sources} />
         </div>
       )}
+      <div className="grid gap-3 border-b border-ink-100 bg-ink-50/60 p-4 dark:border-white/10 dark:bg-white/[0.025] sm:grid-cols-3">
+        <EvidenceStat
+          label="Catalogued records"
+          value={uniqueRows.length.toLocaleString()}
+        />
+        <EvidenceStat
+          label="Named / aggregate"
+          value={`${namedCount.toLocaleString()} / ${aggregateCount.toLocaleString()}`}
+        />
+        <EvidenceStat label="Date span" value={span} />
+      </div>
+      {aggregateCount > 0 && (
+        <p className="border-b border-ink-100 px-5 py-3 text-xs leading-5 text-ink-500 dark:border-white/10 dark:text-ink-100/55">
+          Tradition summaries appear first; named witnesses follow from oldest
+          to newest. Percentage ranges translate terms such as “most” or “many”
+          into conservative approximations for the cited apparatus sample; they
+          are not manuscript censuses.
+        </p>
+      )}
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-ink-50 text-ink-600 dark:bg-white/5 dark:text-ink-100/70">
@@ -179,88 +299,82 @@ export function EvidenceTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-ink-100 dark:divide-white/10">
-            {groupedRows.length ? (
-              groupedRows.map((group, groupIndex) => (
-                <Fragment key={`evidence-group-${group.label}-${groupIndex}`}>
-                  {showUnitHeadings && (
-                    <tr
-                      className="bg-archive-teal/[0.07] dark:bg-archive-teal/10"
-                    >
-                      <th colSpan={columns.length} className="px-5 py-3 text-left">
-                        <span className="mr-2 text-[0.66rem] font-black uppercase tracking-[0.18em] text-archive-teal dark:text-teal-200">
-                          {unitHeadingKind(group.label || "General evidence")}
-                        </span>
-                        <span className="font-display text-base font-black text-ink-900 dark:text-white">
-                          {group.label || "General evidence"}
-                        </span>
-                        {group.sharedRelationship && (
-                          <span className="ml-3 inline-flex rounded-full bg-archive-teal/10 px-2.5 py-1 text-[0.66rem] font-black uppercase tracking-[0.12em] text-archive-teal dark:text-teal-200">
-                            {group.sharedRelationship}
+            {displayRows.length ? (
+              displayRows.map(({ row, range }, index) => {
+                const badge = relationshipLabel(row);
+                const aggregate = isAggregateRow(row);
+                const unit = unitDetails(row);
+                const date = displayDate(row, range);
+                return (
+                  <tr
+                    key={`${row.direction ?? ""}-${row.unitId ?? row.unit ?? ""}-${row.witness}-${index}`}
+                    className="align-top transition even:bg-ink-50/50 hover:bg-archive-gold/10 dark:even:bg-white/[0.03] dark:hover:bg-white/5"
+                  >
+                    <td className="px-5 py-4">
+                      <p className="font-bold text-ink-900 dark:text-white">
+                        {row.witness}
+                      </p>
+                      {unit.label && (
+                        <p className="mt-1 text-xs leading-5 text-ink-600 dark:text-ink-100/65">
+                          <span className="mr-1.5 font-black uppercase tracking-[0.12em] text-archive-teal dark:text-teal-200">
+                            {unitHeadingKind(unit.label)}
                           </span>
-                        )}
-                      </th>
-                    </tr>
-                  )}
-                  {group.rows.map(({ row, range }, index) => {
-                    const badge = relationshipLabel(row);
-                    const showRelationshipBadge =
-                      badge && badge !== group.sharedRelationship;
-                    const date = displayDate(row, range);
-                    return (
-                      <tr
-                        key={`${row.direction ?? ""}-${row.unitId ?? row.unit ?? ""}-${row.witness}-${index}`}
-                        className="align-top transition even:bg-ink-50/50 hover:bg-archive-gold/10 dark:even:bg-white/[0.03] dark:hover:bg-white/5"
+                          {unit.label}
+                        </p>
+                      )}
+                      {aggregate && (
+                        <span className="mt-2 mr-2 inline-flex rounded-full bg-violet-100 px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-violet-800 dark:bg-violet-300/15 dark:text-violet-200">
+                          Aggregate / tradition
+                        </span>
+                      )}
+                      <span
+                        className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[0.68rem] font-black tracking-[0.04em] ${
+                          aggregate
+                            ? "bg-archive-gold/15 text-amber-900 dark:bg-archive-gold/15 dark:text-amber-100"
+                            : "bg-archive-teal/10 text-archive-teal dark:bg-teal-200/10 dark:text-teal-200"
+                        }`}
                       >
-                        <td className="px-5 py-4">
-                          <p className="font-bold text-ink-900 dark:text-white">
-                            {row.witness}
-                          </p>
-                          {row.aggregate && (
-                            <span className="mt-2 mr-2 inline-flex rounded-full bg-violet-100 px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-violet-800 dark:bg-violet-300/15 dark:text-violet-200">
-                              Aggregate / tradition
-                            </span>
+                        {evidenceScope(row)}
+                      </span>
+                      {badge && (
+                        <span className="mt-2 ml-2 inline-flex rounded-full bg-archive-teal/10 px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-archive-teal dark:text-teal-200">
+                          {badge}
+                        </span>
+                      )}
+                    </td>
+                    <td className="whitespace-nowrap px-5 py-4 text-ink-600 dark:text-ink-100/70">
+                      {date ? (
+                        <span className="inline-flex rounded-lg border border-archive-gold/50 bg-archive-gold/10 px-3 py-1.5 text-xs font-black tracking-wide text-amber-900 dark:border-archive-gold/60 dark:bg-archive-gold/15 dark:text-amber-100">
+                          {date}
+                        </span>
+                      ) : (
+                        <span className="text-ink-400 dark:text-ink-100/35" aria-label="Date not specified">
+                          —
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-5 py-4 leading-6 text-ink-700 dark:text-ink-100/75">
+                      {row.note || (row.dateUncertain && !noteExplainsLaterHand(row.note)) ? (
+                        <>
+                          {row.note && <p>{row.note}</p>}
+                          {row.dateUncertain && !noteExplainsLaterHand(row.note) && (
+                            <p className="mt-1 text-[0.78rem] font-bold leading-5 text-amber-800 dark:text-amber-200">
+                              {DATE_UNCERTAIN_NOTE}
+                            </p>
                           )}
-                          {showRelationshipBadge && (
-                            <span className="mt-2 inline-flex rounded-full bg-archive-teal/10 px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-archive-teal dark:text-teal-200">
-                              {badge}
-                            </span>
-                          )}
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4 text-ink-600 dark:text-ink-100/70">
-                          {date ? (
-                            <span className="inline-flex rounded-lg border border-archive-gold/50 bg-archive-gold/10 px-3 py-1.5 text-xs font-black tracking-wide text-amber-900 dark:border-archive-gold/60 dark:bg-archive-gold/15 dark:text-amber-100">
-                              {date}
-                            </span>
-                          ) : (
-                            <span className="text-ink-400 dark:text-ink-100/35" aria-label="Date not specified">
-                              —
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-5 py-4 leading-6 text-ink-700 dark:text-ink-100/75">
-                          {row.note || (row.dateUncertain && !noteExplainsLaterHand(row.note)) ? (
-                            <>
-                              {row.note && <p>{row.note}</p>}
-                              {row.dateUncertain && !noteExplainsLaterHand(row.note) && (
-                                <p className="mt-1 text-[0.78rem] font-bold leading-5 text-amber-800 dark:text-amber-200">
-                                  {DATE_UNCERTAIN_NOTE}
-                                </p>
-                              )}
-                            </>
-                          ) : (
-                            <span
-                              className="text-ink-400 dark:text-ink-100/35"
-                              aria-label="No additional note"
-                            >
-                              —
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </Fragment>
-              ))
+                        </>
+                      ) : (
+                        <span
+                          className="text-ink-400 dark:text-ink-100/35"
+                          aria-label="No additional note"
+                        >
+                          —
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td
@@ -274,6 +388,17 @@ export function EvidenceTable({
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+function EvidenceStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-ink-100 bg-white/75 px-4 py-3 dark:border-white/10 dark:bg-white/[0.04]">
+      <p className="text-[0.66rem] font-black uppercase tracking-[0.16em] text-ink-500 dark:text-ink-100/55">
+        {label}
+      </p>
+      <p className="mt-1 font-bold text-ink-900 dark:text-white">{value}</p>
     </div>
   );
 }

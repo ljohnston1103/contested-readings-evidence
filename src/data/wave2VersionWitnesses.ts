@@ -98,6 +98,12 @@ const WITNESS_DATES = {
     dateEnd: 1599,
     dateSource: DATE_SOURCES.sourceApparatus,
   },
+  luke44LatinSupport: {
+    date: "c. AD 350–1599 (extant Old Latin and Vulgate witnesses)",
+    dateStart: 350,
+    dateEnd: 1599,
+    dateSource: DATE_SOURCES.sourceApparatus,
+  },
   earlyLatinTradition: {
     date: "4th–8th c. aggregate early Latin witness tradition",
     dateStart: 300,
@@ -151,6 +157,12 @@ const WITNESS_DATES = {
     dateEnd: 420,
     dateSource: DATE_SOURCES.vetusLatinaGospels,
     dateSourceUrl: SOURCE_URLS.vetusLatinaGospels,
+  },
+  oldLatinE: {
+    date: "5th c.",
+    dateStart: 400,
+    dateEnd: 499,
+    dateSource: DATE_SOURCES.sourceApparatus,
   },
   oldLatinF: {
     date: "6th c.",
@@ -207,6 +219,12 @@ const WITNESS_DATES = {
     dateEnd: 699,
     dateSource: DATE_SOURCES.vetusLatinaGospels,
     dateSourceUrl: SOURCE_URLS.vetusLatinaGospels,
+  },
+  oldLatinR1: {
+    date: "late 5th–early 7th c.",
+    dateStart: 475,
+    dateEnd: 625,
+    dateSource: DATE_SOURCES.sourceApparatus,
   },
   oldLatinAr: {
     date: "AD 807–808",
@@ -456,11 +474,13 @@ function witness(
       Wave2VersionWitnessSpec,
       | "directionClass"
       | "direction"
-      | "unit"
-      | "relationship"
-      | "aggregate"
-    >
-  > = {},
+       | "unit"
+       | "relationship"
+       | "aggregate"
+       | "dateSource"
+       | "dateSourceUrl"
+     >
+   > = {},
 ): Wave2VersionWitnessSpec {
   return {
     witness: witnessName,
@@ -481,6 +501,10 @@ function row(
 }
 
 const aggregate = { aggregate: true } as const;
+const sourceApparatusDating = {
+  dateSource: DATE_SOURCES.sourceApparatus,
+  dateSourceUrl: undefined,
+} as const;
 
 export const wave2VersionWitnessSpecs: Readonly<
   Record<string, Readonly<Record<number, Wave2VersionRowSpec>>>
@@ -1216,9 +1240,100 @@ export const wave2VersionWitnessSpecs: Readonly<
       witness(
         "Latin witnesses with the fuller quotation",
         "latin",
-        "latinTraditions",
-        "Broad Latin evidence includes the disputed phrase.",
+        "luke44LatinSupport",
+        "All 11 principal Old Latin witnesses collated at this verse (100% of that bounded apparatus set) include the disputed phrase; named representatives are listed below. This is not a claim about every surviving Latin manuscript. The broader Latin evidence extends from the late fourth through sixteenth centuries.",
         aggregate,
+      ),
+      witness(
+        "Old Latin a — Codex Vercellensis",
+        "latin",
+        "oldLatinA",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin d — Codex Bezae (Latin column)",
+        "latin",
+        "oldLatinD",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin e — Codex Palatinus",
+        "latin",
+        "oldLatinE",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin ff² — Codex Corbeiensis secundus",
+        "latin",
+        "oldLatinFf2",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin b — Codex Veronensis",
+        "latin",
+        "oldLatinB",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin r¹ — Codex Usserianus primus",
+        "latin",
+        "oldLatinR1",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin f — Codex Brixianus",
+        "latin",
+        "oldLatinF",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin q — Codex Monacensis",
+        "latin",
+        "oldLatinQ",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Vulgate fu — Codex Fuldensis",
+        "latin",
+        "vulgateFu",
+        "Includes the fuller Latin quotation in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin l — Codex Rehdigeranus",
+        "latin",
+        "oldLatinL",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Vulgate am — Codex Amiatinus",
+        "latin",
+        "vulgateAm",
+        "Includes the fuller Latin quotation in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin aur — Codex Aureus Holmiensis",
+        "latin",
+        "oldLatinAur",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
+      ),
+      witness(
+        "Old Latin c — Codex Colbertinus",
+        "latin",
+        "oldLatinC",
+        "Includes “but by every word of God” in Luke 4:4.",
+        sourceApparatusDating,
       ),
       witness(
         "Syriac Peshitta",

@@ -5,6 +5,10 @@ import { notFound } from "next/navigation";
 import { AmbientVideo } from "@/components/AmbientVideo";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { EarliestSupportPanel } from "@/components/EarliestSupportPanel";
+import {
+  editionEvidenceRows,
+  EditionsSection,
+} from "@/components/EditionsSection";
 import { EvidenceTabs } from "@/components/EvidenceTabs";
 import { ManuscriptSnapshotCard } from "@/components/ManuscriptSnapshotCard";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
@@ -196,6 +200,12 @@ export default async function PassagePage({ params }: PassagePageProps) {
       <Reveal className="mt-8" delay={0.05}>
         <EvidenceTabs passage={passage} />
       </Reveal>
+
+      {editionEvidenceRows(passage).length > 0 ? (
+        <Reveal className="mt-8" delay={0.05}>
+          <EditionsSection passage={passage} />
+        </Reveal>
+      ) : null}
 
       <Reveal className="mt-8" delay={0.05}>
         <ReferencesSection passage={passage} />
