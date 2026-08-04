@@ -1,5 +1,6 @@
 import correctionsData from "./kjv-forward.generated.json";
 import { parseEvidenceDate, sortWitnessRows } from "./evidenceDates";
+import { applyFullWitnessEntry } from "./fullWitness";
 import { latinRepresentativeWitnessesActsPaul } from "./latinRepresentativeWitnessesActsPaul";
 import { latinRepresentativeWitnessesGospelsA } from "./latinRepresentativeWitnessesGospelsA";
 import { latinRepresentativeWitnessesGospelsB } from "./latinRepresentativeWitnessesGospelsB";
@@ -60,10 +61,13 @@ const latinRepresentativeWitnesses: Readonly<
   Record<string, LatinRepresentativeWitnessSet>
 > = {
   ...latinRepresentativeWitnessesGospelsA,
-  ...latinRepresentativeWitnessesGospelsB,
   // Luke 4:4 is already curated directly in the Wave 2 version rows, with a
-  // fuller named set and the same bounded 11/11 apparatus qualification.
-  "luke-4-4": { rows: [] },
+  // tradition-level conclusion followed by the fuller named witness set.
+  ...Object.fromEntries(
+    Object.entries(latinRepresentativeWitnessesGospelsB).filter(
+      ([slug]) => slug !== "luke-4-4",
+    ),
+  ),
   ...latinRepresentativeWitnessesGospelsC,
   ...latinRepresentativeWitnessesActsPaul,
 };
@@ -377,9 +381,17 @@ function normalizeWitnessDate(row: Witness): Witness {
   const existing = parseEvidenceDate(row.date);
   const catalogEntry = resolveVersionWitness(row.witness);
   const normalizedName = normalizedWitnessIdentity(row.witness);
+  const clarifiedAggregate = clarifiedAggregateNames[normalizedName];
   const clarifiedWitness =
-    clarifiedAggregateNames[normalizedName] ?? row.witness;
-  const isClarifiedAggregate = clarifiedWitness !== row.witness;
+    clarifiedAggregate ??
+    (/^(?:old )?syriac sinaitic\b|^sinaitic syriac\b/iu.test(normalizedName)
+      ? "Syriac Sinaitic — Sinai Syriac 30"
+      : /^(?:old )?syriac curetonian\b|^curetonian syriac\b/iu.test(
+            normalizedName,
+          )
+        ? "Syriac Curetonian — British Library Add MS 14451"
+        : row.witness);
+  const isClarifiedAggregate = Boolean(clarifiedAggregate);
   const hasStructuredDate =
     Number.isFinite(row.dateStart) || Number.isFinite(row.dateEnd);
   const contributionDate: PublicDate | undefined =
@@ -461,8 +473,18 @@ function normalizeWitnessDate(row: Witness): Witness {
     date: finalDate,
     dateStart: catalogDate?.start ?? row.dateStart ?? range?.start,
     dateEnd: catalogDate?.end ?? row.dateEnd ?? range?.end,
-    dateSource: row.dateSource ?? catalogEntry?.dateSource,
-    dateSourceUrl: row.dateSourceUrl ?? catalogEntry?.dateSourceUrl,
+    dateSource:
+      catalogEntry?.kind === "version-manuscript"
+        ? catalogEntry.dateSource
+        : row.dateSource ?? catalogEntry?.dateSource ?? row.source,
+    dateSourceUrl:
+      catalogEntry?.kind === "version-manuscript"
+        ? catalogEntry.dateSourceUrl
+        : row.dateSourceUrl ??
+          catalogEntry?.dateSourceUrl ??
+          (!row.dateSource || row.dateSource === row.source
+            ? row.sourceUrl
+            : undefined),
     dateUncertain,
     aggregate:
       row.aggregate === true ||
@@ -1037,6 +1059,17 @@ function oneJohnFiveSevenRows(passage: Passage) {
     }),
   );
   const supportingLatin = latinManuscripts.filter((row) => !isNegativeSupport(row));
+  const latinConclusion: Witness = {
+    witness: "Latin evidence containing a Comma form",
+    date: "Fifth–thirteenth centuries among the named manuscript witnesses",
+    dateStart: 401,
+    dateEnd: 1300,
+    note: "The Latin tradition is divided, but the earliest named Latin witness containing a Comma form is the fifth-century Codex Speculum. The Freising fragments and León Palimpsest provide further early medieval support, followed by a broader later Vulgate reception.",
+    kind: "latin",
+    direction: "FOR_KJV",
+    relationship: "versional",
+    aggregate: true,
+  };
   const competingLatin = latinManuscripts.filter(isNegativeSupport).map((row) => ({
     ...row,
     direction: "AGAINST_KJV",
@@ -1094,7 +1127,7 @@ function oneJohnFiveSevenRows(passage: Passage) {
   return {
     ...passage,
     greekSupportWitnesses,
-    latinWitnesses: supportingLatin,
+    latinWitnesses: [latinConclusion, ...supportingLatin],
     versionalWitnesses: [],
     patristicWitnesses,
     printedWitnesses: [
@@ -1126,6 +1159,12 @@ function withEditorialConclusion(passage: Passage) {
     return passage.shortSummary;
   }
   return `${passage.shortSummary} Oldest & Best retains the KJV reading while presenting the competing witnesses separately below.`;
+}
+
+function isVersionWitnessRow(row: Witness) {
+  return !/^(?:Didache 8|Eastern liturgical tradition|Later Byzantine and ecclesiastical tradition)$/iu.test(
+    row.witness.trim(),
+  );
 }
 
 function standardizeLatinRepresentativeName(witness: string) {
@@ -1183,6 +1222,15 @@ function applyLatinRepresentativeWitnesses(passage: Passage): Passage {
       : updated;
   };
   const removedCompeting = new Set(enrichment.removeCompeting ?? []);
+  const isGospel = ["Matthew", "Mark", "Luke", "John"].includes(
+    passage.book,
+  );
+  const latinDateSource = isGospel
+    ? "University of Birmingham ITSEE, Old Latin Gospel Manuscripts"
+    : "University of Birmingham ITSEE, Vetus Latina manuscript register";
+  const latinDateSourceUrl = isGospel
+    ? "https://itseeweb.cal.bham.ac.uk/vetuslatina/GospelMSS/"
+    : "https://itseeweb.cal.bham.ac.uk/vetuslatina/sigla/";
 
   const namedRows = enrichment.rows.map(
     (row): Witness => ({
@@ -1192,6 +1240,8 @@ function applyLatinRepresentativeWitnesses(passage: Passage): Passage {
       kind: "latin",
       aggregate: false,
       relationship: "versional",
+      dateSource: latinDateSource,
+      dateSourceUrl: latinDateSourceUrl,
     }),
   );
 
@@ -1204,6 +1254,169 @@ function applyLatinRepresentativeWitnesses(passage: Passage): Passage {
     evidenceAgainst: passage.evidenceAgainst
       .filter((row) => !removedCompeting.has(row.witness))
       .map(updateAggregateNote),
+  };
+}
+
+function applyLukeTwentyThreeThirtyFourVersions(passage: Passage): Passage {
+  if (passage.slug !== "luke-23-34") return passage;
+
+  const source =
+    "Wieland Willker, A Textual Commentary on the Greek Gospels, Vol. 3: Luke";
+  const sourceUrl = "https://www.willker.de/wie/TCG/TC-Luke.pdf";
+  const row = (
+    witness: string,
+    date: string,
+    dateStart: number,
+    dateEnd: number,
+    note: string,
+    kind: Witness["kind"],
+    aggregate = false,
+  ): Witness => ({
+    witness,
+    date,
+    dateStart,
+    dateEnd,
+    note,
+    kind,
+    direction: "FOR_KJV",
+    relationship: "versional",
+    aggregate,
+    source,
+    sourceUrl,
+  });
+
+  const support: Witness[] = [
+    row(
+      "Latin evidence including the prayer",
+      "4th–13th c. Old Latin transmission",
+      300,
+      1299,
+      "The surviving Latin evidence is divided, but an Old Latin inclusion strand preserves ‘Father, forgive them.’",
+      "latin",
+      true,
+    ),
+    row(
+      "Syriac Curetonian — British Library Add MS 14451",
+      "c. AD 450–470",
+      450,
+      470,
+      "Contains ‘Father, forgive them.’",
+      "syriac",
+    ),
+    row(
+      "Syriac Peshitta",
+      "Early fifth century",
+      401,
+      450,
+      "Contains ‘Father, forgive them.’",
+      "syriac",
+      true,
+    ),
+    row(
+      "Syriac Harklean",
+      "AD 615–616",
+      615,
+      616,
+      "Contains ‘Father, forgive them.’",
+      "syriac",
+      true,
+    ),
+    row(
+      "Bohairic Coptic inclusion strand",
+      "4th–15th c. tradition",
+      301,
+      1500,
+      "Bohairic manuscripts include the prayer; other Bohairic evidence omits it.",
+      "coptic",
+      true,
+    ),
+    row(
+      "Armenian version",
+      "Fifth–sixteenth centuries",
+      401,
+      1600,
+      "Contains ‘Father, forgive them.’",
+      "version",
+      true,
+    ),
+  ];
+
+  const competing: Witness[] = [
+    {
+      ...row(
+        "Syriac Sinaitic — Sinai Syriac 30",
+        "Late fourth–early fifth century",
+        375,
+        425,
+        "Omits the prayer.",
+        "syriac",
+      ),
+      direction: "AGAINST_KJV",
+      relationship: "related",
+    },
+    {
+      ...row(
+        "Old Latin a — Codex Vercellensis",
+        "Second half of the fourth century",
+        350,
+        399,
+        "Omits the prayer.",
+        "latin",
+      ),
+      direction: "AGAINST_KJV",
+      relationship: "related",
+    },
+    {
+      ...row(
+        "Old Latin d — Codex Bezae (Latin column)",
+        "c. AD 400",
+        390,
+        420,
+        "Omits the prayer.",
+        "latin",
+      ),
+      direction: "AGAINST_KJV",
+      relationship: "related",
+    },
+    {
+      ...row(
+        "Sahidic Coptic",
+        "Third–eleventh centuries",
+        201,
+        1100,
+        "Omits the prayer.",
+        "coptic",
+        true,
+      ),
+      direction: "AGAINST_KJV",
+      relationship: "related",
+    },
+    {
+      ...row(
+        "Bohairic Coptic omission strand",
+        "4th–15th c. tradition",
+        301,
+        1500,
+        "Omits the prayer in part of the Bohairic tradition.",
+        "coptic",
+        true,
+      ),
+      direction: "AGAINST_KJV",
+      relationship: "related",
+    },
+  ];
+
+  return {
+    ...passage,
+    latinWitnesses: [
+      ...passage.latinWitnesses,
+      ...support.filter((item) => item.kind === "latin"),
+    ],
+    versionalWitnesses: [
+      ...passage.versionalWitnesses,
+      ...support.filter((item) => item.kind !== "latin"),
+    ],
+    evidenceAgainst: [...passage.evidenceAgainst, ...competing],
   };
 }
 
@@ -1233,6 +1446,8 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
   }
 
   passage = applyLatinRepresentativeWitnesses(passage);
+  passage = applyLukeTwentyThreeThirtyFourVersions(passage);
+  passage = applyFullWitnessEntry(passage);
 
   const embeddedPrinted = [
     ...passage.greekSupportWitnesses,
@@ -1251,7 +1466,9 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
       passage.book,
     ),
     versionalWitnesses: normalizeWitnessRows(
-      passage.versionalWitnesses.filter((row) => row.kind !== "printed"),
+      passage.versionalWitnesses.filter(
+        (row) => row.kind !== "printed" && isVersionWitnessRow(row),
+      ),
       passage.book,
     ),
     patristicWitnesses: normalizePatristicRows(

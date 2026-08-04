@@ -14,9 +14,8 @@ export type LatinRepresentativeWitnessGospelsCPassage = Readonly<{
 /**
  * Additional named Latin representatives for Mark 11:26 and Luke 23:17.
  *
- * The percentages describe only the bounded set of individually reported Old
- * Latin witnesses in the passage-level apparatus. Existing named support rows
- * are intentionally not repeated here.
+ * Each summary states the direction of the surviving Old Latin evidence in
+ * plain language. Existing named support rows are intentionally not repeated.
  */
 export const latinRepresentativeWitnessesGospelsC = {
   "mark-11-26": {
@@ -59,7 +58,7 @@ export const latinRepresentativeWitnessesGospelsC = {
     ],
     aggregateUpdates: {
       "Old Latin copies":
-        "In the bounded passage-level apparatus set, 10 of 12 individually listed Old Latin witnesses contain Mark 11:26 (about 83%); k and l omit it. This is not a percentage of every surviving Latin manuscript.",
+        "The surviving Old Latin evidence predominantly supports inclusion of Mark 11:26. The Latin column of Codex Bezae around AD 400 is the earliest named supporting witness, followed by several fifth-century codices; k and l omit the verse.",
     },
   },
 
@@ -103,9 +102,9 @@ export const latinRepresentativeWitnessesGospelsC = {
     ],
     aggregateUpdates: {
       "Most Old Latin copies":
-        "In the bounded passage-level apparatus set, 10 of 11 individually listed Old Latin witnesses contain Luke 23:17 (about 91%): nine place it conventionally, while d relocates it after verse 19. Old Latin a alone omits it.",
+        "The surviving Old Latin evidence predominantly supports inclusion of Luke 23:17. Fifth-century Codex Palatinus and Codex Corbeiensis secundus are among the earliest named witnesses in the conventional location; Codex Bezae relocates the verse after verse 19, and Codex Vercellensis omits it.",
       "One Latin witness":
-        "Old Latin a, Codex Vercellensis, is the one individually listed Old Latin witness that omits Luke 23:17; the other 10 of 11 include it, although d relocates the verse after verse 19.",
+        "Old Latin a, Codex Vercellensis, omits Luke 23:17, while the surviving Old Latin evidence predominantly includes it; d relocates the verse after verse 19.",
     },
   },
 } as const satisfies Readonly<

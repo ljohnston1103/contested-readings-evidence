@@ -22,8 +22,7 @@ export type LatinRepresentativeGospelsBWitnessSet = Readonly<{
   rows: readonly LatinRepresentativeGospelsBRow[];
   /**
    * Keys are exact labels of existing aggregate support rows. Values replace
-   * only their notes. Percentages are limited to an explicitly bounded set of
-   * witnesses collated at the passage, never the global Latin manuscript pool.
+   * only their notes with a plain conclusion followed by named early examples.
   */
   aggregateUpdates?: Readonly<Record<string, string>>;
   aggregateLabelUpdates?: Readonly<Record<string, string>>;
@@ -70,7 +69,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Old Latin witnesses reading “Joseph and his mother”":
-        "In the bounded Itala apparatus set, 11 of 12 named Latin witnesses with a collatable reading (about 92%) read ‘Joseph and his mother’; the Latin column of Codex Bezae reads ‘his father and mother.’ This is not a percentage of every surviving Latin manuscript.",
+        "The surviving Old Latin evidence predominantly reads ‘Joseph and his mother.’ Fourth-century Codex Vercellensis is the earliest named supporting witness, followed by several fifth-century codices; the Latin column of Codex Bezae reads ‘his father and mother.’",
     },
   },
 
@@ -114,7 +113,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Latin witnesses with the fuller quotation":
-        "All 11 principal Old Latin witnesses collated at this verse (11/11, 100% of that bounded apparatus set) include the disputed phrase. This is not a claim about every surviving Latin manuscript, and the percentage gives no genealogical weight.",
+        "The surviving Old Latin evidence consistently supports ‘but by every word of God.’ Fourth-century Codex Vercellensis and the Latin column of Codex Bezae around AD 400 are the earliest named supporting witnesses.",
     },
   },
 
@@ -158,7 +157,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Most Latin witnesses":
-        "The compact apparatus names eight Old Latin witnesses (a, aur, b, c, e, f, q, r¹) for both longer clauses; Codex Bezae's Latin column (d) supports only the first added sentence. Because the apparatus does not enumerate a complete denominator, no corpus-wide percentage is claimed.",
+        "The surviving Old Latin evidence broadly supports both longer clauses. Fourth-century Codex Vercellensis is the earliest named witness to both; the Latin column of Codex Bezae around AD 400 supports only the first added sentence.",
     },
   },
 
@@ -202,7 +201,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Most Old Latin witnesses":
-        "Luke 11:2–4 contains several independent variants, so a single Latin percentage would be misleading. The apparatus names b, d, f, l, q, and r¹ for ‘our’; f and q also include ‘deliver us from evil.’ These clause-level witnesses do not all support every longer KJV phrase as one unit.",
+        "The Old Latin evidence supports individual KJV clauses rather than one uniform longer form. The Latin column of Codex Bezae around AD 400 is the earliest named support for ‘our’; Codex Brixianus and Codex Monacensis also include ‘deliver us from evil.’",
     },
   },
 
@@ -246,7 +245,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Most Old Latin witnesses":
-        "Early Latin evidence broadly includes the verses, and the compact apparatus identifies Codex Brixianus (it f) as an omission. It does not provide a complete, locus-specific Latin denominator, so no corpus-wide percentage is claimed.",
+        "The surviving Old Latin evidence predominantly includes the angel and agony account. Fourth-century Codex Vercellensis and the Latin column of Codex Bezae around AD 400 are the earliest named supporting witnesses; Codex Brixianus omits the verses.",
     },
   },
 
@@ -283,7 +282,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Old Latin witnesses containing the verse (aggregate)":
-        "In the bounded apparatus set, 4 of 11 named Old Latin witnesses with a listed reading (about 36%) contain the verse: aur, c, f, and q. Seven named witnesses omit it. This is not a percentage of the entire Latin manuscript tradition.",
+        "Inclusion of Luke 24:40 is not the predominant Old Latin reading. Its oldest named support is Codex Brixianus in the sixth century, followed by Codex Monacensis in the sixth or seventh century.",
     },
   },
 
@@ -327,7 +326,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Old Latin witnesses containing the phrase (aggregate)":
-        "In the bounded apparatus set, 5 of 11 named Old Latin witnesses with a listed reading (about 45%) contain the phrase: aur, c, f, q, and r¹. Six named witnesses omit it. This is not a percentage of the entire Latin manuscript tradition.",
+        "The ascension phrase is not the predominant Old Latin reading. Its oldest named support is Codex Usserianus primus, dated from the late fifth to early seventh century, followed by Codex Brixianus and Codex Monacensis.",
     },
   },
 
@@ -364,7 +363,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Old Latin witnesses containing the phrase (aggregate)":
-        "In the bounded apparatus set, 4 of 10 named Old Latin witnesses with a listed reading (40%) contain the phrase: aur, c, f, and q. Six named witnesses omit it; witnesses not listed at the locus are excluded from the denominator.",
+        "The worship clause is not the predominant Old Latin reading. Its oldest named support is Codex Brixianus in the sixth century, followed by Codex Monacensis in the sixth or seventh century.",
     },
   },
 
@@ -408,7 +407,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Most Old Latin witnesses":
-        "All 10 consistently Old Latin John codices extant at this locus (10/10, 100% of that bounded set) support a Son reading; Codex Bezae is lacunose here and is excluded. This is not a percentage of every Latin manuscript.",
+        "The surviving Old Latin evidence consistently supports a Son reading rather than ‘God.’ Fourth-century Codex Vercellensis is the earliest named supporting witness; Codex Bezae is lacunose at this point.",
     },
   },
 
@@ -452,7 +451,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Old Latin witnesses with “who is in heaven”":
-        "In the bounded Itala apparatus set, 10 of 11 collatable Latin witnesses (about 91%) have the exact ‘who is in heaven’ form; Codex Palatinus has the related ‘who was’ form, and Codex Bezae is lacunose and excluded. This is not a percentage of all surviving Latin manuscripts.",
+        "The surviving Old Latin evidence predominantly supports the exact phrase ‘who is in heaven.’ Fourth-century Codex Vercellensis is the earliest named supporting witness; Codex Palatinus has the related form ‘who was,’ and Codex Bezae is lacunose.",
     },
   },
 
@@ -496,9 +495,11 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Most Latin witnesses":
-        "In the bounded apparatus set, 9 of 14 named Latin witnesses (about 64%) contain the full longer unit, while five omit it. The percentage describes only that collated set, not the entire Latin manuscript tradition.",
+        "The surviving Old Latin evidence predominantly supports the full longer unit about the angel and the moving of the water. Fourth-century Codex Vercellensis is the earliest named supporting witness, followed by several fifth-century codices.",
       "One Latin witness":
-        "Five of the 14 named Latin witnesses in the bounded apparatus set omit the full longer unit (about 36%): d, f, l, 11A, and q.",
+        "A substantial Latin strand omits the full longer unit, including d, f, l, 11A, and q.",
+      "Later Vulgate manuscripts":
+        "Later Vulgate transmission supports the longer reading about the angel and the moving of the water.",
     },
     aggregateLabelUpdates: {
       "One Latin witness":
@@ -546,7 +547,7 @@ export const latinRepresentativeWitnessesGospelsB = {
     ],
     aggregateUpdates: {
       "Most Old Latin witnesses":
-        "In the bounded Itala apparatus set, 11 of 12 named Latin witnesses with a listed reading (about 92%) include ‘on me’; Codex Rehdigeranus (it l) omits it. This is not a percentage of the entire Latin manuscript tradition.",
+        "The surviving Old Latin evidence predominantly supports ‘believeth on me.’ Fourth-century Codex Vercellensis and the Latin column of Codex Bezae around AD 400 are the earliest named supporting witnesses; Codex Rehdigeranus omits ‘on me.’",
     },
   },
 } as const satisfies Readonly<

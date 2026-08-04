@@ -20,8 +20,8 @@ export type LatinRepresentativeWitnessSet = Readonly<{
   rows: readonly LatinRepresentativeRow[];
   /**
    * Keys are the exact labels of existing aggregate support rows. Values are
-   * replacement notes that preserve the claim without implying unanimity or a
-   * reading-specific percentage that the cited dossier does not establish.
+   * replacement notes that state the direction of the evidence and identify
+   * the earliest named supporting witnesses without implying unanimity.
   */
   aggregateUpdates?: Readonly<Record<string, string>>;
   aggregateLabelUpdates?: Readonly<Record<string, string>>;
@@ -69,9 +69,9 @@ export const latinRepresentativeWitnessesActsPaul = {
     ],
     aggregateUpdates: {
       "Old Latin tradition":
-        "Multiple named Latin witnesses from the sixth or seventh century onward contain the confession in exact, close, or partial forms; the evidence does not establish a corpus-wide percentage or uniform wording.",
+        "The surviving Old Latin evidence supports the presence of the confession in several forms. The sixth- or seventh-century Latin column of Codex Laudianus is the earliest named supporting witness, followed by the seventh-century León Palimpsest.",
       "Vulgate tradition":
-        "The Vulgate transmission is divided: later received Latin tradition includes the verse, while the principal critical Vulgate texts omit it; do not imply Vulgate unanimity.",
+        "The Vulgate transmission is divided: the later received Latin tradition includes the verse, while the principal critical Vulgate text omits it.",
     },
   },
 
@@ -122,7 +122,7 @@ export const latinRepresentativeWitnessesActsPaul = {
     ],
     aggregateUpdates: {
       "Latin Vulgate manuscripts":
-        "Several individually identified Latin witnesses contain the full longer wording, beginning with the fifth-century Fleury Palimpsest; other Latin witnesses omit it, so the tradition is not unanimous.",
+        "The Latin tradition is divided, but the full longer wording has early support in the fifth-century Fleury Palimpsest. The seventh-century León Palimpsest and later named witnesses also contain it.",
     },
     removeCompeting: ["Old Latin h, p", "Old Latin h", "Old Latin p"],
   },
@@ -167,7 +167,7 @@ export const latinRepresentativeWitnessesActsPaul = {
     ],
     aggregateUpdates: {
       "Vulgate manuscript tradition":
-        "Named Latin support for “God” is preserved from the Book of Armagh onward. Important Latin witnesses also read “Lord,” so this row must not imply an early Latin majority or unanimity.",
+        "The Latin evidence is divided between ‘God’ and ‘Lord.’ The earliest named Latin support for the KJV's ‘God’ reading is the Book of Armagh, AD 807–808, followed by the eleventh-century Bible de Roda.",
     },
   },
 
@@ -211,13 +211,13 @@ export const latinRepresentativeWitnessesActsPaul = {
     ],
     aggregateUpdates: {
       "Most Latin witnesses":
-        "The named Latin evidence is divided: these witnesses include the verse, while several other cited Latin witnesses omit it. The dossier does not establish a corpus-wide “most” percentage.",
+        "The Latin evidence is divided. The earliest named Latin support for inclusion is the Book of Armagh, AD 807–808, followed by several twelfth- and thirteenth-century witnesses.",
       "Later Vulgate manuscripts":
-        "Later Vulgate evidence is divided, and the dossier provides no reading-specific numerator or denominator from which to calculate a percentage.",
+        "Later Vulgate evidence is divided between inclusion and omission of the verse.",
       "Two Latin witnesses":
-        "Several individually cited Latin witnesses omit the verse, including e, dem, ro, and s; the compact dossier does not provide a corpus-wide numerator or denominator.",
+        "Several named Latin witnesses omit the verse, including e, dem, ro, and s.",
       "Earlier Vulgate witnesses":
-        "The principal critical Vulgate line and several earlier Latin witnesses omit the verse; the dossier does not provide a reading-specific percentage.",
+        "The principal critical Vulgate line and several earlier Latin witnesses omit the verse.",
     },
     aggregateLabelUpdates: {
       "Most Latin witnesses": "Latin witnesses containing the verse (aggregate)",
@@ -251,7 +251,7 @@ export const latinRepresentativeWitnessesActsPaul = {
     ],
     aggregateUpdates: {
       "Two Old Latin witnesses containing the full clause (aggregate)":
-        "The compact apparatus cites the Book of Armagh, Codex Sangermanensis with a videtur qualification, and the Pelagius lemma text in Balliol MS 157. Their different kinds and qualifications do not support a simple corpus-wide count or percentage.",
+        "The full KJV clause has named Latin support beginning with the Book of Armagh, AD 807–808. Ninth-century Codex Sangermanensis probably supports it, and the later Pelagius lemma text also contains it.",
     },
     aggregateLabelUpdates: {
       "Two Old Latin witnesses containing the full clause (aggregate)":
@@ -285,7 +285,7 @@ export const latinRepresentativeWitnessesActsPaul = {
     ],
     aggregateUpdates: {
       "Latin witnesses reading “Christ”":
-        "Three individually cited Latin witnesses read “Christ”: Codex Carolinus, the Freising fragments, and the lost Codex Demidovianus. Broader early Latin evidence reads “God,” so this is not a Latin-majority claim.",
+        "‘Christ’ is not the predominant early Latin reading. Its oldest named Latin support is Codex Carolinus at the beginning of the sixth century, followed by the sixth- or seventh-century Freising fragments.",
     },
   },
 
@@ -336,9 +336,9 @@ export const latinRepresentativeWitnessesActsPaul = {
     ],
     aggregateUpdates: {
       "Most Latin witnesses":
-        "Several individually cited Latin witnesses contain the benediction in exact, qualified, or partial forms, while other Latin evidence omits it. This apparatus sample should not be generalized into a corpus-wide percentage.",
+        "The Latin evidence is divided, but the complete benediction has early support in the mid-fifth-century Latin column of Codex Claromontanus. Later named witnesses preserve exact, qualified, or partial forms.",
       "Later Vulgate manuscripts":
-        "The later Latin evidence is divided, and the dossier does not identify a reading-specific manuscript total from which to calculate a percentage.",
+        "The later Vulgate evidence is divided between inclusion and omission of the benediction.",
     },
     aggregateLabelUpdates: {
       "Most Latin witnesses":
@@ -350,7 +350,7 @@ export const latinRepresentativeWitnessesActsPaul = {
     rows: [],
     aggregateUpdates: {
       "Later Vulgate manuscripts":
-        "The cited dossier does not name an individual Latin manuscript for “through his blood”; do not infer named manuscripts or a reading-specific percentage from the overall size of the Vulgate tradition.",
+        "The KJV phrase ‘through his blood’ is supported in later Vulgate transmission.",
     },
     aggregateLabelUpdates: {
       "Later Vulgate manuscripts": "Later Vulgate evidence (aggregate)",
@@ -397,9 +397,9 @@ export const latinRepresentativeWitnessesActsPaul = {
     ],
     aggregateUpdates: {
       "Old Latin tradition":
-        "Several individually named Old Latin witnesses contain Mark 16:9–20, while Codex Bobiensis preserves the shorter ending. The surviving set is not a complete denominator for a global Latin percentage.",
+        "The surviving Old Latin evidence broadly supports Mark 16:9–20. Fifth-century Codex Corbeiensis secundus and the St Gall/Chur fragments are the earliest named supporting witnesses; Codex Bobiensis preserves the shorter ending.",
       Vulgate:
-        "The Vulgate tradition broadly transmits Mark 16:9–20, but the dossier does not supply a reading-specific manuscript total or percentage; Codex Fuldensis remains separately named.",
+        "The Vulgate tradition broadly supports Mark 16:9–20; sixth-century Codex Fuldensis is an important named supporting witness.",
     },
   },
 
@@ -443,9 +443,9 @@ export const latinRepresentativeWitnessesActsPaul = {
     ],
     aggregateUpdates: {
       "Old Latin tradition":
-        "In the bounded comparison set of 23 extant Old Latin manuscripts covering John 7–8, 17 contain at least part of the passage (about 74%, or roughly two-thirds to three-quarters). This is not a percentage of all Latin or Vulgate manuscripts, and partial or mixed texts are included in the count.",
+        "The surviving Old Latin evidence predominantly supports at least part of John 7:53–8:11. The Latin column of Codex Bezae around AD 400 is the earliest named supporting witness, followed by Codex Palatinus and Codex Corbeiensis secundus in the fifth century.",
       Vulgate:
-        "The Vulgate tradition broadly transmits John 7:53–8:11, but the dossier does not supply a reading-specific total for all Vulgate manuscripts; Codex Fuldensis remains separately named.",
+        "The Vulgate tradition broadly supports John 7:53–8:11; sixth-century Codex Fuldensis is an important named supporting witness.",
     },
   },
 } as const satisfies Readonly<

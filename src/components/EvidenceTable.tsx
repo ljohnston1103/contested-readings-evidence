@@ -259,10 +259,9 @@ export function EvidenceTable({
       </div>
       {aggregateCount > 0 && (
         <p className="border-b border-ink-100 px-5 py-3 text-xs leading-5 text-ink-500 dark:border-white/10 dark:text-ink-100/55">
-          Tradition summaries appear first; named witnesses follow from oldest
-          to newest. A percentage appears only when the source gives a total for
-          this passage or explicitly states a percentage. Named rows are
-          examples unless a note identifies a complete collated set.
+          Tradition conclusions appear first. Named manuscripts and other
+          identifiable witnesses follow from oldest to newest with their dates
+          and passage-specific readings.
         </p>
       )}
       <div className="overflow-x-auto">

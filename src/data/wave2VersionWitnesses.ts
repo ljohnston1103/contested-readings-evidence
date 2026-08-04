@@ -62,7 +62,7 @@ const DATE_SOURCES = {
   palmer:
     "David Robert Palmer, The Revelation of John: Greek and English, version apparatus",
   vulgate:
-    "H. A. G. Houghton, The Latin New Testament; Palmer's Vulgate manuscript key",
+    "H. A. G. Houghton, The Latin New Testament",
   ancientVersions:
     "B. M. Metzger, The Early Versions of the New Testament; standard version histories",
   sourceApparatus:
@@ -75,7 +75,8 @@ const SOURCE_URLS = {
   vetusLatinaGospels: "https://itseeweb.cal.bham.ac.uk/vetuslatina/GospelMSS/",
   vetusLatinaSigla: "https://itseeweb.cal.bham.ac.uk/vetuslatina/sigla/",
   palmer: "https://www.bibletranslation.ws/trans/revwgrk.pdf",
-  vulgate: "https://bibletranslation.ws/vulgate-manuscripts/",
+  vulgate: "https://academic.oup.com/book/12425",
+  ancientVersions: "https://academic.oup.com/book/26742",
 } as const;
 
 /**
@@ -97,6 +98,13 @@ const WITNESS_DATES = {
     dateStart: 180,
     dateEnd: 1599,
     dateSource: DATE_SOURCES.sourceApparatus,
+  },
+  revelationLordSupport: {
+    date: "7th–15th c. among the named manuscript witnesses",
+    dateStart: 600,
+    dateEnd: 1499,
+    dateSource: DATE_SOURCES.palmer,
+    dateSourceUrl: SOURCE_URLS.palmer,
   },
   luke44LatinSupport: {
     date: "c. AD 350–1599 (extant Old Latin and Vulgate witnesses)",
@@ -358,10 +366,11 @@ const WITNESS_DATES = {
     dateSource: DATE_SOURCES.ancientVersions,
   },
   syriacCuretonian: {
-    date: "5th c. manuscript",
-    dateStart: 400,
-    dateEnd: 499,
-    dateSource: DATE_SOURCES.ancientVersions,
+    date: "c. AD 450–470 manuscript",
+    dateStart: 450,
+    dateEnd: 470,
+    dateSource: "British Library Archives and Manuscripts Catalogue",
+    dateSourceUrl: "https://searcharchives.bl.uk/catalog/040-002086117",
   },
   syriacTraditions: {
     date: "late 4th–7th c. Syriac textual traditions",
@@ -410,6 +419,12 @@ const WITNESS_DATES = {
   middleEgyptian1: {
     date: "5th c. (Middle Egyptian witness mae-1, Codex Scheide)",
     dateStart: 400,
+    dateEnd: 499,
+    dateSource: DATE_SOURCES.sourceApparatus,
+  },
+  middleEgyptianTradition: {
+    date: "4th–5th c. Middle Egyptian witnesses",
+    dateStart: 300,
     dateEnd: 499,
     dateSource: DATE_SOURCES.sourceApparatus,
   },
@@ -482,10 +497,18 @@ function witness(
      >
    > = {},
 ): Wave2VersionWitnessSpec {
+  const date = WITNESS_DATES[dateKey];
+  const dateSourceUrl =
+    date.dateSource === DATE_SOURCES.ancientVersions
+      ? SOURCE_URLS.ancientVersions
+      : "dateSourceUrl" in date
+        ? date.dateSourceUrl
+        : undefined;
   return {
     witness: witnessName,
     kind,
-    ...WITNESS_DATES[dateKey],
+    ...date,
+    dateSourceUrl,
     note,
     ...overrides,
   };
@@ -603,21 +626,68 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Old Latin witnesses including the phrase",
         "latin",
         "oldLatinTradition",
-        "A large part of the Old Latin tradition (about 90 manuscripts survive overall) includes the phrase, though not every copy does.",
+        "The surviving Old Latin evidence predominantly includes the phrase; named early manuscripts follow below.",
         aggregate,
       ),
       witness(
-        "Syriac traditions including the phrase",
+        "Syriac evidence including the phrase",
         "syriac",
         "syriacTraditions",
-        "The cited Syriac streams include the phrase; the source cites the tradition as a group rather than naming each manuscript.",
+        "The early Syriac evidence consistently supports inclusion of the phrase in the named witnesses and traditions listed below.",
         aggregate,
       ),
       witness(
-        "Coptic traditions including the phrase",
+        "Syriac Sinaitic — Sinai Syriac 30",
+        "syriac",
+        "syriacSinaitic",
+        "Includes the phrase.",
+      ),
+      witness(
+        "Syriac Curetonian — British Library Add MS 14451",
+        "syriac",
+        "syriacCuretonian",
+        "Includes the phrase.",
+      ),
+      witness(
+        "Syriac Peshitta",
+        "syriac",
+        "syriacPeshitta",
+        "Includes the phrase.",
+        aggregate,
+      ),
+      witness(
+        "Syriac Harklean",
+        "syriac",
+        "syriacHarklean",
+        "Includes the phrase.",
+        aggregate,
+      ),
+      witness(
+        "Coptic evidence including the phrase",
         "coptic",
         "copticTraditions",
-        "The cited Coptic evidence includes the phrase across the tradition as a whole.",
+        "The Sahidic, Bohairic, and Middle Egyptian evidence cited for this reading includes the phrase.",
+        aggregate,
+      ),
+      witness(
+        "Sahidic Coptic",
+        "coptic",
+        "sahidic",
+        "Includes the phrase.",
+        aggregate,
+      ),
+      witness(
+        "Bohairic Coptic",
+        "coptic",
+        "bohairic",
+        "Includes the phrase in the cited Bohairic evidence.",
+        aggregate,
+      ),
+      witness(
+        "Middle Egyptian witnesses",
+        "coptic",
+        "middleEgyptianTradition",
+        "Include the phrase.",
         aggregate,
       ),
       witness(
@@ -1122,18 +1192,28 @@ export const wave2VersionWitnessSpecs: Readonly<
   "luke-2-14": {
     0: row("primary", "FOR_KJV", "FOR_KJV", [
       witness(
-        "Syriac witnesses with the nominative sense",
+        "Syriac Peshitta — related ‘good hope’ form",
         "syriac",
-        "syriacTraditions",
-        "Syriac traditions support the nominative sense represented by the KJV rendering.",
-        aggregate,
+        "syriacPeshitta",
+        "Preserves the distinct ‘good hope’ rendering rather than the exact KJV nominative form.",
+        {
+          directionClass: "OTHER",
+          direction: "RELATED_ONLY",
+          relationship: "related",
+          aggregate: true,
+        },
       ),
       witness(
-        "Bohairic witnesses with the nominative sense",
-        "coptic",
-        "bohairic",
-        "One Bohairic strand supports the nominative sense; Bohairic evidence is divided.",
-        aggregate,
+        "Diatessaron-descendant tradition — related ‘good hope’ form",
+        "syriac",
+        "diatessaronEphrem",
+        "Preserves the distinct ‘good hope’ rendering rather than the exact KJV nominative form.",
+        {
+          directionClass: "OTHER",
+          direction: "RELATED_ONLY",
+          relationship: "related",
+          aggregate: true,
+        },
       ),
     ]),
     1: row("primary", "AGAINST_KJV", "AGAINST_KJV", [
@@ -1241,7 +1321,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Latin witnesses with the fuller quotation",
         "latin",
         "luke44LatinSupport",
-        "All 11 principal Old Latin witnesses collated at this verse (100% of that bounded apparatus set) include the disputed phrase; named representatives are listed below. This is not a claim about every surviving Latin manuscript. The broader Latin evidence extends from the late fourth through sixteenth centuries.",
+        "The surviving Old Latin evidence consistently supports the fuller quotation ‘but by every word of God.’ Fourth-century Codex Vercellensis and the Latin column of Codex Bezae around AD 400 are the earliest named supporting witnesses; later Vulgate witnesses also contain it.",
         aggregate,
       ),
       witness(
@@ -1419,7 +1499,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Old Latin witnesses omitting the clause",
         "latin",
         "oldLatinTradition",
-        "Part of the Old Latin tradition omits; the source does not identify each manuscript in this summary row.",
+        "A substantial Old Latin strand omits the clause.",
         aggregate,
       ),
       witness(
@@ -1558,7 +1638,7 @@ export const wave2VersionWitnessSpecs: Readonly<
         "Armenian witnesses reading “Lord”",
         "version",
         "armenian",
-        "Supports “Lord” across the tradition as a whole; the source does not claim Armenian unanimity.",
+        "The Armenian tradition supports the reading “Lord.”",
         aggregate,
       ),
     ]),
@@ -2037,6 +2117,13 @@ export const wave2VersionWitnessSpecs: Readonly<
 
   "revelation-16-5": {
     0: row("unit-1", "FOR_KJV", "FOR_KJV_LORD", [
+      witness(
+        "Versional witnesses containing “Lord”",
+        "version",
+        "revelationLordSupport",
+        "Versional support for the KJV's “Lord” is limited but concrete: the named manuscript evidence includes Vulgate Leipzig MSS 4 and 6 and Bohairic-G. No ancient version listed here has the exact full KJV future-tense form.",
+        aggregate,
+      ),
       witness(
         "Clementine Vulgate",
         "printed",

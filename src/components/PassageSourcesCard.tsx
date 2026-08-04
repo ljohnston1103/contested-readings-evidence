@@ -1,4 +1,5 @@
-import { ExternalLink, Library } from "lucide-react";
+import { ExternalLink, Library, UsersRound } from "lucide-react";
+import Link from "next/link";
 
 import type { Passage } from "@/data/types";
 import {
@@ -48,8 +49,7 @@ export function PassageSourcesCard({ passage }: PassageSourcesCardProps) {
         Where the evidence on this page comes from.
       </h2>
       <p className="mt-2 text-sm leading-6 text-ink-600 dark:text-ink-100/70">
-        Every witness, date, and note below draws on these works. Individual
-        tables list only the witness, its date range, and any needed note.
+        Sources used for the witnesses, readings, dates, and notes on this page.
         {passage.references?.length
           ? " Complete citations appear in the References section at the end of the page."
           : ""}
@@ -75,6 +75,13 @@ export function PassageSourcesCard({ passage }: PassageSourcesCardProps) {
           </li>
         ))}
       </ul>
+      <Link
+        href={`/full-witness-information#${passage.slug}`}
+        className="mt-5 inline-flex items-center gap-2 rounded-full border border-archive-gold/35 bg-archive-gold/10 px-4 py-2 text-sm font-black text-ink-800 transition hover:border-archive-gold hover:bg-archive-gold/15 dark:text-white"
+      >
+        <UsersRound className="h-4 w-4 text-archive-gold" aria-hidden="true" />
+        Full witness information
+      </Link>
     </section>
   );
 }

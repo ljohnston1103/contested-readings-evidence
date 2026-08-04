@@ -15,9 +15,8 @@ export type LatinRepresentativeWitnessPassage = Readonly<{
 /**
  * Named Latin representatives for the first Matthew/Mark research group.
  *
- * Percentages below describe only the bounded set of individually reported
- * Old Latin witnesses in the passage-level apparatus. They are not estimates
- * for every surviving Latin manuscript.
+ * Each summary states the direction of the surviving Old Latin evidence in
+ * plain language. Named and dated witnesses follow as concrete examples.
  */
 export const latinRepresentativeWitnessesGospelsA = {
   "matthew-5-22": {
@@ -60,7 +59,7 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Old Latin witnesses including the phrase":
-        "In the bounded passage-level apparatus set, 11 of 12 individually listed Old Latin witnesses include the phrase (about 92%); Old Latin aur omits it. This is not a percentage of every surviving Latin manuscript.",
+        "The surviving Old Latin evidence predominantly supports the phrase represented by the KJV's ‘without a cause.’ Fourth-century Codex Bobiensis and Codex Vercellensis are among the earliest named supporting witnesses; Old Latin aur omits it.",
     },
   },
 
@@ -97,7 +96,7 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Latin witnesses with the fuller form":
-        "Four of 11 individually listed Old Latin witnesses preserve the complete KJV expansion (about 36%). Six more preserve only part of the expansion, while Old Latin k has the short form; the broader figure is larger only if partial forms are counted.",
+        "The complete KJV expansion is not the predominant Old Latin form. Its oldest named complete support is the Latin column of Codex Bezae around AD 400, followed by Codex Claromontanus in the late fifth century; several other Old Latin witnesses preserve only part of the expansion.",
     },
   },
 
@@ -127,9 +126,9 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Many Vulgate manuscripts":
-        "Later Vulgate support remains an aggregate report, not a complete census. In the separate bounded Old Latin set, f and q support the complete doxology; g¹ is near-exact without Amen, k is partial, and seven omit.",
+        "The complete KJV doxology is a later Vulgate reading but is not the predominant Old Latin form. Its oldest named complete Old Latin support is Codex Brixianus in the sixth century, followed by Codex Monacensis in the sixth or seventh century; g¹ is near-exact without Amen and k is partial.",
       "Most Old Latin representatives":
-        "Seven of 11 individually listed Old Latin witnesses omit the complete doxology (about 64%); f and q contain it, g¹ is near-exact without Amen, and k preserves only a partial form.",
+        "The surviving Old Latin evidence predominantly omits the complete doxology. Codex Brixianus and Codex Monacensis contain the complete form, g¹ is near-exact without Amen, and Codex Bobiensis preserves only a partial form.",
     },
   },
 
@@ -173,7 +172,7 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Latin tradition":
-        "In the bounded passage-level apparatus set, 11 of 13 individually listed Old Latin witnesses contain the verse (about 85%), although several have minor wording differences; e and ff¹ omit it.",
+        "The surviving Old Latin evidence predominantly supports inclusion of the verse, although e and ff¹ omit it. Codex Vercellensis in the fourth century and the Latin column of Codex Bezae around AD 400 are among the earliest named supporting witnesses.",
     },
   },
 
@@ -217,9 +216,11 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Old Latin witnesses containing the verse (aggregate)":
-        "Seven of 13 individually listed Old Latin witnesses contain the verse (about 54%). The bounded Old Latin set is nearly divided rather than a broad majority.",
+        "The surviving Old Latin evidence is divided, with somewhat more named witnesses containing the verse than omitting it. Fifth-century Codex Corbeiensis secundus, Codex Veronensis, and Codex Claromontanus are among the earliest named supporting witnesses.",
       "Old Latin witnesses omitting the verse (aggregate)":
-        "Six of 13 individually listed Old Latin witnesses omit the verse (about 46%): a, aur, d, e, ff¹, and g¹. The main Vulgate text also omits, while some later Vulgate manuscripts include it.",
+        "A substantial Old Latin strand omits the verse: a, aur, d, e, ff¹, and g¹. The main Vulgate text also omits it, while some later Vulgate manuscripts include it.",
+      "Later Vulgate manuscripts":
+        "Some later Vulgate manuscripts include Matthew 23:14, while the principal Vulgate text omits it.",
     },
   },
 
@@ -263,7 +264,7 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Old Latin copies":
-        "All 12 individually listed Old Latin witnesses in the bounded passage-level apparatus set contain Mark 7:16 (100% of that set). This is not a claim about every surviving Latin manuscript.",
+        "The surviving Old Latin evidence consistently supports inclusion of Mark 7:16. Codex Bobiensis and Codex Vercellensis in the fourth century are among the earliest named supporting witnesses.",
     },
     removeCompeting: ["Old Latin Vercellensis, a"],
   },
@@ -308,9 +309,9 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Most Old Latin witnesses":
-        "In the bounded passage-level apparatus set, 11 of 12 individually listed Old Latin witnesses support ‘prayer and fasting’ (about 92%); k alone has the shorter reading.",
+        "The surviving Old Latin evidence predominantly supports ‘prayer and fasting.’ Codex Vercellensis in the fourth century and the Latin column of Codex Bezae around AD 400 are among the earliest named supporting witnesses; Codex Bobiensis has the shorter reading.",
       "One Old Latin witness":
-        "Old Latin k, Codex Bobiensis, is the one individually listed Old Latin witness that omits ‘and fasting’; the other 11 of 12 listed witnesses include it.",
+        "Old Latin k, Codex Bobiensis, omits ‘and fasting,’ while the surviving Old Latin evidence predominantly includes it.",
     },
   },
 
@@ -354,9 +355,9 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Most Old Latin copies":
-        "In the bounded passage-level apparatus set, 11 of 12 individually listed Old Latin witnesses contain both repeated verses (about 92%); k alone omits them.",
+        "The surviving Old Latin evidence predominantly supports both repeated verses, Mark 9:44 and 9:46. Codex Vercellensis in the fourth century and the Latin column of Codex Bezae around AD 400 are among the earliest named supporting witnesses; Codex Bobiensis omits them.",
       "One Old Latin witness":
-        "Old Latin k, Codex Bobiensis, is the one individually listed Old Latin witness that omits Mark 9:44 and 9:46; the other 11 of 12 listed witnesses contain both.",
+        "Old Latin k, Codex Bobiensis, omits Mark 9:44 and 9:46, while the surviving Old Latin evidence predominantly contains both repeated verses.",
     },
   },
 
@@ -400,7 +401,7 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Latin witnesses with the qualifying phrase":
-        "Eight of 10 individually listed Old Latin witnesses preserve the qualifying sense (80% of the bounded set). Four transpose verses 24 and 25; c has only ‘a rich man,’ and k has the shorter reading.",
+        "The surviving Old Latin evidence predominantly preserves the qualifying sense. Fourth-century Codex Vercellensis and the Latin column of Codex Bezae around AD 400 are the earliest named supporting witnesses; several witnesses transpose verses 24 and 25.",
     },
   },
 
@@ -444,7 +445,7 @@ export const latinRepresentativeWitnessesGospelsA = {
     ],
     aggregateUpdates: {
       "Two Latin witnesses":
-        "Old Latin d and k are the two individually listed Latin witnesses that omit the verse (25% of the bounded set); six of the eight reported Old Latin witnesses at this locus include it.",
+        "The surviving Old Latin evidence predominantly supports inclusion of Mark 15:28. Fifth-century Codex Corbeiensis secundus and Fragmenta Sangallensia are the earliest named supporting witnesses; d and k omit the verse.",
     },
   },
 } as const satisfies Readonly<
