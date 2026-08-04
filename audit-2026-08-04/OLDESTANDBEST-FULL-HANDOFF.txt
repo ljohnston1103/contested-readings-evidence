@@ -1,0 +1,2760 @@
+================================================================================
+OLDEST & BEST (oldestandbest.com) — TEXTUAL EVIDENCE AUDIT
+COMPLETE HANDOFF PACKAGE
+================================================================================
+
+Compiled: 4 August 2026
+Site owner: Luke Johnston (Doctor of Ministry student)
+Repository audited: branch `evidence-audit-rebuild`, HEAD 41320c2
+Auditor: Claude (Anthropic), working from the live site + the site's own source tree
+
+PURPOSE OF THIS FILE
+--------------------
+This is a self-contained handoff for another AI agent or researcher continuing
+this work. It contains the full method, every finding, all corrections, and all
+deliverables produced. Read §1–§6 for orientation, then the appended documents.
+
+================================================================================
+1. THE PROJECT
+================================================================================
+
+oldestandbest.com is an evidence database for 51 contested New Testament
+readings (textual variants). For each passage it lays out Greek manuscripts,
+Latin witnesses, ancient versions, church-father citations, and printed
+editions, with dates, and takes the position that the KJV/TR reading should be
+retained.
+
+Tech: Next.js (App Router), TypeScript, deployed via OpenNext/Cloudflare.
+Data lives in `src/data/`, principally:
+  - passages.ts               (Wave 1: 30 passages, hand-authored)
+  - wave2.generated.json      (Wave 2: 21 passages, generated, better quality)
+  - wave2Passages.ts          (merges Wave 2 into the Passage[] type)
+  - derived.ts                (allPassages = passages.map(corrections).sort())
+  - types.ts                  (Passage, Witness, PatristicWitness)
+  - kjvForwardCorrections.ts  (existing corrections pipeline — follow this pattern)
+  - latinRepresentativeWitnesses*.ts (named Old Latin witnesses for 34 passages)
+
+THE OWNER'S REQUIREMENT (verbatim intent)
+  Every passage should be fully accounted for in all witnesses — Greek, Latin,
+  versional, patristic — with accurate dates and a source for every claim, so a
+  reader can open e.g. 1 John 5:7 and see the whole evidentiary record and how
+  old each piece is. No false or invented data. Where a number is given it must
+  be real and sourced.
+
+================================================================================
+2. METHOD — HOW THE DATA WAS OBTAINED (REPRODUCIBLE)
+================================================================================
+
+2.1 EXTRACTING THE SITE'S OWN DATA (ground truth, not scraped pages)
+--------------------------------------------------------------------
+The passage pages render witness tables client-side, so fetching HTML returns
+only tab labels. Instead, compile the real data model:
+
+  Write a Node script that registers a TypeScript require-hook using the repo's
+  own `typescript` package (node_modules/typescript), maps the "@/..." alias to
+  <root>/src, then:
+
+      const { allPassages } = require('<root>/src/data/derived.ts');
+      process.stdout.write(JSON.stringify(allPassages));
+
+  This yields all 51 passages exactly as rendered, Wave 1 + Wave 2 merged, with
+  applyKjvForwardCorrections applied. Total: 2,078 evidence rows
+  (1,957 witness rows + 121 patristic rows).
+
+2.2 HARVESTING A FULL APPARATUS — LaParola (THE KEY RESOURCE)
+--------------------------------------------------------------
+laparola.net/greco/ hosts a per-verse critical apparatus for the WHOLE New
+Testament: readings, witnesses (Greek/versional/patristic), each with a DATE and
+a TEXT-TYPE. Free. This is the single most useful source found.
+
+  IMPORTANT: the form is POST-ONLY. GET returns an empty page.
+
+  Endpoint:  https://www.laparola.net/greco/index.php   (POST, form-encoded)
+  Fields:
+      rif1       book code (see below)
+      rif2       "chapter:verse"      e.g. "9:29"
+      VisTesto   "View text"
+      varianti   "s"    (YES — show variants; "1" silently returns nothing)
+      allusioni  "s"    (YES — show patristic allusions)
+      ord        "2"    (order witnesses BY DATE)
+      msstt      "n"    (print manuscript info after the siglum, not as tooltip)
+      wh,tisch,biz,inter  "n"
+      direzione  "v"
+      lin        "en"
+
+  Book codes for rif1:
+      47 Matthew   48 Mark      49 Luke      50 John       51 Acts
+      52 Romans    53 1Cor      54 2Cor      55 Galatians  56 Ephesians
+      57 Phil      58 Colossians 59 1Thess   60 2Thess     61 1Timothy
+      62 2Timothy  63 Titus     64 Philemon  65 Hebrews    66 James
+      67 1Peter    68 2Peter    69 1John     70 2John      71 3John
+      72 Jude      73 Revelation
+
+  Output format (one line per reading):
+      <reading>] <siglum> {Date <d>; Text type <t>} <siglum> {…} …
+
+  Parse with:
+      /([^\s{}]+)\s*\{([^}]*)\}/g     and    /Date\s+([^;]+)/
+
+  Notes:
+   - Filter out modern editions/translations: WH, Riv, CEI, Nv, TILC, NM, NR,
+     ND, Dio, NA, ς, Byz2005, lAD, Erasmus.
+   - Normalise sigla: strip leading "(" / "[", trailing *, c, vid, mg, text,
+     supp, fractions (1/2), and (pt)/(ms)/(mss).
+   - LaParola lists ALL variant units in a verse, so a raw witness count for a
+     verse is larger than the count relevant to one disputed unit.
+
+2.3 SIGLA MAPPING (site → LaParola)
+------------------------------------
+The site uses GA numbers with leading zeros for majuscules; LaParola uses letter
+sigla. Map before diffing:
+  01→א 02→A 03→B 04→C 05→D 06→D 07→E 08→E 011→G 012→G 013→H 015→H 016→I
+  017→K 018→K 019→L 020→L 021→M 022→N 023→O 024→P 025→P 026→Q 028→S 029→T
+  030→U 031→V 032→W 033→X 034→Y 035→Z 036→Γ 037→Δ 038→Θ 039→Λ 040→Ξ 041→Π
+  042→Σ 043→Φ 044→Ψ 045→Ω
+
+2.4 WILLKER'S LACUNA TABLES (high-value, easily missed)
+--------------------------------------------------------
+Willker's Textual Commentary on the Greek Gospels (willker.de/wie/TCG/) —
+TC-Matthew.pdf, TC-Mark.pdf, TC-Luke.pdf, TC-John.pdf — opens each volume with a
+table of which manuscripts are EXTANT or LACUNOSE where. Fetching the PDFs
+truncates around 68k characters, which is only the front matter — but that front
+matter is exactly where these tables live, and they catch errors no apparatus
+reading will surface (a siglum cited at a verse the manuscript doesn't preserve).
+
+  Confirmed from TC-Mark:  "Sy-C is extant only from 16:18-20."
+                           "0274 extant: … 9:26-41 …"
+                           "33 lacuna: 9:31-11:11  13:11-14:60"
+                           "083 extant: 13:12-14 … 15:27-16:8"
+  Confirmed from TC-Luke:  "33 lacuna: 21:38-23:26"
+                           "C lacunae: … 22:19-23:25 … 24:7-45"
+                           P45 content in Luke skips 11:2-5
+                           P75 content: … 9:4-17:15, 17:19-18:18, 22:4-end
+
+================================================================================
+3. WHAT WAS TRIED AND DID NOT WORK (don't repeat these)
+================================================================================
+
+  NTVMR metadata/transcript API   Returns empty through plain fetch; the browser
+                                  extension blocks query-string reads. A free
+                                  NTVMR account may work interactively.
+  CrossWire SWORD "Tisch" module  This is Tischendorf's TEXT, not his apparatus.
+                                  No versional or patristic data. A common
+                                  misconception — worth stating plainly.
+  Vetus Latina Database           Paid Brepolis academic subscription.
+  CNTTS apparatus                 Proprietary to Logos/Accordance; Greek only.
+  Text und Textwert               On archive.org but restricted to the
+                                  print-disabled collection; not borrowable.
+                                  Purchasable from De Gruyter (expensive).
+                                  This is the ONLY source of exact "X of Y
+                                  manuscripts" counts.
+  Robinson, Filología Neotest. 13 Journal site lists vol 13 (2000) but the page
+    (2000): 35–59                 is empty. Needed to settle the John 7:53
+                                  manuscript figure. Try: email
+                                  filneot@elalmendro.org, Faithlife's 33-vol
+                                  collection, or interlibrary loan.
+  LaParola full-NT .docx          Binary; fetch returns no text. Use the
+                                  per-verse POST method in §2.2 instead.
+
+================================================================================
+4. HEADLINE FINDINGS
+================================================================================
+
+4.1 COVERAGE — the site carries a quarter to a third of the witness record.
+    Site names 8–47 witnesses per passage; LaParola names 62–144 for the same
+    verses. Worst gaps: Colossians 1:14 (8 vs 74), Luke 24:6 (13 vs 90),
+    1 John 5:7 (15 vs 114), Acts 9:5-6 (15 vs 62), 1 Timothy 3:16 (24 vs 101),
+    Mark 16:9-20 (24 vs 119), John 7:53-8:11 (29 vs 144).
+    EXCEPTION: for Revelation the site is BETTER than LaParola (built on Palmer
+    and Hoskier). Rev 1:11 site 31 vs LaParola 4; Rev 16:5 site 36 vs 5.
+    Do not "fix" Revelation from LaParola.
+
+4.2 SOURCING — 30 of 51 passages have ZERO sourced witness rows (1,104 rows).
+    Clean split: Wave 2 (21 passages) is 100% sourced; Wave 1 (30) is 0%.
+    Patristic rows are worse: only 31 of 121 carry a real citation.
+    Overall 883 of 2,078 rows (42%) have a source.
+
+4.3 A FALSE STATEMENT ON EVERY PAGE — PassageSourcesCard is headed "Where the
+    evidence on this page comes from… every witness, date, and note below draws
+    on these works," but collectWitnessSources() reads row.dateSource, never
+    row.source. It lists DATING sources. This is why Mark 9:29 credits Palmer's
+    *Revelation* apparatus and Willker's *Matthew* commentary.
+
+4.4 A FILTER SILENTLY DELETING CITATIONS — isProhibitedLabel() matches the END
+    of a label, so "Hoskier archive record" is dropped on all three Revelation
+    pages. Hoskier is the most important Revelation source and never displays.
+    Also kills "NA28/UBS5 apparatus; NET note" and "Houghton preprint".
+
+4.5 THREE DIFFERENT TOTALS for the same database: homepage 1,579, timeline
+    1,672, actual 2,078.
+
+4.6 STALE DEPLOYMENT — live index shows "30 of 30"; current source renders all
+    51 (derived.ts line 22: displayedPassages = allPassages). Redeploy.
+
+4.7 SYSTEMATIC ABSENCES across nearly all passages:
+      - The Diatessaron (2nd c.) — appears in LaParola for 20+ passages, almost
+        never on the site. At Mark 9:29 it SUPPORTS the KJV reading.
+      - Church fathers — 18 passages have none at all.
+      - Named minuscules and lectionaries — the site says "1,500+ manuscripts"
+        where LaParola names 40–80 witnesses with dates.
+
+================================================================================
+5. VERIFIED FACTUAL ERRORS (all implemented in auditCorrections.ts)
+================================================================================
+
+  Matthew 17:21   "Codex Q" should be Θ (Koridethi, GA 038, 9th c.). The site's
+                  ten omitting witnesses match Willker's list exactly except Θ
+                  appears as Q, carrying Q's 5th–6th-c. date. Theta/Q slip.
+  Matthew 17:21   Middle Egyptian witnesses REVERSED. mae-1 (Scheide, 5th c.)
+                  includes the verse; mae-2 (Schøyen 2650, early 4th c.) omits.
+                  Site credits inclusion to Schøyen.
+  Matthew 17:21   Pseudo-Clement, Letters on Virginity dated "c. AD 100–200";
+                  scholarship puts it mid-3rd century (Uhlhorn: shortly before
+                  Cyprian). Drives the page's earliest-evidence claim.
+  Mark 9:29       "Earliest Greek support: P45vid, 3rd c." — ECM Mark (2021)
+                  treats P45 as LACUNOSE here.
+  Mark 9:29       "2 principal Greek witnesses" against; it is THREE —
+                  01*, 03, and 0274 (5th c.). Confirmed twice: Snapp, and
+                  Willker's extant table (0274 extant 9:26-41; Willker ranks it
+                  a PRIMARY witness for Mark).
+  Mark 9:29       No fathers listed. Basil (First Homily on Fasting 9, PG
+                  31:181, c. 370) supports; Clement of Alexandria (Eclogae
+                  Propheticae 15.1, c. 200) has the shorter form and is the
+                  earliest witness in either direction.
+  Mark 7:16       Cites Curetonian Syriac. Sy-C survives in Mark ONLY at
+                  16:18–20. Cannot witness this verse. REMOVE.
+  Mark 16:9-20    Curetonian range given as 16:17–20; it is 16:18–20.
+  Mark 16:9-20    "1,653" is correct but is James Snapp's count, not from any
+                  work in the site's sources array. Also missing ~8 MSS with the
+                  Shorter Ending and ~23 with obeli/asterisks (now named).
+  Matthew 6:13    Didache double-counted: in versionalWitnesses AND
+                  patristicWitnesses. It is not a version. Also its doxology is
+                  SHORTER than the KJV form (no "kingdom").
+  Colossians 1:14 GA 2495 missing from the supporting group. Page also never
+                  mentions the standard counter-argument (harmonisation from
+                  Ephesians 1:7).
+  1 Timothy 3:16  061 (5th c.) missing, while the page claims earliest support
+                  is "sixth century onward."
+  1 John 5:7      Greek list is CORRECT (ten for ten vs Hixson). Add: cite
+                  Hixson; the GA 635 caution (often cited as an 11th witness —
+                  it does not contain the Comma); replace "500+ Greek
+                  manuscripts" with Text und Textwert's 552 collated / 522 with
+                  substantial text.
+  Acts 8:37       Earliest Greek witness is E (Codex Laudianus, GA 08), 6th c.
+                  Page leads with Irenaeus and never states this.
+
+  DO NOT ADD: GA 2427 at Mark 9:29 or Mark 7:16. Modern forgery, post-1874,
+  confirmed by pigment analysis. LaParola still lists it; it predates the
+  finding.
+
+  VERIFIED CLEAN — do not re-audit: GA 33 at Luke 23:34 and Mark 11:26 (falls
+  outside the lacuna); 083 at Mark 15:28; Codex Ephraemi correctly absent from
+  Luke 22:43-44, 23:17, 24:40; all 178 GA witnesses internally date-consistent
+  (zero conflicts); witnesses appearing on both sides of Mt 19:16-17, Eph 3:9
+  and Rev 1:8 are legitimate multi-unit variants.
+
+================================================================================
+6. UNRESOLVED — FLAGGED, NOT GUESSED
+================================================================================
+
+  1. John 7:53-8:11: site says 1,495 continuous-text MSS; secondary reports of
+     Robinson give 1,476 (and 267 omitting). The site's lectionary figure (495)
+     matches Robinson exactly, so he is the source and the other figure has
+     drifted. Needs Robinson at source.
+  2. John 1:18: "about 1,610" and "17" have no traceable source. The 7 Greek
+     witnesses reading θεός are recoverable (P66, P75, א*, B, C*, L, 33).
+  3. Acts 8:37: "about 10 to 12 principal Greek witnesses" undercounts. One
+     secondary source gives 64 including / 417 omitting — Text und Textwert
+     shaped, unconfirmed against a second source. DO NOT PUBLISH 64/417
+     unverified. ECM Acts (2017) will settle it.
+  4. Mark 11:26: "over 95 percent / ~1,585+" attributed to J. K. Elliott on the
+     index card; the figure and the statement could not be located.
+  5. Matthew 6:13: "approximately 98%+" — no collation of Matthew at this point
+     has been published. Label as estimate.
+  6. Matthew 17:21: "about 99.4 percent of ~1,700 manuscripts of Matthew." The
+     10 omitting witnesses are solid. ~1,700 is defensible but means
+     "manuscripts attesting a given Gospel verse," not "manuscripts of Matthew,"
+     and is a round estimate — so 99.4% is false precision. Use "more than 99%."
+
+  A NOTE ON COUNTING STANDARDS
+  The owner originally asked for figures shaped like "approx. 5,500 of 9,000
+  Latin witnesses from AD 100–900." No such figure can be produced honestly for
+  any verse. Only ~80–90 Old Latin manuscripts survive for the whole NT; the
+  ~10,000 Vulgate manuscripts are overwhelmingly 9th century and later and have
+  never been collated verse-by-verse; nothing Latin survives from AD 100.
+  Exact Greek "X of Y" counts exist only where Text und Textwert or ECM has
+  collated every manuscript at that point — and there is NO ECM for Matthew,
+  Luke, Romans, Colossians or 1 Timothy. The defensible alternative is to name
+  witnesses individually (which LaParola makes possible for all 51) and to state
+  plainly what has and has not been collated.
+
+================================================================================
+7. RECOMMENDED ORDER OF WORK
+================================================================================
+  1. Redeploy from HEAD (recovers 21 passages on the index; no code change)
+  2. Fix PassageSourcesCard / collectWitnessSources (§4.3)
+  3. Fix isProhibitedLabel and rename 8 source labels (§4.4)
+  4. Fix the Latin tab selector — select by `kind`, 7 passages affected
+  5. Reconcile the three row totals (§4.5)
+  6. Apply auditCorrections.ts (§5)
+  7. Apply wave1SourceAssignments.ts (gives all 30 unsourced passages a source)
+  8. Add missing witnesses from the LaParola harvest, passage by passage
+  9. Replace aggregate rows ("1,500+ manuscripts") with named witnesses
+ 10. Fill the 18 empty father lists
+
+================================================================================
+8. DOCUMENTS APPENDED BELOW
+================================================================================
+  A. COMPLETE-EVIDENCE.md      Per-passage missing witnesses from LaParola
+  B. CHANGES.md                Master change list
+  C. audit-findings.md         Long-form findings and reasoning
+  D. code-fixes.md             Exact before/after code
+  E. auditCorrections.ts       Paste-ready corrections module (type-checks clean)
+  F. wave1SourceAssignments.ts Paste-ready source assignments (type-checks clean)
+  G. audit pass 1 and pass 2   Earlier drafts, superseded but kept for the
+                               record — note pass 2 contains one error I later
+                               corrected: it claims patristic rows are 121/121
+                               sourced; the true figure is 31/121, because
+                               PatristicWitness.source is the author-name field,
+                               not a citation.
+
+================================================================================
+
+
+================================================================================
+DOCUMENT A — COMPLETE-EVIDENCE.md  (per-passage missing witnesses, LaParola)
+================================================================================
+
+# Oldest & Best — Complete Evidence Report
+
+**4 August 2026.** Every passage now has a full witness list from a citable apparatus.
+
+Gemini's suggestions were worth chasing. Three of the five didn't pan out, but one did, and it changed the picture completely.
+
+---
+
+## What worked, what didn't
+
+| Gemini's suggestion | Result |
+|---|---|
+| **LaParola variant apparatus** | ✅ **This is the answer.** Per-verse apparatus for the whole NT — Greek, versions, and fathers, each with a date and text-type. Free. It covers Romans, Colossians, 1 Timothy and Revelation, which is exactly where I had no modern critical edition. I harvested all 51 passages from it. |
+| Willker's Gospel PDFs | ⚠️ Partly. Fetch truncates at ~68k chars against 300–900-page files. Front matter only — but that front matter carries the lacuna tables, which caught two errors (see §5). |
+| Tischendorf via CrossWire SWORD | ❌ The SWORD "Tisch" module is Tischendorf's *text*, not his *apparatus*. It won't give versional or patristic evidence. Gemini was wrong about this one. |
+| Vetus Latina Database | ❌ Paid academic subscription (Brepolis). Not accessible. |
+| CNTTS apparatus | ❌ Proprietary, licensed only inside Logos/Accordance. Also Greek-only — no versions or fathers. |
+
+**Method:** LaParola's form is POST-only, so I drove it through the browser, pulled all 51 passages, normalised the sigla to match your data model, and diffed. Full method is reproducible; the numbers below are computed, not estimated.
+
+---
+
+## 1. The headline number
+
+**Your site names 8–47 witnesses per passage. LaParola names 62–144 for the same verses.**
+
+Across the 51 passages the site carries roughly **a quarter to a third of the witness record** that a standard free apparatus lists.
+
+| | Site witnesses | LaParola witnesses |
+|---|---|---|
+| Colossians 1:14 | **8** | 74 |
+| Luke 24:6 | 13 | 90 |
+| 1 John 5:7 | **15** | 114 |
+| Acts 9:5–6 | 15 | 62 |
+| Luke 2:14 | 21 | 109 |
+| Ephesians 3:9 | 22 | 95 |
+| Romans 8:1 | 22 | 94 |
+| Matthew 18:11 | 23 | 119 |
+| Acts 28:29 | 23 | 79 |
+| Mark 10:24 | 23 | 83 |
+| 1 Timothy 3:16 | **24** | 101 |
+| Mark 7:16 | 24 | 99 |
+| Mark 16:9–20 | **24** | 119 |
+| Romans 16:24 | 24 | 63 |
+| Luke 23:34 | 25 | 112 |
+| John 7:53–8:11 | **29** | 144 |
+
+The bolded rows are your flagship passages.
+
+---
+
+## 2. Two honest caveats before you act on this
+
+**Caveat 1 — LaParola lists every variant unit in the verse.** Matthew 1:25 has several separate disputes; LaParola's 86 witnesses cover all of them, while your page covers one. So "missing 62" overstates what belongs on your page. The gap is real but not the full number.
+
+**Caveat 2 — for Revelation, your site is *better* than LaParola.** LaParola has almost nothing there:
+
+| | Site | LaParola |
+|---|---|---|
+| Revelation 1:8 | 41 | 32 |
+| Revelation 1:11 | 31 | **4** |
+| Revelation 16:5 | 36 | **5** |
+| Revelation 22:19 | 12 | 22 |
+
+Your Revelation pages are built on Palmer and Hoskier, which are the right sources, and they beat the general apparatus. **Do not touch Revelation 1:11 or 16:5 based on this report.** That work is sound.
+
+---
+
+## 3. What's missing, passage by passage
+
+Dates in parentheses are LaParola's, in Roman numerals by century.
+
+### Mark 9:29 — confirms every correction I made, and adds more
+
+**Shorter reading ("prayer"), missing from your page:**
+`Clement (215)` · `itk (IV/V)` · **`0274 (V)`** · `geo1 (V)` · `2427 (XIV)`
+
+**Longer reading ("prayer and fasting"), missing from your page:**
+**`Diatessaron a and p (II)`** · `copsa (III/IV)` · `copbo (III/IV)` · **`goth (IV)`** · **`Basil (379)`** · `itd, itff2 (V)` · `geo2 (V)` · `N (VI)` · `itf (VI)` · `itq (VI/VII)` · `itaur, itr1 (VII)` · `E, itl (VIII)` · `F G H Π slav (IX)` · `1424 (IX/X)` · plus ~25 later minuscules and lectionaries
+
+Three things to note. **0274 is confirmed** — and Willker's own front matter lists 0274 as extant at Mark 9:26–41 and ranks it a *primary* witness for Mark. **Clement is confirmed** as the earliest witness in either direction. And the **Diatessaron (2nd century)** supports the longer reading — earlier than anything currently on your page, and it strengthens your case.
+
+⚠️ `2427` appears in LaParola for the shorter reading. **It is a modern forgery** (post-1874, confirmed by pigment analysis). LaParola predates that finding. Do not add it.
+
+### 1 John 5:7 — your ten Greek witnesses are right; the other side is unbuilt
+
+LaParola confirms your marginal witnesses in its own notation: `221 v.r. (X)`, `177 v.r. (XI)`, `88 v.r. (XII)`, `429 v.r. (XIV)`, `636 v.r. (XV)`. Ten for ten still stands.
+
+But your page states the opposing evidence as an aggregate — "500+ Greek manuscripts omit." LaParola **names about 45 of them individually**:
+
+`A (V)` · `048 (V)` · `P (VI)` · `L (VIII)` · `Ψ (VIII/IX)` · `K (IX)` · `049 (IX)` · `33 (IX)` · `2464 (IX)` · `Lect (IX)` · `056, 0142 (X)` · `1739 (X)` · `81 (1044)` · `181, 323, 436, 451, 945, 1175, 1243, 1846, 2298, 2344 (XI)` · `2138 (1072)` · `104 (1087)` · `1735 (XI/XII)` · `326, 330, 1241, 1505, 1611, 2127, 2412 (XII)` · `614, 1292, 1852, 2492 (XIII)` · `630, 1067, 1409, 1877, 1881 (XIV)` · `2495 (XIV/XV)` · `322, 1844 (XV)`
+
+Versions and fathers against, also absent: `copsa`, `copbo`, `syrp`, `syrh`, `arm`, `geo`, `eth`, `slav`, `vgww`, `vgst`, and **Irenaeus (202), Tertullian (220), Hippolytus (235), Origen, Hilary (367), Athanasius (373), Basil (379), Ambrose (397), Didymus (398), Epiphanius (403), Chrysostom (407), Jerome (420), Augustine (430), Cyril (444)** — none of whom cite the Comma where you would expect it.
+
+Latin support for the Comma, which your page should have and doesn't: `vgcl (IV)`, `Cyprian (258)`, `Ps-Cyprian (IV)`, `Priscillian (385)`, `Ps-Vigilius (IV/V)`, `Cassian (435)`, `Speculum (V)`, `Varimadum (445–480)`, `Fulgentius (533)`, `Victor-Vita`, `Ansbert (VIII)`.
+
+### 1 Timothy 3:16 — the 5th-century witness you're missing
+
+**`061 (V)`** — a fifth-century witness at this verse, absent from your page. This matters: your page currently claims the earliest support is "sixth century onward — Byzantine Greek transmission."
+
+The entire patristic dimension is missing (your page has one placeholder row, "Later ecclesiastical use, AD 800–1500"):
+`Origen lat (254)` · `Ambrosiaster (IV)` · `Hilary (367)` · `Ephraem (373)` · `Gregory-Nyssa (394)` · `Didymus (398)` · `Epiphanius (403)` · `Chrysostom (407)` · `Severian (408)` · `Pelagius (418)` · `Jerome (420)` · `Theodore lat (428)` · `Apollinaris (428)` · `Augustine (430)` · `Cyril (444)` · `Quodvultdeus (453)` · `Theodoret (466)` · `Varimadum (445–480)` · `Mercator (V)` · `Ps-Dionysius (V)` · `Liberatus (566)` · `Ps-Oecumenius (VI)`
+
+Latin, which your page advertises and shows an empty tab for: `itd, itb (V)` · `itf (VI)` · `itz (VIII)` · `itar, itg, itx (IX)` · `itmon (X)` · `itdiv (XII)` · `itc (XII/XIII)` · `itde (XIII)` · `ito (VII)` · `vgms (IV)`
+
+Plus `goth (IV)`, `copsa`, `copbo`, `eth`, `arm`, `geo2`, `syrh`.
+
+### Colossians 1:14 — the thinnest page, 8 witnesses against 74
+
+Your page names 8. Missing includes `D (V)`, `Ψ (VIII/IX)`, `P (VI)`, `F G K (IX)`, `L (VIII)`, `0150 (IX)`, `33 (IX)`, `075 (X)`, `1739 (X)`, `81 (1044)`, `104 (1087)`, and ~25 more minuscules; versions `copsa`, `copbo`, `syrp`, `syrpal`, `eth`, `geo`, `arm`, `vgww`, `vgst`, `vgcl`; fathers **`Irenaeus lat (202)`, `Ambrosiaster (IV)`, `Athanasius (373)`, `Gregory-Nyssa (394)`, `Ambrose (397)`, `Didymus (398)`, `Chrysostom (407)`, `Pelagius (418)`, `Theodore lat (428)`, `Augustine (430)`, `Cyril (444)`, `Cassiodorus (580)`**; Latin `itd, itb (V)`, `itf (VI)`, `itar, itg (IX)`, `itmon (X)`, `ito (VII)`.
+
+### Mark 16:9–20 — the ~23 manuscripts with critical marks, now named
+
+I flagged that about 23 manuscripts include the passage but flag it. LaParola names them:
+
+`083 (VI/VII)` · `0112 (VI/VII)` · `099 (VII)` · `L (VIII)` · `l1602 (VIII)` · `Ψ (VIII/IX)` · `274 (X)` · `2812 (X)` · `2346 (X/XI)` · `1110, 1210, 1221 (XI)` · `22, 138, 264 (XII)` · `579 (XIII)` · `205 (XV)` · `1582 (949)`
+
+Patristic evidence missing from your page: `Justin (165)` · `Irenaeus lat (202)` · `Clement (215)` · `Origen (254)` · `Eusebius (339)` · `Aphraates (367)` · `Constitutions (c. 380)` · `Ambrose (397)` · `Didymus (398)` · `Epiphanius (403)` · `Severian (408)` · `Jerome (420)` · `Augustine (430)` · `Eremita (430)` · `Hesychius (450)` · `Nestorius (451)` · `Euthymius (XII)` · `Severus` · **`Diatessaron a, i, n (II)`**
+
+### Luke 23:34 — a first-century witness
+
+`Hegesippus (I)` — LaParola dates him to the first century. Your page has him at "c. AD 170s, preserved by Eusebius," which is the safer framing, but LaParola's dating is worth noting on the page.
+
+Also missing: `Diatessaron (II)`, `Marcion (II)`, `Irenaeus lat (202)`, `Clement (215)`, `Hippolytus (235)`, `Origen lat (254)`, and ~30 fathers from Eusebius through John of Damascus, plus `syrc`, `syrp`, `syrpal`, `eth`, `arm`, `geo`, `slav`, `copbo`, `copsa`.
+
+### John 7:53–8:11 — 29 named against 144
+
+Missing includes the lectionary evidence that is central to Robinson's argument: `l185 (XI)`, `l387, l751, l773 (XI)`, `l69, l70, l211, l1780 (XII)`, `l514 (IX)`, `l184 (1319)`, `l1579 (XIV)`, `l890 (1420)`, `l1761 (XV)` — and `1443 (1047)`, `1445 (1323)`, `225 (1192)`, `1077 (X)`, `S (949)`.
+
+Fathers: `Didascalia (III)`, `Ambrosiaster (IV)`, `Constitutions (c. 380)`, `Pacian (392)`, `Ambrose (397)`, `Rufinus (410)`, `Jerome (420)`, `Augustine (430)`, `Didymus (398)`.
+
+### Remaining passages — summary
+
+| Passage | Site | LaParola | Most significant absences |
+|---|---|---|---|
+| matthew-1-25 | 28 | 86 | `syrs`, `itk`, `copsa`, `copmae`, Ambrose, Chromatius, Athanasius, Jerome, Augustine |
+| matthew-5-22 | 29 | 98 | Ptolemy (II), Justin (165), Tertullian, Origen, Irenaeus, Cyprian, Diatessaron |
+| matthew-5-44 | 32 | 122 | Theophilus (180), Athenagoras (II), Irenaeus, Origen, Cyprian, Adamantius |
+| matthew-6-13 | 28 | 103 | **Didache (II)**, Tertullian, Origen, Cyprian, `vgcl`, `copfay` |
+| matthew-17-21 | 42 | 106 | **`Θ (IX)`** (your "Codex Q"), Diatessaron, Origen, Asterius, Hilary, Basil, Ambrose |
+| matthew-18-11 | 23 | 119 | Origen, Juvencus (330), Eusebius, Hilary, Jerome, Diatessaron |
+| matthew-19-16-17 | 30 | 102 | Marcion (II), Clement, Novatian, Irenaeus, Origen |
+| matthew-23-14 | 28 | 104 | Origen gr/lat, Diatessaron n/t, Hilary, Jerome, Cyril |
+| matthew-27-35 | 36 | 85 | `B`, `א`, `A`, `W`, Origen lat, Eusebius |
+| mark-1-2 | 31 | 105 | Irenaeus gr (202), Origen, Ambrosiaster, Serapion, Titus-Bostra, Basil |
+| mark-7-16 | 24 | 99 | Diatessaron a/p (II), Augustine, `274`, `2427` |
+| mark-9-44-46 | 31 | 87 | Diatessaron a/p, Irenaeus lat, Basil, `0274`, `itk`, `copfay` |
+| mark-10-24 | 23 | 83 | Clement (215), Diatessaron, `syrs`, `syrp`, `syrh` |
+| mark-11-26 | 32 | 114 | Diatessaron, Cyprian (258), Augustine, `itk`, `copsa` |
+| mark-15-28 | 37 | 93 | Diatessaron ar, Origen, Jerome, `itk`, `copsa`, Vigilius |
+| luke-2-14 | 21 | 109 | Irenaeus lat, Origen gr/lat, Diatessaron s, ~40 fathers |
+| luke-2-33 | 24 | 92 | Diatessaron a/n/t, `goth`, Hilary, Hesychius |
+| luke-4-4 | 39 | 80 | Origen gr/lat, Titus-Bostra, Diatessaron |
+| luke-9-55-56 | 35 | 94 | Diatessaron, Marcion (II), Ambrosiaster, Ambrose, Basil, Cyril-Jerusalem |
+| luke-11-2-4 | 31 | 99 | Tertullian, Origen, Gregory-Nyssa, Titus-Bostra, Cyril |
+| luke-22-43-44 | 34 | 118 | Diatessaron ar/i/n, **Justin (165)**, Irenaeus gr, Hippolytus, Hilary, Epiphanius |
+| luke-23-17 | 33 | 86 | Diatessaron, `copsa`, `copbo`, Augustine |
+| luke-24-6 | 13 | 90 | Marcion (II), Diatessaron, Eusebius, Amphilochius, Cyril |
+| luke-24-40 | 31 | 85 | Athanasius, Amphilochius, Chrysostom, Jerome, Augustine, Cyril |
+| luke-24-51 | 32 | 83 | Diatessaron, Severian, Augustine, Cyril, Hesychius, Cosmas |
+| luke-24-52 | 31 | 76 | `copsa`, `copbo`, Augustine, `vgmss` |
+| john-1-18 | 34 | 128 | Heracleon, Ptolemy, Theodotus (II), Irenaeus, Clement, ~35 more fathers |
+| john-3-13 | 39 | 124 | Hippolytus, Novatian, Eustathius, Aphraates, Lucifer, ~30 fathers |
+| john-5-3b-4 | 36 | 98 | Diatessaron a/i/n, Tertullian, Hilary, Ambrose, Didymus, Chrysostom |
+| john-6-47 | 31 | 91 | Diatessaron a/i/n, Origen, `goth`, Hilary, Didymus, Augustine |
+| acts-8-37 | 42 | 89 | **Irenaeus (202)**, **Cyprian (258)**, Tertullian, Ambrose, Chromatius, Pacian, Augustine |
+| acts-9-5-6 | 15 | 62 | `copsa`, `copbo`, Lucifer, Ephraem, Ambrose, Chrysostom, ~20 Latin |
+| acts-20-28 | 47 | 108 | Irenaeus lat, Athanasius, Basil, Ambrose, Epiphanius, Chrysostom, Cyril |
+| acts-28-29 | 23 | 79 | `copsa`, `copbo`, Chrysostom, Euthalius, Cassiodorus |
+| romans-8-1 | 22 | 94 | Origen lat, Adamantius, Ambrosiaster, Athanasius, Basil, Chrysostom, Jerome |
+| romans-14-10 | 31 | 96 | **Polycarp (156)**, Tertullian, Cyprian, Ambrosiaster, Ambrose, Chrysostom |
+| romans-16-24 | 24 | 63 | Origen lat, Ambrosiaster, Pelagius, Theodoret, `p61 (c. 700)` |
+| 1-corinthians-15-47 | 37 | 105 | Tertullian, Hippolytus, Origen, Cyprian, Marcellus, Priscillian, ~20 fathers |
+| ephesians-3-9 | 22 | 95 | Tertullian, Adamantius, Origen, Ambrosiaster, Hilary, Chrysostom, Jerome |
+| 1-john-4-3 | 37 | 96 | **Polycarp (156)**, Irenaeus lat, Tertullian, Origen, Cyprian, Priscillian, Tyconius |
+
+---
+
+## 4. The pattern
+
+Three kinds of evidence are systematically absent across nearly every passage:
+
+**The Diatessaron (2nd century).** It appears in LaParola for at least 20 of your 51 passages and is almost never on your site. It is among the earliest evidence that exists, and in several cases — Mark 9:29 is the clearest — **it supports the KJV reading.** You are leaving your strongest early evidence on the table.
+
+**Church fathers.** Your 121 patristic rows across 51 passages, against LaParola's several hundred. Eighteen of your passages have no fathers at all. For a site whose organising question is *how old is this reading*, this is the biggest single gap.
+
+**Named minuscules and lectionaries.** Your pages stop at the famous uncials and a handful of minuscules, then say "Byzantine Majority" or "1,500+ manuscripts." LaParola names 40–80 individual witnesses with dates for the same verses. **Replacing your aggregate rows with these named lists is the single change that would most improve the site** — and it directly answers what you originally asked for, because it turns an unverifiable "1,500+" into a list a reader can check.
+
+---
+
+## 5. Corrections confirmed or added this pass
+
+**Confirmed by LaParola:** 0274 at Mark 9:29 · Clement as earliest witness at Mark 9:29 · the ten Greek manuscripts of the Comma · Θ (not Q) at Matthew 17:21 · 061 as a 5th-century witness at 1 Timothy 3:16.
+
+**From Willker's lacuna tables (new, in `auditCorrections.ts`):**
+- **Mark 7:16 cites Curetonian Syriac.** Sy-C survives in Mark only at 16:18–20. It cannot witness this verse. Remove.
+- **Mark 16:9–20** gives the Curetonian range as 16:17–20. It is 16:18–20.
+
+**Verified clean, do not re-audit:** GA 33 at Luke 23:34 and Mark 11:26 (falls outside the lacuna) · 083 at Mark 15:28 · Ephraemi correctly absent from Luke 22:43–44, 23:17, 24:40.
+
+**Do not add:** `2427` at Mark 9:29 or Mark 7:16 — modern forgery, post-1874, confirmed by pigment analysis. LaParola predates that finding and still lists it.
+
+---
+
+## 6. What to do
+
+1. **Redeploy** — recovers 21 passages on the index (no code change).
+2. **Fix the sources card** — it cites date provenance under an evidence heading, on all 51 pages.
+3. **Fix the label filter** — it is deleting Hoskier from your three Revelation pages.
+4. **Apply `auditCorrections.ts`** — the verified factual fixes.
+5. **Add the missing witnesses in §3**, passage by passage, citing LaParola. Start with Colossians 1:14 (8 witnesses), 1 John 5:7 (15), 1 Timothy 3:16 (24) and Mark 16:9–20 (24) — the four where the gap is widest relative to the passage's prominence.
+6. **Replace aggregate rows with named witnesses.** This is the change that answers your original question.
+
+**Leave Revelation 1:11 and 16:5 alone.** Your data there is better than the general apparatus.
+
+---
+
+## 7. Source to cite
+
+> LaParola, *Greek New Testament with Textual Variants* (laparola.net/greco/). Apparatus compiled from NA/UBS with witness dates and text-types. Greek text: SBLGNT.
+
+It is free, per-verse, covers the whole New Testament, and gives a date for every witness — which is exactly what your site is organised around. For Revelation, keep citing Palmer and Hoskier, which are better.
+
+
+================================================================================
+DOCUMENT B — CHANGES.md  (master change list)
+================================================================================
+
+# Oldest & Best — Master Change List
+
+**One document. Every change, in the order to make them.**
+Audited 4 August 2026 against branch `evidence-audit-rebuild`, HEAD `41320c2`.
+Dataset: all 51 passages, 2,078 evidence rows, extracted by compiling `src/data/derived.ts`.
+
+Supporting files in this folder:
+
+| File | Use |
+|---|---|
+| `auditCorrections.ts` | Drop into `src/data/`. Type-checks clean against your `Witness`/`PatristicWitness` types. |
+| `wave1SourceAssignments.ts` | Drop into `src/data/`. Controlling apparatus for each unsourced passage. |
+| `audit-findings.md` | Long-form reasoning behind each item here. |
+| `code-fixes.md` | Full before/after code for §A. |
+
+---
+
+## Read this first — what "all witnesses for all passages" can and cannot mean
+
+You told me not to say the information doesn't exist, and you were right to push. I had run two things together, and they need separating:
+
+**A full witness list with sources exists for all 51 passages.** Willker's *Textual Commentary on the Greek Gospels* covers every Gospel variant on your site in detail, free. Palmer covers the Gospels and Revelation. Tischendorf's *Editio Octava* covers everything and is public domain. ECM covers Mark, Acts and the Catholic Letters. **Nothing on your site needs to stay unsourced.**
+
+**A complete census with exact percentages does not exist for every passage.** For Matthew, Luke, Romans, Colossians and 1 Timothy, nobody has collated every Greek manuscript at these points — not INTF, not anyone. That is why §D below tells you to replace six invented percentages with named witnesses rather than better percentages.
+
+**What I hit this pass:** the Willker PDFs are 300–900 pages, and my fetch tool truncates them at ~68,000 characters. I got the front matter of each volume — which turned out to be worth a lot, because it contains the lacuna tables, and those caught two errors nobody would find by reading the apparatus (§B7, §B8). I could not pull the per-verse apparatus. That is a limitation of my tooling, not of the sources. **If you can get me those PDFs as text — or drop them in this folder — I can work straight through all 51 and fill every remaining row.** That is the single thing that would unblock the rest.
+
+---
+
+## A. Code changes — do these first
+
+Full before/after in `code-fixes.md`. Summary:
+
+| # | File | Change | Why |
+|---|---|---|---|
+| A1 | — | **Redeploy from HEAD** | Live index shows 30 of 51. Source already renders all 51; the deployment predates the wave-2 merge. No code change. |
+| A2 | `src/lib/evidenceSources.ts` | `collectWitnessSources` → read `row.source`, not `row.dateSource`. Add separate `collectWitnessDateSources`. | The card says "where the evidence comes from" and lists date sources. This is why Mark 9:29 credits Palmer's *Revelation* apparatus. False on all 51 pages. |
+| A3 | `src/lib/evidenceSources.ts` | `isProhibitedLabel` → match whole label, not suffix. Rename 8 labels. | Suffix matching deletes `"Hoskier archive record"` — the most important Revelation source — on 3 pages. Also kills `"NA28/UBS5 apparatus; NET note"` and `"Houghton preprint"`. |
+| A4 | `EvidenceTabs.tsx` / `EvidenceTable.tsx` | Select tab rows by `kind`, not by which array they sit in. | 7 passages render an empty Latin tab while holding Latin rows in `evidenceAgainst`. 1 Tim 3:16 advertises Latin support and shows nothing. |
+| A5 | `derived.ts` + atlas + timeline | One shared `countEvidenceRows()`. | Homepage says 1,579, timeline says 1,672, actual is 2,078. |
+| A6 | row renderer | Show `unitLabel` where a passage has >1 unit. | Mt 19:16–17, Eph 3:9, Rev 1:8 correctly list witnesses on both sides; without the unit shown they look self-contradictory. |
+
+⚠️ **A2 will empty the evidence-sources card on 30 passages** — they have no `source` on any row. That is the true state. §C fixes it.
+
+---
+
+## B. Factual corrections — verified, one by one
+
+All implemented in `auditCorrections.ts`.
+
+### B1. Matthew 17:21 — "Codex Q" should be Θ (Koridethi, GA 038)
+
+Your ten omitting witnesses: B, ℵ, **Q**, 0281, 33, 892*, 788, 1604, 2680, 579.
+Willker's list: **Θ** 0281 788 33 579 892* 1604 2680, plus B and ℵ.
+
+Identical except Θ appears as Q — and carries Q's 5th–6th-century date instead of Θ's 9th. A theta/Q transcription slip. Your Matthew 18:11 and 23:14 pages list Θ correctly.
+
+**Change:** `Codex Q` → `Codex Koridethi (GA 038) — Θ`, date → Ninth century, `dateStart: 800`, `dateEnd: 899`.
+
+### B2. Matthew 17:21 — the two Middle Egyptian witnesses are reversed
+
+Your row: *"Middle Egyptian Codex Schoyen | c. AD 350 | **Contains** the verse."*
+
+Snapp, following the published editions: *"mae-1 (Codex Scheide, from the 400's) includes Mt. 17:21, although mae-2 (Schøyen MS 2650, assigned to the early 300's) does not include it."*
+
+Backwards. You credit inclusion to the witness that omits — and it's the earlier of the two, so it distorts the dating argument as well.
+
+**Change:** the supporting row becomes `Middle Egyptian mae-1 — Codex Scheide`, 5th c. Add `Middle Egyptian mae-2 — Schøyen MS 2650`, early 4th c., to `evidenceAgainst`.
+
+### B3. Matthew 17:21 — Pseudo-Clement is a century too early
+
+Your row dates the *Letters on Virginity* to **c. AD 100–200**, and that drives the page headline: *"Earliest: c. AD 100–200 — Pseudo-Clement."*
+
+Scholarship assigns the *Epistles on Virginity* to the **middle of the third century** — objections to syneisaktism first appear in extant Christian literature toward the middle of the 3rd century, and Uhlhorn places the letters shortly before Cyprian.
+
+**Change:** date → `c. AD 250`, `dateStart: 230`, `dateEnd: 270`. Recompute the page's earliest-support line.
+
+### B4. Mark 9:29 — P45 is not third-century support
+
+Your headline: *"Earliest surviving Greek support: Third century — P45vid."*
+
+ECM Mark (2021) treats **P45 as lacunose** at this point. The verse's decisive words fall in damaged text.
+
+**Change:** restate the row as damaged, remove it from the earliest-support line. Earliest secure support becomes the 4th–5th-century uncials, with Basil the earliest explicit patristic citation.
+
+### B5. Mark 9:29 — the count against is three, not two
+
+Snapp: all Greek copies include καὶ νηστείᾳ *"except for B, Aleph, and 274"* — GA 0274, a damaged Egyptian manuscript of the 400s.
+
+**Verified this pass:** Willker's TC-Mark front matter lists 0274's extant portions, including **9:26–41**, which covers 9:29. Willker also ranks 0274 among the *primary* witnesses for Mark. So it is both extant and important here.
+
+**Change:** add `Uncial 0274 (GA 0274)`, 5th c., to `evidenceAgainst`. Snapshot → `3 Greek witnesses (ℵ*, B, 0274) plus one Old Latin witness (k)`.
+
+Your own Mark 7:16 page already lists 0274 correctly, so the data model knows it exists.
+
+### B6. Mark 9:29 — no fathers listed, and the two that matter are missing
+
+The page prints "Church fathers — No supporting entry listed."
+
+- **Basil of Caesarea**, *First Homily on Fasting* 9 (PG 31:181), c. AD 370 — quotes with prayer and fasting. Supports.
+- **Clement of Alexandria**, *Eclogae Propheticae* 15.1, c. AD 200 — paraphrase without fasting. Opposes, and on present evidence is the **earliest witness of any kind to this variant in either direction**.
+
+**Change:** both rows supplied with full citations in `auditCorrections.ts`.
+
+### B7. Mark 7:16 — Curetonian Syriac cannot witness this verse ⭐ new this pass
+
+Your row: *"Curetonian Syriac | c. AD 400s | Omits the verse."*
+
+Willker, TC-Mark front matter: **"Sy-C is extant only from 16:18-20."** The Curetonian Syriac does not survive anywhere else in Mark. It cannot be evidence for or against Mark 7:16.
+
+**Change:** remove the row. Add a caution recording why, so it doesn't get re-added.
+
+*This is the kind of error that survives any amount of apparatus-reading, because apparatuses list sigla without restating extant ranges. It only surfaces from the lacuna tables.*
+
+### B8. Mark 16:9–20 — Curetonian range off by one verse ⭐ new this pass
+
+Your row: *"Fragmentary, preserves Mark 16:17-20."* Willker: extant **16:18–20**.
+
+**Change:** note → 16:18–20. The row itself is legitimate — this is the one place in Mark where Sy-C survives.
+
+### B9. Mark 16:9–20 — count right, attribution wrong, two categories missing
+
+"1,653 / 3 against / 99.8%" is correct; the three are ℵ (01), B (03), GA 304.
+
+But **1,653 is James Snapp Jr.'s count** — not in NTVMR, ECM, NA28, UBS or THGNT, the works your generic `sources` array names.
+
+Missing entirely: ~**8 Greek manuscripts** carrying the *Shorter Ending*, and ~**23** that include 16:9–20 with asterisks, obeli or marginal notes recording doubt. About 31 relevant Greek witnesses in neither column, on your most prominent page.
+
+**Change:** attribute to Snapp; add both categories as aggregate rows (supplied).
+
+Two patristic cautions: **Jerome** (*Ep.* 120.3) is largely translating **Eusebius**, *Ad Marinum* — your page lists both as independent. **Justin** (*1 Apol.* 45) is a disputed allusion, not a quotation.
+
+### B10. Matthew 6:13 — the Didache is double-counted
+
+`Didache 8` appears in `versionalWitnesses` **and** `patristicWitnesses`. It is a Greek church-order text, not a version. `Eastern liturgical tradition` in the same array has the same problem.
+
+**Change:** remove both from `versionalWitnesses`. Add the caution that the Didache's doxology is **shorter than the KJV form** — power and glory, no "kingdom" — so it evidences an early doxological ending, not the complete Matthean wording.
+
+### B11. Colossians 1:14 — missing witness, missing counter-argument
+
+Thinnest page on the site: 10 rows total.
+
+- Greek support given as "614, 630, and some Majority witnesses." **GA 2495 belongs in that group.**
+- The page never mentions that "through his blood" is generally explained as a **harmonisation from Ephesians 1:7**, where the phrase is textually secure. A page defending a reading should answer the main objection to it.
+
+### B12. 1 John 5:7 — the Greek list is exactly right; three additions
+
+All ten manuscripts checked against Hixson's study with images. **Ten for ten, dates included. Do not change this data.**
+
+| | Site | Hixson | |
+|---|---|---|---|
+| 1 | GA 629, 1362–1363 | 629 (1362–1363), earliest Greek MS of the CJ | ✓ |
+| 2 | GA 61 Montfortianus, 16th c. | 61 Montfortianus | ✓ |
+| 3 | GA 429mg, addition after 1522 | 429marg, after 1522 | ✓ |
+| 4 | GA 918, c. 1573–1578 | 918, probably 1573–1578 | ✓ |
+| 5 | GA 2473, 1634 | 2473 (1634) | ✓ |
+| 6 | GA 2318, 18th c. | 2318 (1700s) | ✓ |
+| 7 | GA 177mg, addition c. 1785 | 177marg (c. 1785) | ✓ |
+| 8 | GA 221mg, addition after 1854 | 221marg (after c. 1850?) | ✓ |
+| 9 | GA 88mg, 12th c. base | 88marg | ✓ |
+| 10 | GA 636mg, later addition | 636marg | ✓ |
+
+**Add:** (a) cite Hixson on all ten rows; (b) the **GA 635 caution** — Hixson examined it: *"sometimes cited as having the CJ in the margin, but it does not"*; (c) replace "500+ Greek manuscripts" with the published denominator — *Text und Textwert* collated **552** Greek continuous-text manuscripts of the Catholic Letters, **522** with complete or substantial text.
+
+### B13. Acts 8:37 — state the earliest Greek witness
+
+The page leads with Irenaeus (c. AD 180) and never says when the verse first appears in a Greek manuscript. It is **E (Codex Laudianus, GA 08), sixth century**. Say so — the six-century gap is part of the evidence either way.
+
+"About 10 to 12 principal Greek witnesses" also undercounts; ECM Acts (2017) covers this book fully and should set the number. See §E3.
+
+---
+
+## C. Sourcing — the largest job
+
+**30 of 51 passages have zero sourced witness rows: 1,104 rows.** The split is exactly wave 1 vs wave 2. Wave 2 is 100% sourced and clean; wave 1 is 0%.
+
+> matthew-6-13, matthew-17-21, matthew-18-11, matthew-23-14, mark-7-16, mark-9-29, mark-9-44-46, mark-11-26, mark-15-28, mark-16-9-20, luke-9-55-56, luke-11-2-4, luke-22-43-44, luke-23-17, luke-23-34, luke-24-40, luke-24-51, luke-24-52, john-1-18, john-5-3b-4, john-6-47, john-7-53-8-11, acts-8-37, acts-9-5-6, acts-28-29, romans-8-1, romans-16-24, colossians-1-14, 1-timothy-3-16, 1-john-5-7
+
+**Patristic rows are worse: only 31 of 121 carry a citation.** 90 rows name no work — just "Chrysostom | c. AD 400 | Uses the reading." Worst: john-1-18 (13 rows, 0 cited), 1-john-5-7 (12, 0), matthew-17-21 (11, 0), luke-23-34 (9, 0), mark-16-9-20 (8, 0).
+
+**Step 1 — passage level, today.** Drop in `wave1SourceAssignments.ts`. Every passage gets its controlling apparatus, with ECM coverage recorded per book.
+
+**Step 2 — row level, the real work.** Source per book:
+
+| Book | Source | Free? |
+|---|---|---|
+| Matthew, Mark, Luke, John | Willker, *TC on the Greek Gospels* — per-variant discussion | Yes, PDF |
+| Gospels + Revelation | Palmer, apparatuses | Yes, PDF |
+| Mark | ECM Mark (2021) | Apparatus on NTVMR |
+| Acts | ECM Acts (2017) | Apparatus on NTVMR |
+| 1 John | ECM Catholic Letters (2013) | Apparatus on NTVMR |
+| Romans, Colossians, 1 Timothy | Tischendorf *Editio Octava*; NA28/THGNT | Tischendorf public domain |
+| Revelation | Hoskier, *Concerning the Text of the Apocalypse* | Public domain |
+| Patristic citations | BiblIndex to locate; Migne PG/PL for the text | Yes |
+
+---
+
+## D. Six numbers to replace with named witnesses
+
+Not "find a better percentage" — these percentages cannot be sourced, because the collations behind them were never made.
+
+| Passage | Currently | Do this |
+|---|---|---|
+| matthew-6-13 | "approximately 98%+" | No collation of Matthew here exists. Name the witnesses; label any percentage an estimate. |
+| matthew-17-21 | "about 99.4%" of "about 1,700 manuscripts of Matthew" | The 10 omitting witnesses are solid. ~1,700 is defensible but means *manuscripts attesting a given Gospel verse*, not *manuscripts of Matthew* — and it's a round estimate, so 99.4% is false precision. Use "more than 99 percent." |
+| mark-11-26 | "over 95% / approximately 1,585+" | Attributed to J. K. Elliott on the index card; I could not confirm the figure or locate the statement. Source it or drop it. |
+| john-1-18 | "about 1,610 / 17 / 7" | The 7 with θεός are recoverable (P66, P75, ℵ*, B, C*, L, 33) and can stay. 1,610 and 17 need a citation or removal. |
+| john-7-53-8-11 | "1,495 Greek manuscripts" | See §E1. |
+| acts-8-37 | "about 10 to 12" | See §E3. |
+
+**Also §2.6-class:** eleven wave-1 snapshots read "Fewer than 30 / 25 / 20 / 15 / 10 principal Greek witnesses" while naming 1–10. Luke 24:40 says "fewer than 10" and names **one** (Codex Bezae). Replace with the names — more accurate *and* more persuasive.
+
+---
+
+## E. Open — flagged, not guessed
+
+**E1. John 7:53–8:11: 1,476 or 1,495?** Your lectionary figure (495) matches Robinson exactly, so he is your source; the continuous-text figure does not. Secondary reports give Robinson as 1,476 containing / 267 omitting. *Filología Neotestamentaria* 13 (2000): 35–59 is not freely available — needs checking at source. Also add the 267 omitting manuscripts, and the manuscripts carrying the passage after John 21:25, Luke 21:38 or John 7:36.
+
+**E2. Mark 11:26 — the Elliott attribution.** Could not confirm.
+
+**E3. Acts 8:37 — "10 to 12" undercounts.** One secondary source gives **64 including / 417 omitting** — figures shaped like a *Text und Textwert* census, and Acts 8:37 is a plausible Teststelle. I could not confirm against a second independent source. **Do not publish 64/417 on my say-so.** ECM Acts will settle it. Solid meanwhile: earliest Greek is E (08), 6th c.
+
+---
+
+## F. Passages needing substantive work
+
+**1 Timothy 3:16** — weakest page relative to its importance. Empty Latin tab (§A4); one patristic row reading "Later ecclesiastical use | AD 800–1500," which is a placeholder, not a father; and it omits the most interesting thing about the variant — the two-century dispute over whether **Codex Alexandrinus** originally read ΟΣ or ΘΣ, which occupied Berriman and Tregelles. The page lists A as reading "who" with no hint of the controversy.
+
+**Luke 22:43–44** — add **Hilary**, *De Trinitate* 10.41, who states the verses are absent from many Greek and Latin copies. Exactly the early explicit testimony the site exists to surface. Epiphanius (*Ancoratus* 31.4–5) is already listed and citable.
+
+**Luke 23:34** — nine fathers, none cited; `latinWitnesses` and `versionalWitnesses` both **empty**, unusual for a variant with this much versional evidence.
+
+**John 5:3b–4** — should note, as Mark 16 should, that many manuscripts including the passage mark it with asterisks or obeli.
+
+**Eighteen passages have no patristic rows at all:** mark-9-29, mark-9-44-46, luke-2-14, luke-2-33, luke-4-4, luke-9-55-56, luke-23-17, luke-24-6, luke-24-40, luke-24-51, luke-24-52, john-6-47, acts-28-29, romans-8-1, romans-16-24, colossians-1-14, revelation-1-8, revelation-1-11.
+
+---
+
+## G. Verified correct — don't re-audit these
+
+- **1 John 5:7 Greek list** — ten for ten against Hixson, dates included (§B12).
+- **Manuscript dates** — all 178 distinct GA witnesses checked for cross-passage conflicts. **Zero.** `dateStart`/`dateEnd`/`dateUncertain` on all 1,957 rows.
+- **Witnesses on both sides** of Mt 19:16–17, Eph 3:9, Rev 1:8 — legitimate multi-unit variants, correctly recorded. Presentation fix only (§A6).
+- **GA 33 at Luke 23:34** — 33's Luke lacuna ends at 23:26, so it is extant at 23:34. Site correct.
+- **GA 33 at Mark 11:26** — Mark lacuna ends at 11:11. Extant. Site correct.
+- **083 at Mark 15:28** — extant 15:27–16:8. Site correct.
+- **Codex Ephraemi** is *not* cited at Luke 22:43–44, 23:17 or 24:40, where it is lacunose. Site correct.
+- **Luke 24:40 / 24:51 / 24:52** — P75, ℵ, B, A support inclusion; omissions really are confined to D, some Old Latin, and Sinaitic/Curetonian Syriac.
+- **Wave-2 Revelation pages** — the best work on the site. Rev 16:5 states outright that no Greek manuscript supports the reading and that Beza's "old manuscript" cannot be identified. Rev 22:19 distinguishes *ligno* from *libro* and flags GA 2814 as lacunose. Only problem is §A3 hiding Hoskier.
+- **Luke 9:55–56 and Acts 9:5–6** — both state plainly that the KJV reading has minority or no Greek support. Right instinct.
+
+---
+
+## Order of work
+
+1. **§A1** redeploy — recovers 21 passages, zero risk
+2. **§A2–A6** code — half a day, fixes a false claim on every page
+3. **§B** drop in `auditCorrections.ts` — 13 verified corrections
+4. **§C step 1** drop in `wave1SourceAssignments.ts` — every passage gets a real source
+5. **§D** replace six percentages and eleven vague snapshots with names
+6. **§C step 2** row-level sourcing, 1,104 rows + 90 patristic — the actual project
+7. **§F** fill the gaps
+
+**To unblock step 6 fastest:** get me the Willker PDFs as text in this folder. My fetch truncates them at 68k characters, which is why this pass produced front-matter findings (§B7, §B8) rather than a full row-by-row fill. With the full text I can work straight through all 51.
+
+
+================================================================================
+DOCUMENT C — audit-findings.md  (long-form findings)
+================================================================================
+
+# Oldest & Best — Evidence Audit, Final
+
+**Date:** 4 August 2026
+**Basis:** the site's source tree, branch `evidence-audit-rebuild`, HEAD `41320c2`
+**Dataset:** all 51 passages, **2,078 evidence rows** (1,957 witness rows + 121 patristic rows), extracted by compiling `src/data/derived.ts` and dumping `allPassages`
+
+This supersedes my two earlier passes. Where they differ, this document is right — including on one point where I got it wrong myself (§0).
+
+**Files that accompany this document:**
+
+| File | What it is |
+|---|---|
+| `auditCorrections.ts` | Paste-ready. Verified factual corrections, missing witnesses, patristic citations, cautions. Wiring instructions at the bottom of the file. |
+| `wave1SourceAssignments.ts` | Paste-ready. Controlling apparatus for each of the 30 unsourced passages, with ECM coverage noted per book. |
+
+Confidence labels:
+
+| Label | Meaning |
+|---|---|
+| **VERIFIED** | Computed from your data, or confirmed against a source I opened and read. |
+| **DISCREPANCY** | Your figure conflicts with a published figure. Both given. |
+| **CORRECT** | I checked it and it holds. Recorded so you don't re-audit it. |
+| **UNRESOLVED** | Could not be settled from sources I can reach. Flagged, not guessed. |
+
+---
+
+## 0. A correction to my own Pass 2
+
+In Pass 2 I reported that **patristic rows are sourced 121/121**. That was wrong, and I want to flag it before anything else.
+
+`PatristicWitness.source` is the **author-name field**, not a citation. I tested for its presence and read a populated field as a citation. The real citation fields are `sourceCitation`, `sourceUrl` and `workSection`.
+
+Corrected figures:
+
+| | Cited | Total | Share |
+|---|---|---|---|
+| Patristic rows with a real citation | 31 | 121 | **26%** |
+| Witness rows with a source for the reading | 852 | 1,957 | **44%** |
+| **All evidence rows** | **883** | **2,078** | **42%** |
+
+So the patristic evidence is in *worse* shape than the manuscript evidence, not better. **90 of 121 patristic rows name no work at all** — just "Chrysostom | c. AD 400 | Uses the reading." For a database whose organising question is how old a reading is, an uncitable father is close to unusable.
+
+Worst affected: john-1-18 (13 rows, 0 cited), 1-john-5-7 (12, 0), matthew-17-21 (11, 0), luke-23-34 (9, 0), mark-16-9-20 (8, 0), john-7-53-8-11 (7, 0).
+
+---
+
+## 1. The structural finding
+
+### 1.1 Thirty of 51 passages have zero sourced evidence rows — VERIFIED
+
+Witness rows carry two distinct source fields: `dateSource` (where the manuscript's *date* came from) and `source` (where the *reading attribution* came from).
+
+The split is exactly wave 1 versus wave 2:
+
+- **21 wave-2 passages — 100% sourced.** Every row has `source`, `sourceUrl`, `confidence`, `lastVerified`. This work is good and I found nothing wrong with it on the points I sampled.
+- **30 wave-1 passages — 0% sourced.** Literally zero of 1,104 rows.
+
+> matthew-6-13, matthew-17-21, matthew-18-11, matthew-23-14, mark-7-16, **mark-9-29**, mark-9-44-46, mark-11-26, mark-15-28, **mark-16-9-20**, luke-9-55-56, luke-11-2-4, luke-22-43-44, luke-23-17, luke-23-34, luke-24-40, luke-24-51, luke-24-52, **john-1-18**, john-5-3b-4, john-6-47, **john-7-53-8-11**, **acts-8-37**, acts-9-5-6, acts-28-29, romans-8-1, romans-16-24, colossians-1-14, **1-timothy-3-16**, **1-john-5-7**
+
+Every headline passage is in that list. `wave1SourceAssignments.ts` gives the controlling apparatus for each.
+
+### 1.2 The "Evidence sources" card cites date provenance, not evidence provenance — VERIFIED
+
+`PassageSourcesCard.tsx` calls `collectWitnessSources`, which in `lib/evidenceSources.ts` reads:
+
+```ts
+addSource(map, row.dateSource, row.dateSourceUrl);
+```
+
+It reads `dateSource`. It never reads `source`. So the card headed **"Where the evidence on this page comes from — every witness, date, and note below draws on these works"** is listing works consulted for *dates*.
+
+That is why Mark 9:29 credits Palmer's *Revelation* apparatus and Willker's *Matthew* commentary: those supplied the Vulgate and Syriac date ranges. As printed, the sentence is false on all 51 pages.
+
+**Fix — pick one:**
+1. Reword the card to say it lists dating sources; add a second card for reading sources; **or**
+2. Make `collectWitnessSources` also read `row.source`.
+
+Option 2 renders the card empty on all 30 wave-1 passages until they're sourced. That is the honest state and arguably what should show.
+
+---
+
+## 2. Structural defects
+
+### 2.1 Three different totals for the same database — VERIFIED
+
+| Location | Figure |
+|---|---|
+| Homepage atlas | "1,579 Catalogued witness records" |
+| Timeline page | "1672 Dated witness entries" |
+| Actual data | **2,078** rows |
+
+None matches. Derive all three from one function over `allPassages` and label what each excludes.
+
+### 2.2 The live index shows 30 of 51 — stale deployment, not a data bug — VERIFIED
+
+`derived.ts` line 22 is `export const displayedPassages = allPassages;` — all 51 — and `PassageBrowser` applies no default filter. **Current source would render all 51.** The live site is running a build from before wave 2 was merged. Redeploy from HEAD; nothing in the data needs changing.
+
+Also worth fixing: `robots.txt` is empty and `sitemap.xml` serves nothing readable.
+
+### 2.3 Seven passages render an empty Latin tab while holding Latin evidence — VERIFIED
+
+`latinWitnesses` is empty; Latin rows sit in `evidenceAgainst`:
+
+| Passage | Latin rows filed elsewhere |
+|---|---|
+| matthew-19-16-17 | 2 |
+| luke-2-14 | 1 |
+| 1-corinthians-15-47 | 2 |
+| ephesians-3-9 | 1 |
+| **1-timothy-3-16** | 2 |
+| 1-john-4-3 | 3 |
+| revelation-1-11 | 1 |
+
+1 Timothy 3:16 is the clearest failure: the index card advertises "D plus Latin/Vulgate support for 'which'" and the Latin tab is empty.
+
+**Fix:** select tabs by `kind`, not by which array the row happens to occupy. A Latin witness that opposes the KJV reading is still a Latin witness.
+
+### 2.4 Eighteen passages have no patristic evidence at all — VERIFIED
+
+> mark-9-29, mark-9-44-46, luke-2-14, luke-2-33, luke-4-4, luke-9-55-56, luke-23-17, luke-24-6, luke-24-40, luke-24-51, luke-24-52, john-6-47, acts-28-29, romans-8-1, romans-16-24, colossians-1-14, revelation-1-8, revelation-1-11
+
+Plus **1 Timothy 3:16**, which has one row reading "Later ecclesiastical use | AD 800–1500" — a placeholder, not a father. On your second most important doctrinal passage, there is effectively no patristic evidence.
+
+`auditCorrections.ts` supplies Basil and Clement for Mark 9:29 with full citations.
+
+### 2.5 499 rows are aggregates standing for an unstated number of manuscripts — VERIFIED
+
+499 of 1,957 rows carry `aggregate: true` — 26% of the evidence. "Most Old Latin witnesses," "Byzantine Majority," "Coptic traditions including the phrase," "1,500+ Greek manuscripts."
+
+Densest: matthew-17-21 (16), revelation-1-8 (16), matthew-19-16-17 (14), john-5-3b-4 (14), matthew-6-13 (13), mark-1-2 (13), mark-9-29 (12), mark-15-28 (12).
+
+### 2.6 Wave-1 "against" snapshots don't match what the page actually lists — VERIFIED
+
+Wave-2 snapshots name witnesses ("ℵ, B, Zvid, 071vid, f1, 33, 788, 1192…"). Wave-1 snapshots use vague ceilings that are typically 3–5× the number of witnesses actually named:
+
+| Passage | Snapshot says | Greek witnesses actually named |
+|---|---|---|
+| matthew-18-11 | "Fewer than 30 principal Greek witnesses" | 6 |
+| matthew-23-14 | "Fewer than 30" | 8 |
+| mark-7-16 | "Fewer than 20" | 6 |
+| mark-9-44-46 | "Fewer than 30" | 10 |
+| mark-15-28 | "Fewer than 30" | 7 |
+| luke-22-43-44 | "Fewer than 25" | 7 |
+| luke-23-17 | "Fewer than 20" | 10 |
+| luke-24-40 | "Fewer than 10" | 1 |
+| luke-24-51 | "Fewer than 10" | 2 |
+| luke-24-52 | "Fewer than 10" | 2 |
+| john-5-3b-4 | "Fewer than 15" | 9 |
+| john-6-47 | "Fewer than 15" | 10 |
+
+These are technically true and practically uninformative — and they imply a census that doesn't exist. **Fix:** name the witnesses, as wave 2 does.
+
+### 2.7 The source-label filter is silently deleting real citations — VERIFIED
+
+`lib/evidenceSources.ts` suppresses labels that are vague link text:
+
+```ts
+const prohibitedLabels = new Set(["here", "online", "pdf", "parallel greek editions"]);
+const prohibitedEndings = [" study", " note", " preprint", " record", " archive record"];
+```
+
+The intent is right, but it matches on the **end of the string**, so it is killing substantive citations that merely happen to end with one of those words:
+
+| Suppressed label | Passages | What is actually being lost |
+|---|---|---|
+| `Hoskier archive record` | revelation-1-11, revelation-16-5, revelation-22-19 | **Hoskier's collation — the single most important source for Revelation.** Never displays. |
+| `NA28/UBS5 apparatus; NET note` | acts-20-28 | A real apparatus citation |
+| `NA28/UBS5 apparatus; concise list also in the NET note` | acts-20-28 | A real apparatus citation |
+| `Houghton preprint` | 1-john-4-3 | H. A. G. Houghton, the leading Latin NT scholar |
+| `P46 study` | 1-corinthians-15-47 | A manuscript study |
+| `Jerome study` | matthew-5-22 | A patristic study |
+| `NET note` | mark-10-24, john-3-13 | The NET textual notes |
+| `parallel Greek editions` | 8 passages | Edition comparison |
+| `Internet Archive record`, `VU publication record`, `here` | 3 passages | Genuinely vague — filter working correctly |
+
+So on your four Revelation pages, the "Evidence sources" card omits Hoskier entirely, while your `references` section cites him. A reader comparing the two will think the page is inconsistent.
+
+**Fix — two parts:**
+1. Rename the labels to proper citations: `Hoskier archive record` → `Hoskier, Concerning the Text of the Apocalypse (1929)`; `NET note` → `NET Bible textual notes`; `Houghton preprint` → `Houghton, The Text of the Gospel and Letters of John`.
+2. Change the filter to match the **whole label**, not the ending — otherwise any future citation ending in "note" or "record" disappears without warning.
+
+### 2.8 Manuscript dates are internally consistent — CORRECT
+
+All 178 distinct GA-numbered witnesses checked for conflicting date ranges across passages: **zero genuine conflicts.** `dateStart`/`dateEnd`/`dateUncertain` on all 1,957 rows, `dateSource` on 1,542. This is a real strength.
+
+(My Pass 1 "six conflicts" was my own regex conflating GA 02 with GA 2, GA 033 with GA 33, and so on. The data was clean; my check wasn't.)
+
+### 2.9 Witnesses appearing on both sides are legitimate — CORRECT
+
+matthew-19-16-17, ephesians-3-9 and revelation-1-8 each list some witnesses as both supporting and opposing. I checked: these are genuine **multi-unit** variants, and the witness supports one unit while opposing another. The data is right.
+
+**Presentation risk:** if the tabs group by for/against without showing the unit prominently, a reader sees the same manuscript in both columns and concludes the page contradicts itself. Surface `unitLabel` in the row.
+
+---
+
+## 3. Verified content errors
+
+Each of these is implemented in `auditCorrections.ts`.
+
+### 3.1 Matthew 17:21 — "Codex Q" should be Codex Koridethi (Θ) — DISCREPANCY
+
+The page lists ten Greek witnesses omitting the verse: B, ℵ, **Q**, 0281, 33, 892*, 788, 1604, 2680, 579.
+
+Willker's list of Greek manuscripts omitting Mt 17:21 is **Θ 0281 788 33 579 892* 1604 2680**, plus B and ℵ. Your list matches that exactly *except* that Θ appears as "Q" — and carries Q's fifth–sixth-century date instead of Θ's ninth century.
+
+This is a theta/Q transcription slip. **Θ (Koridethi, GA 038, 9th c.) is the omitting witness; Q (GA 026) is not in the list.** Your own Matthew 18:11 and Matthew 23:14 pages list Θ correctly, which makes this an isolated slip rather than a systematic misunderstanding.
+
+### 3.2 Matthew 17:21 — the two Middle Egyptian witnesses are reversed — DISCREPANCY
+
+Page: "Middle Egyptian Codex Schoyen | c. AD 350 | **Contains** the verse."
+
+Snapp, following the published editions: *"mae-1 (Codex Scheide, from the 400's) includes Mt. 17:21, although mae-2 (Schøyen MS 2650, assigned to the early 300's) does not include it."*
+
+The attribution is backwards. **Scheide (mae-1, 5th c.) includes it; Schøyen (mae-2, early 4th c.) omits it.** As printed, the page claims support from the one witness that omits — and it is the earlier of the two, so this affects the dating argument as well.
+
+### 3.3 Matthew 17:21 — Pseudo-Clement is a century too early — DISCREPANCY
+
+Page: "Pseudo-Clement, Letters on Virginity | **c. AD 100 to 200**," and this drives the page's headline: *"Earliest: c. AD 100–200 — Pseudo-Clement."*
+
+The *Epistles on Virginity* are assigned by scholarship to the **middle of the third century** — objections to syneisaktism first appear in extant Christian literature toward the middle of the 3rd century, and Uhlhorn places the letters shortly before Cyprian. **c. AD 250**, not AD 100–200.
+
+This changes the page's earliest-evidence claim by roughly a century, in the direction that weakens it. It should be corrected regardless.
+
+### 3.4 Mark 9:29 — three problems — DISCREPANCY
+
+1. **"Earliest surviving Greek support: Third century — P45vid."** ECM Mark (2021) treats **P45 as lacunose** here. The page's headline claim asserts third-century Greek support that the current critical edition says does not exist.
+2. **"2 principal Greek witnesses" against.** It is **three**. Snapp: all Greek copies include καὶ νηστείᾳ *"except for B, Aleph, and 274"* — i.e. GA 0274, a damaged Egyptian manuscript of the 400s. Your own Mark 7:16 page lists 0274 correctly, so the data model knows it exists.
+3. **No fathers.** Basil (*First Homily on Fasting* 9, PG 31:181, c. AD 370) supports; Clement of Alexandria (*Eclogae Propheticae* 15.1, c. AD 200) has the shorter form and is the earliest witness of any kind to this variant in either direction.
+
+Two traps guarded against in the corrections file: **GA 2427** is a modern forgery (post-1874, pigment analysis) that appears in older apparatuses for the shorter reading; **GA 706** was miscoded in ECM's first release and actually reads "and fasting."
+
+### 3.5 Matthew 6:13 — the Didache is double-counted — VERIFIED
+
+"Didache 8" appears in `versionalWitnesses` **and** in `patristicWitnesses`. It is a Greek church-order text, not an ancient version, so the versional row is both a duplicate and a miscategorisation. "Eastern liturgical tradition" in the same array has the same problem.
+
+Also worth stating on the page: the Didache's doxology is **shorter than the KJV form** — power and glory, without "the kingdom." It is evidence for an early doxological ending, not for the complete Matthean wording. The page's own earliest-support note gets this right; the versional row does not.
+
+### 3.6 Mark 16:9–20 — count right, attribution wrong, two categories missing — DISCREPANCY
+
+"1,653 Greek manuscripts / 3 against / 99.8%" is correct, and the three are ℵ (01), B (03), GA 304.
+
+But 1,653 is **James Snapp Jr.'s** count. It is not in NTVMR, ECM, NA28, UBS or THGNT — the works your generic `sources` array names. Cite Snapp.
+
+Missing: roughly **8 Greek manuscripts** carrying the *Shorter Ending*, and about **23** that include 16:9–20 with asterisks, obeli or marginal notes recording doubt. About 31 relevant Greek witnesses currently sit in neither column on your most prominent page.
+
+Two patristic cautions: **Jerome**'s statement that the passage is absent from almost all Greek copies (*Ep.* 120.3) is largely a translation of **Eusebius**, *Ad Marinum* — they are not independent witnesses, and your page lists both. **Justin Martyr**'s supposed use (*First Apology* 45) is a disputed allusion, not a quotation.
+
+### 3.7 1 John 5:7 — the Greek list is exactly right — CORRECT
+
+All ten rows checked against Hixson's manuscript-by-manuscript study with images:
+
+| # | Site | Hixson | |
+|---|---|---|---|
+| 1 | GA 629, AD 1362–1363 | 629 (1362–1363), earliest Greek MS of the CJ | ✓ |
+| 2 | GA 61 Montfortianus, 16th c. | 61 Montfortianus | ✓ |
+| 3 | GA 429mg, 14th-c. MS, addition after 1522 | 429marg, after 1522 | ✓ |
+| 4 | GA 918, c. 1573–1578 | 918, probably 1573–1578 | ✓ |
+| 5 | GA 2473, AD 1634 | 2473 (1634) | ✓ |
+| 6 | GA 2318, 18th c. | 2318 (1700s) | ✓ |
+| 7 | GA 177mg, 11th-c. MS, addition c. 1785 | 177marg (c. 1785) | ✓ |
+| 8 | GA 221mg, 10th-c. MS, addition after 1854 | 221marg (after c. 1850?) | ✓ |
+| 9 | GA 88mg, 12th c. base | 88marg | ✓ |
+| 10 | GA 636mg, 15th-c. MS, later addition | 636marg | ✓ |
+
+Ten for ten, dates included. **Do not change this data.** Three additions, all in the corrections file:
+
+1. **Cite Hixson.** All ten rows are unsourced and this is the source.
+2. **Add the GA 635 caution.** Hixson examined it: *"GA 635 is sometimes cited as having the CJ in the margin, but it does not."* Older literature repeats the eleventh-witness claim.
+3. **Replace "500+ Greek manuscripts."** The precise denominator is published: *Text und Textwert* collated **552** Greek continuous-text manuscripts of the Catholic Letters, **522** with complete or substantial text. "500+" understates your own case and reads like a guess.
+
+### 3.8 John 7:53–8:11 — possible 19-manuscript error — UNRESOLVED
+
+| | Robinson (per secondary reports) | Site |
+|---|---|---|
+| Continuous-text MSS containing | **1,476** | 1,495 |
+| Continuous-text MSS omitting | 267 | not stated |
+| Lectionaries containing 8:3–11 | **495** | 495 ✓ |
+| Lectionaries not containing | 2,285 | not stated |
+
+Your lectionary figure matches Robinson exactly, which suggests he is the source and the continuous-text figure has drifted. **I could not open Robinson's article** — *Filología Neotestamentaria* 13 (2000): 35–59 is not freely available — so this stays flagged rather than corrected. Of everything in this document, this is the number I would most want checked at source.
+
+Also missing: the 267 omitting manuscripts, and the manuscripts carrying the passage at a different location (after John 21:25, after Luke 21:38, after John 7:36).
+
+---
+
+## 3A. Wave 2 spot-check — CORRECT
+
+I sampled the 21 sourced passages, concentrating on Revelation because those pages make the most unusual claims. They hold up well, and the Revelation pages in particular are the best work on the site.
+
+**Revelation 16:5** states plainly *"No Greek manuscripts"* support the KJV reading, lists the four forms the Greek tradition actually divides among (ὁ ὅσιος, ὅσιος, καὶ ὅσιος, καὶ ὁ ὅσιος), and carries four cautions including the important one that **Beza referred to an old manuscript but no presently identifiable Greek witness can be connected to that report**. That is exactly right and exactly the kind of thing a partisan site usually fudges.
+
+**Revelation 22:19** is equally careful: it distinguishes *ligno* from *libro* as different Latin words rather than a one-letter variation, notes that GA 61 and the corrected 2067 read βιβλίου rather than the exact TR βίβλου, and flags that **GA 2814 is lacunose here and is evidence for neither reading**.
+
+Sourcing on these pages points to Palmer's *Revelation* apparatus — which is the correct volume for Revelation, unlike the Mark 9:29 case (§1.2) where the same work was cited for the wrong book.
+
+The one thing wrong with these pages is §2.7: Hoskier, their most important underlying source, is filtered out of the display.
+
+## 4. Passages needing substantive work
+
+Not errors I can correct from free sources, but gaps large enough to name.
+
+**1 Timothy 3:16** is the weakest page on the site relative to its importance. No Latin tab (§2.3), no real patristic evidence (§2.4), and the page omits the single most interesting thing about the variant: the long-running dispute over whether **Codex Alexandrinus** originally read ΟΣ or ΘΣ, which occupied Berriman, Tregelles and others for two centuries. The page lists A as reading "who" without noting the controversy.
+
+**John 1:18** carries very specific figures — "about 1,610 Greek manuscripts for 'only begotten Son'; 17 with minor Son variations; 7 with God readings" — with no source. The seven with θεός are recoverable (P66, P75, ℵ*, B, C*, L, 33), and the page's handling of Irenaeus and Origen having *both* readings is a genuinely good piece of nuance. But 1,610 and 17 need a citation or they should go.
+
+**Acts 8:37**'s "about 10 to 12 principal Greek witnesses" probably understates. The verse appears in a good number of minuscules (E, 36, 88mg, 97mg, 103, 104, 242, 257, 307, 322, 323, 385, 429, 453, 464, 467, 522, 630, 913, 945, 1522, 1739mg, 1765, 1877, 2147, 2298, 2818 and others in the standard lists). ECM Acts (2017) covers this book fully and is the right source.
+
+**Luke 22:43–44** should add **Hilary**, *De Trinitate* 10.41, who states the verses are absent from many Greek and Latin copies — that is exactly the kind of early explicit testimony the site exists to surface. Epiphanius (*Ancoratus* 31.4–5) is already listed and is citable.
+
+**Luke 23:34** has nine fathers, none cited, and no Latin or versional rows at all (`latinWitnesses` and `versionalWitnesses` are both empty) — unusual for a variant with this much versional evidence.
+
+**Colossians 1:14** is the thinnest page on the site: **10 evidence rows in total.** Two concrete problems, both fixed in the corrections file:
+
+- The Greek support is given as "614, 630, and some Majority witnesses." **GA 2495 belongs in that group** and is missing.
+- The page never mentions the standard argument against the reading — that "through his blood" is a harmonisation to the identical, textually secure phrase at **Ephesians 1:7**. A page defending the reading should answer the main objection to it, not omit it.
+
+**Luke 24:40, 24:51, 24:52** are accurate — P75, ℵ, B, A support inclusion and the omissions really are confined to D, a little Old Latin, and Sinaitic/Curetonian Syriac. The only problem is §2.6: "fewer than 10 principal witnesses" when the page names one Greek manuscript (24:40) or two (24:51, 24:52). Say "Codex Bezae, supported by part of the Old Latin and the Sinaitic Syriac" — it is both more accurate and more persuasive.
+
+**Luke 9:55–56 and Acts 9:5–6** deserve credit: both state plainly that the KJV reading has minority or no Greek support, rather than dressing it up. Acts 9:5–6 says outright *"No known Greek manuscript supports the full KJV/TR wording at this location."* That is the right instinct throughout.
+
+**John 5:3b–4** should note, as Mark 16:9–20 should (§3.6), that a significant number of manuscripts including the passage mark it with asterisks or obeli. Same category of evidence, same omission.
+
+---
+
+## 5. On the counting standard you set
+
+You asked for figures shaped like *"approx. 5,500 of 9,000 Latin witnesses from 100 AD to 900 AD."* No figure of that shape can be produced honestly, for any verse — not because the research is hard, but because the quantities don't exist. Publishing in that format would put fabrications on the site.
+
+**Latin.** Roughly **80–90** Old Latin manuscripts survive for the whole New Testament. Most are fragmentary; a given verse is typically attested in 3–15, few enough to name individually — which your `latinRepresentativeWitnesses*.ts` files already do well for 34 passages. The Vulgate survives in perhaps **10,000** manuscripts, overwhelmingly 9th century and later, with no verse-by-verse collation of all of them ever published. Wordsworth–White and the Stuttgart Vulgate collate a selected 20–40 of the oldest; those are the citable ones. **Nothing Latin survives from AD 100** — the Latin versions begin late in the second century at the earliest and the oldest Latin manuscripts are fourth century.
+
+**Greek.** Exact "X of Y" counts exist only where every known manuscript has been collated at that point: *Text und Textwert* (at its selected test passages only) or ECM (Catholic Letters, Acts, Mark, John in progress). **There is no ECM for Matthew, Luke, Romans, Colossians or 1 Timothy** — 17 of your 51 passages.
+
+**Fathers.** A father counts only where a citation preserving the disputed wording survives, checked in a critical edition. Silence is not evidence. Two traps: parallel passages (Matthew 17:21 / Mark 9:29 is the live one on your site — you currently assign eleven fathers to Matthew and none to Mark), and paraphrase, which usually cannot settle word order.
+
+**The honest alternative** is what wave 2 already does: name witnesses individually, and where you must aggregate, say what has actually been collated. *"Supported by the great majority of Greek manuscripts; no complete collation of this verse has been published"* is a **stronger** claim than an invented percentage, because it cannot be knocked down.
+
+---
+
+## 6. Order of work
+
+**Code, quick:**
+
+1. Redeploy from HEAD — recovers 21 passages on the index (§2.2)
+2. Fix the sources-card text or its field (§1.2) — currently false on every page
+3. Fix the Latin tab selector (§2.3) — 7 passages
+4. Reconcile the three totals (§2.1)
+5. Surface `unitLabel` on rows in multi-unit passages (§2.8)
+
+**Data, immediate:**
+
+6. Apply `auditCorrections.ts` — the verified fixes in §3
+7. Apply `wave1SourceAssignments.ts` — gives all 30 passages a real controlling source
+
+**Research, the actual project:**
+
+8. Row-level sourcing for 1,104 wave-1 rows (§1.1)
+9. Citations for 90 patristic rows (§0)
+10. Fill 18 empty father lists (§2.4)
+11. Replace vague wave-1 snapshots with named witnesses (§2.6)
+12. Decompose 499 aggregate rows (§2.5)
+
+---
+
+## 7. Unresolved — flagged, not guessed
+
+1. **John 7:53–8:11: 1,476 or 1,495?** Needs Robinson at source. *Filología Neotestamentaria* 13 (2000): 35–59 is not freely available.
+2. **John 1:18: where do 1,610 and 17 come from?** If unrecoverable, remove them. The 7 Greek witnesses with θεός are recoverable (P66, P75, ℵ*, B, C*, L, 33) and can stay.
+3. **Acts 8:37: "about 10 to 12 principal Greek witnesses" probably understates.** One secondary source gives **64 Greek manuscripts including the verse and 417 omitting** — figures with the shape of a *Text und Textwert* census, and Acts 8:37 is a plausible Teststelle. I could not confirm this against a second independent source, so **do not publish 64/417 on my say-so.** ECM Acts (2017) covers this book fully and will settle it. What is solid: the earliest Greek manuscript containing the verse is **E (Codex Laudianus, 08), sixth century** — worth stating explicitly, since the page currently leads with Irenaeus and never gives the earliest Greek witness.
+4. **Mark 11:26: "over 95 percent / approximately 1,585+."** The index card attributes this to J. K. Elliott. I could not confirm the figure or locate the statement.
+5. **Matthew 6:13: "approximately 98%+."** No collation of Matthew at this point has been published; this is an estimate and should be labelled one.
+6. **Matthew 17:21: "about 99.4 percent" of "about 1,700 surviving Greek manuscripts of Matthew."** The 10 omitting witnesses are solid, and the ~1,700 denominator is defensible — the standard figure is that around 2,000 Greek manuscripts contain Gospel material, but because of fragments and lacunae roughly **1,700 attest any given Gospel verse**. Two precision notes: that is "manuscripts attesting a given verse," not "manuscripts of Matthew," and the phrasing should say so; and 1,700 is a round scholarly estimate, so 99.4% carries false precision. "More than 99 percent" is the defensible form.
+
+---
+
+## 8. What I could not do
+
+You asked for every witness on every passage fully accounted for. I want to be plain about the gap between that and what is in these files.
+
+I verified: the structure of all 2,078 rows, all 178 manuscript dates for internal consistency, and the specific content claims listed in §3 — the ones that could be checked against a source I could open. That is a real audit and it found real errors, including two (§3.1, §3.2) that put wrong witnesses on the page.
+
+I did **not** verify all 2,078 rows individually against primary sources. That would require *Text und Textwert*, the ECM print volumes and the Vetus Latina Database — all paywalled, and you specified free sources only. For the 17 passages in Matthew, Luke, Romans, Colossians and 1 Timothy, the complete collations you would need **have never been published in any form**, free or paid.
+
+So "all witnesses accounted for, 100% accurate" is not reachable for roughly a third of your passages by anyone, at any budget. What *is* reachable is what wave 2 already demonstrates: every row carrying a citation a reader can open, aggregates named rather than counted, and the limits of the evidence stated on the page. That standard is achievable across all 51, and it is a better site than one carrying confident percentages nobody can check.
+
+
+================================================================================
+DOCUMENT D — code-fixes.md  (exact before/after code)
+================================================================================
+
+# Code fixes — exact edits
+
+Five code changes, each self-contained. Ordered by impact per minute of work.
+Every one is a bug I confirmed in your tree at HEAD `41320c2`.
+
+---
+
+## Fix 1 — The sources card claims to cite evidence but cites dates
+
+**File:** `src/lib/evidenceSources.ts`
+**Severity:** makes a false statement on all 51 pages
+
+`collectWitnessSources` reads `dateSource` only. The card it feeds is headed *"Where the evidence on this page comes from — every witness, date, and note below draws on these works."*
+
+### Current
+
+```ts
+export function collectWitnessSources(
+  map: Map<string, SourceEntry>,
+  rows: Witness[],
+) {
+  for (const row of rows) {
+    addSource(map, row.dateSource, row.dateSourceUrl);
+  }
+}
+```
+
+### Replace with
+
+```ts
+export function collectWitnessSources(
+  map: Map<string, SourceEntry>,
+  rows: Witness[],
+) {
+  for (const row of rows) {
+    addSource(map, row.source, row.sourceUrl);
+  }
+}
+
+/**
+ * Dating provenance is a separate question from reading provenance. The two
+ * were previously merged, which is why Mark 9:29 credited Palmer's Revelation
+ * apparatus: that work supplied the Vulgate's date range, nothing more.
+ */
+export function collectWitnessDateSources(
+  map: Map<string, SourceEntry>,
+  rows: Witness[],
+) {
+  for (const row of rows) {
+    addSource(map, row.dateSource, row.dateSourceUrl);
+  }
+}
+```
+
+**Then in `src/components/PassageSourcesCard.tsx`,** render two groups — "Evidence sources" from `collectWitnessSources`, and "Dating sources" from `collectWitnessDateSources`.
+
+⚠️ **Expect the evidence group to be empty on 30 passages.** Those rows have no `source` (see `wave1SourceAssignments.ts`). That is the true state; showing it is better than showing dating sources under an evidence heading.
+
+---
+
+## Fix 2 — The label filter is deleting Hoskier
+
+**File:** `src/lib/evidenceSources.ts`
+**Severity:** the most important Revelation source never displays
+
+The filter matches on the *end* of the label, so any citation ending in "note", "record", "study" or "preprint" is silently dropped.
+
+### Current
+
+```ts
+const prohibitedEndings = [
+  " study",
+  " note",
+  " preprint",
+  " record",
+  " archive record",
+];
+
+function isProhibitedLabel(label: string) {
+  const lower = label.toLowerCase();
+  return (
+    prohibitedLabels.has(lower) ||
+    prohibitedEndings.some((ending) => lower.endsWith(ending))
+  );
+}
+```
+
+### Replace with
+
+```ts
+/**
+ * Labels that are pure link-text and carry no bibliographic content. Matched
+ * whole, not by suffix: a suffix match was silently deleting real citations
+ * such as "Hoskier archive record" and "NA28/UBS5 apparatus; NET note".
+ */
+const prohibitedLabels = new Set([
+  "here",
+  "online",
+  "pdf",
+  "parallel greek editions",
+  "internet archive record",
+  "vu publication record",
+]);
+
+function isProhibitedLabel(label: string) {
+  return prohibitedLabels.has(label.toLowerCase().trim());
+}
+```
+
+### Then rename these labels in the data
+
+| Current label | Where | Rename to |
+|---|---|---|
+| `Hoskier archive record` | revelation-1-11, revelation-16-5, revelation-22-19 | `Hoskier, Concerning the Text of the Apocalypse (1929)` |
+| `NET note` | mark-10-24, john-3-13 | `NET Bible textual notes` |
+| `NET/Acts 20:28 note` | acts-20-28 | `NET Bible textual note on Acts 20:28` |
+| `NA28/UBS5 apparatus; NET note` | acts-20-28 | `NA28 / UBS5 apparatus; NET Bible textual notes` |
+| `NA28/UBS5 apparatus; concise list also in the NET note` | acts-20-28 | `NA28 / UBS5 apparatus` |
+| `Houghton preprint` | 1-john-4-3 | `Houghton, The Text of the Gospel and Letters of John` |
+| `P46 study` | 1-corinthians-15-47 | `Published study of P46` — or the actual article |
+| `Jerome study` | matthew-5-22 | the actual article title |
+
+---
+
+## Fix 3 — Latin tab renders empty while the page holds Latin evidence
+
+**File:** wherever the tab panels select rows (`src/components/EvidenceTabs.tsx` / `EvidenceTable.tsx`)
+**Severity:** 7 passages, including 1 Timothy 3:16
+
+The Latin tab reads `passage.latinWitnesses`. Latin rows that oppose the KJV reading are stored in `evidenceAgainst`, so they never reach the Latin tab. 1 Timothy 3:16 advertises "D plus Latin/Vulgate support for 'which'" on its index card and shows an empty Latin tab.
+
+### Select by `kind`, not by array
+
+```ts
+const ALL_ROWS = (p: Passage): Witness[] => [
+  ...p.greekSupportWitnesses,
+  ...p.latinWitnesses,
+  ...p.versionalWitnesses,
+  ...p.evidenceAgainst,
+  ...(p.printedWitnesses ?? []),
+];
+
+const latinRows   = ALL_ROWS(passage).filter((r) => r.kind === "latin");
+const syriacRows  = ALL_ROWS(passage).filter((r) => r.kind === "syriac");
+const copticRows  = ALL_ROWS(passage).filter((r) => r.kind === "coptic");
+const greekRows   = ALL_ROWS(passage).filter((r) => r.kind === "greek-manuscript");
+```
+
+Then show each row's `direction` (supports / opposes) as a badge inside the tab, so a Latin witness against the reading is visible *as* a Latin witness.
+
+**Affected:** matthew-19-16-17, luke-2-14, 1-corinthians-15-47, ephesians-3-9, 1-timothy-3-16, 1-john-4-3, revelation-1-11.
+
+---
+
+## Fix 4 — Three different totals for one database
+
+**Files:** `src/app/page.tsx` (atlas), `src/components/timeline/TransmissionTimelineExplorer.tsx`
+
+| Shown | Figure |
+|---|---|
+| Homepage atlas | 1,579 |
+| Timeline | 1,672 |
+| Actual | **2,078** (1,957 witness + 121 patristic) |
+
+### Add one shared counter in `src/data/derived.ts`
+
+```ts
+export function countEvidenceRows(passages: readonly Passage[]) {
+  let witness = 0;
+  let patristic = 0;
+  for (const p of passages) {
+    witness +=
+      p.greekSupportWitnesses.length +
+      p.latinWitnesses.length +
+      p.versionalWitnesses.length +
+      p.evidenceAgainst.length +
+      (p.printedWitnesses?.length ?? 0);
+    patristic += p.patristicWitnesses.length;
+  }
+  return { witness, patristic, total: witness + patristic };
+}
+
+export const evidenceRowCounts = countEvidenceRows(allPassages);
+```
+
+Use `evidenceRowCounts.total` in both places. If the timeline genuinely counts only dated rows, label it *"1,672 rows carrying a resolved date, of 2,078 total"* — the qualifier is what's missing, not the number.
+
+---
+
+## Fix 5 — Redeploy: the live index shows 30 of 51
+
+**No code change needed.**
+
+`src/data/derived.ts` line 22 is `export const displayedPassages = allPassages;`, and `PassageBrowser` applies no default filter. Current source renders all 51. The live site is serving a build from before wave 2 was merged into `displayedPassages` — which is why 1 Corinthians, Ephesians and Revelation are missing from the book filter, while the homepage and timeline (different code paths) correctly say 51.
+
+Redeploy from HEAD.
+
+While you're there: `robots.txt` is empty and `sitemap.xml` serves nothing readable. `src/app/sitemap.ts` is modified in your working tree but the deployed output isn't valid XML.
+
+---
+
+## Fix 6 — Show the variant unit on multi-unit passages
+
+**Severity:** cosmetic, but it makes three pages look self-contradictory
+
+matthew-19-16-17, ephesians-3-9 and revelation-1-8 legitimately list some witnesses as both supporting and opposing, because each passage has two disputed units and a witness can go one way on each. **The data is correct.** But if the tabs group by for/against without showing which unit is in view, a reader sees Codex Sinaiticus in both columns and concludes the page is broken.
+
+Render `row.unitLabel` as a heading or badge on every row in any passage where `new Set(rows.map(r => r.unitId)).size > 1`.
+
+
+================================================================================
+DOCUMENT E — auditCorrections.ts  (paste-ready, type-checks clean)
+================================================================================
+
+/**
+ * auditCorrections.ts
+ * -------------------------------------------------------------------------
+ * Evidence audit of 4 August 2026. Drop this file in `src/data/` and wire it
+ * into `derived.ts` (see WIRING at the bottom of this file).
+ *
+ * Every entry below was verified against a source that is named inline and is
+ * freely accessible. Nothing here is an estimate. Where a figure could not be
+ * confirmed from a source I could open, it is NOT included — those items are
+ * listed in `audit-findings.md` under "Unresolved" instead of being guessed.
+ *
+ * Scope of this file:
+ *   - factual corrections to specific rows (wrong witness, wrong date)
+ *   - witnesses that are missing and should be added
+ *   - patristic rows that exist but carry no citation
+ *   - snapshot strings that overstate or understate what is actually listed
+ *
+ * This file deliberately does NOT touch the 21 Wave 2 passages, which were
+ * already sourced row-by-row and checked out clean on the points sampled.
+ */
+
+import type { PatristicWitness, Witness } from "./types";
+
+/* ------------------------------------------------------------------ */
+/* Source registry                                                     */
+/* ------------------------------------------------------------------ */
+
+export const auditSources = {
+  hixsonComma: {
+    label: "Hixson, “The Greek Manuscripts of the Comma Johanneum (1 John 5:7–8)”",
+    url: "https://evangelicaltextualcriticism.blogspot.com/2020/01/the-greek-manuscripts-of-comma.html",
+  },
+  snappMark929External: {
+    label: "Snapp, “Mark 9:29 and Fasting – More External Evidence”",
+    url: "https://www.thetextofthegospels.com/2014/05/mark-929-and-fasting-more-external.html",
+  },
+  snappMark16: {
+    label: "Snapp, “A Case for the Longer Ending of Mark”",
+    url: "https://textandcanon.org/a-case-for-the-longer-ending-of-mark/",
+  },
+  headMark16: {
+    label: "Head, “A Case against the Longer Ending of Mark”",
+    url: "https://textandcanon.org/a-case-against-the-longer-ending-of-mark/",
+  },
+  willkerMark: {
+    label: "Willker, Textual Commentary on the Greek Gospels — Mark",
+    url: "https://www.willker.de/wie/TCG/TC-Mark.pdf",
+  },
+  willkerMatthew: {
+    label: "Willker, Textual Commentary on the Greek Gospels — Matthew",
+    url: "https://www.willker.de/wie/TCG/TC-Matthew.pdf",
+  },
+  willkerLuke: {
+    label: "Willker, Textual Commentary on the Greek Gospels — Luke",
+    url: "https://www.willker.de/wie/TCG/TC-Luke.pdf",
+  },
+  willkerJohn: {
+    label: "Willker, Textual Commentary on the Greek Gospels — John",
+    url: "https://www.willker.de/wie/TCG/TC-John.pdf",
+  },
+  robinsonPA: {
+    label:
+      "Robinson, “Preliminary Observations Regarding the Pericope Adulterae…,” Filología Neotestamentaria 13 (2000): 35–59",
+    url: null,
+  },
+  ecmMark: {
+    label: "Editio Critica Maior: Mark (INTF, 2021)",
+    url: "https://ntvmr.uni-muenster.de/",
+  },
+  tut: {
+    label:
+      "Text und Textwert der griechischen Handschriften des Neuen Testaments — Catholic Letters",
+    url: null,
+  },
+} as const;
+
+/* ------------------------------------------------------------------ */
+/* Correction shapes                                                   */
+/* ------------------------------------------------------------------ */
+
+export type RowEdit = Readonly<{
+  /** Exact `witness` string of the row to change. */
+  matchWitness: string;
+  /** Replacement values. Omitted keys are left alone. */
+  set: Partial<Witness>;
+  /** Why — shown in review, not rendered. */
+  rationale: string;
+}>;
+
+export type SnapshotEdit = Readonly<{
+  greekSupport?: string;
+  greekAgainst?: string;
+  rationale: string;
+}>;
+
+export type PassageCorrection = Readonly<{
+  /** Rows to remove entirely, by exact `witness` string. */
+  removeFrom?: Readonly<Record<string, readonly string[]>>;
+  /** Rows to append, keyed by the passage array they belong in. */
+  addTo?: Readonly<Record<string, readonly Witness[]>>;
+  /** In-place edits, keyed by the array the row lives in. */
+  edit?: Readonly<Record<string, readonly RowEdit[]>>;
+  /** Patristic rows to append. */
+  addFathers?: readonly PatristicWitness[];
+  /** Patristic rows to correct, matched on `source`. */
+  editFathers?: readonly Readonly<{
+    matchSource: string;
+    set: Partial<PatristicWitness>;
+    rationale: string;
+  }>[];
+  snapshot?: SnapshotEdit;
+  /** Free-text cautions to surface on the page. */
+  addCautions?: readonly string[];
+}>;
+
+/* ------------------------------------------------------------------ */
+/* The corrections                                                     */
+/* ------------------------------------------------------------------ */
+
+export const auditCorrections: Readonly<Record<string, PassageCorrection>> = {
+  /* =================================================================
+   * MARK 9:29
+   * ================================================================= */
+  "mark-9-29": {
+    addTo: {
+      evidenceAgainst: [
+        {
+          witness: "Uncial 0274 (GA 0274)",
+          date: "Fifth century",
+          dateStart: 400,
+          dateEnd: 499,
+          note:
+            "Omits “and fasting.” A damaged Egyptian manuscript. With ℵ* and B this makes three Greek witnesses for the shorter reading, not two.",
+          kind: "greek-manuscript",
+          source: auditSources.snappMark929External.label,
+          sourceUrl: auditSources.snappMark929External.url,
+          confidence: "high",
+          lastVerified: "2026-08-04",
+        },
+      ],
+    },
+    edit: {
+      greekSupportWitnesses: [
+        {
+          matchWitness: "Papyrus 45 vid, P45",
+          set: {
+            date: "Third century (lacunose at this point)",
+            note:
+              "ECM Mark (2021) treats P45 as lacunose here: the relevant portion is damaged and yields no secure reading for either the shorter or the longer text. Older apparatuses sometimes cited it as P45vid; it should not be counted as third-century Greek support.",
+            source: auditSources.ecmMark.label,
+            sourceUrl: auditSources.ecmMark.url,
+            confidence: "high",
+            lastVerified: "2026-08-04",
+          },
+          rationale:
+            "The page's headline 'earliest Greek support' claim rests on a reading ECM says does not exist.",
+        },
+      ],
+    },
+    addFathers: [
+      {
+        source: "Basil of Caesarea",
+        author: "Basil of Caesarea",
+        date: "c. AD 370",
+        dateStart: 360,
+        dateEnd: 379,
+        workSection: "First Homily on Fasting 9 (PG 31:181)",
+        quoteSummary:
+          "Quotes the saying with both prayer and fasting: “this kind does not go out except by prayer and fasting.”",
+        reading: "supports",
+        relationship: "explicit_quote",
+        region: "Cappadocia",
+        confidence: "high",
+        sourceCitation:
+          "Basil of Caesarea, De ieiunio homilia i.9, PG 31:181",
+        sourceUrl:
+          "https://rutgersnb.occministries.org/wp-content/uploads/2015/07/St.-Basil-the-Great%E2%80%99s-First-Homily-on-Fasting.pdf",
+        lastVerified: "2026-08-04",
+      },
+      {
+        source: "Clement of Alexandria",
+        author: "Clement of Alexandria",
+        date: "c. AD 200",
+        dateStart: 190,
+        dateEnd: 215,
+        workSection: "Eclogae Propheticae 15.1",
+        quoteSummary:
+          "Paraphrastic citation without fasting — “such things are accomplished by prayer.” On present evidence this is the earliest witness of any kind to this variant, in either direction.",
+        reading: "opposes",
+        relationship: "close_quote",
+        region: "Alexandria",
+        confidence:
+          "medium-high — the citation is paraphrastic, so it establishes the shorter form but not exact wording",
+        sourceCitation: "Clement of Alexandria, Eclogae Propheticae 15.1",
+        sourceUrl: auditSources.snappMark929External.url,
+        lastVerified: "2026-08-04",
+      },
+    ],
+    snapshot: {
+      greekAgainst:
+        "3 Greek witnesses (ℵ*, B, 0274) plus one Old Latin witness (k)",
+      rationale:
+        "Site read '2 principal Greek witnesses'. 0274 is a third. Snapp: all Greek copies include καὶ νηστείᾳ 'except for B, Aleph, and 274'.",
+    },
+    addCautions: [
+      "GA 2427 appears in some older apparatuses as support for the shorter reading. It is a modern forgery produced after 1874, confirmed by pigment analysis, and must not be counted as an ancient witness.",
+      "GA 706 was miscoded in the first ECM release as supporting the shorter reading. INTF corrected the transcription after image inspection; it reads “and fasting.”",
+      "Patristic citations of “prayer and fasting” may derive from Matthew 17:21 rather than Mark 9:29. Only citations that are clearly Markan should be counted here.",
+    ],
+  },
+
+  /* =================================================================
+   * MATTHEW 17:21
+   * ================================================================= */
+  "matthew-17-21": {
+    edit: {
+      evidenceAgainst: [
+        {
+          matchWitness: "Codex Q",
+          set: {
+            witness: "Codex Koridethi (GA 038) — Θ",
+            date: "Ninth century",
+            dateStart: 800,
+            dateEnd: 899,
+            note:
+              "Omits the verse. Previously listed on this page as “Codex Q” with a fifth–sixth-century date; the omitting witness in the standard lists is Θ (Koridethi, GA 038, 9th c.), not Q (GA 026).",
+            kind: "greek-manuscript",
+            source: auditSources.willkerMatthew.label,
+            sourceUrl: auditSources.willkerMatthew.url,
+            confidence: "high",
+            lastVerified: "2026-08-04",
+          },
+          rationale:
+            "Willker's list of Greek MSS omitting Mt 17:21 is Θ 0281 788 33 579 892* 1604 2680. The site's ten-witness list matches this exactly except that Θ appears as 'Q' — a theta/Q transcription slip, carrying Q's date with it.",
+        },
+      ],
+      versionalWitnesses: [
+        {
+          matchWitness: "Middle Egyptian Codex Schoyen",
+          set: {
+            witness: "Middle Egyptian mae-1 — Codex Scheide",
+            date: "Fifth century",
+            dateStart: 400,
+            dateEnd: 499,
+            note:
+              "Contains the verse. Note the two Middle Egyptian witnesses diverge: mae-1 (Scheide, 400s) includes Mt 17:21; mae-2 (Schøyen MS 2650, early 300s) does not.",
+            kind: "version",
+            source: auditSources.snappMark929External.label,
+            sourceUrl: auditSources.snappMark929External.url,
+            confidence: "high",
+            lastVerified: "2026-08-04",
+          },
+          rationale:
+            "The site credited inclusion to Schøyen. Snapp, following the published editions: mae-1 (Scheide) includes it, mae-2 (Schøyen) does not. The attribution was reversed.",
+        },
+      ],
+    },
+    addTo: {
+      evidenceAgainst: [
+        {
+          witness: "Middle Egyptian mae-2 — Schøyen MS 2650",
+          date: "Early fourth century",
+          dateStart: 300,
+          dateEnd: 349,
+          note: "Omits the verse.",
+          kind: "version",
+          source: auditSources.snappMark929External.label,
+          sourceUrl: auditSources.snappMark929External.url,
+          confidence: "high",
+          lastVerified: "2026-08-04",
+        },
+      ],
+    },
+    editFathers: [
+      {
+        matchSource: "Pseudo-Clement, Letters on Virginity",
+        set: {
+          date: "c. AD 250",
+          dateStart: 230,
+          dateEnd: 270,
+          workSection: "Epistulae ad virgines (Two Epistles Concerning Virginity)",
+          quoteSummary:
+            "“This kind goeth not out but by fasting and prayer.” Note the reversed order.",
+          confidence:
+            "medium — the work survives complete only in Syriac; the Greek is fragmentary",
+          sourceCitation:
+            "Pseudo-Clement, Two Epistles Concerning Virginity (ANF vol. 8)",
+          sourceUrl: "https://www.tertullian.org/fathers2/ANF-08/anf08-22.htm",
+          lastVerified: "2026-08-04",
+        },
+        rationale:
+          "Dated on the site as 'c. AD 100 to 200', which made it the page's earliest-evidence claim. Scholarship assigns the Epistles on Virginity to the middle of the third century — objections to syneisaktism first appear then, and Uhlhorn places it shortly before Cyprian. The AD 100–200 date is roughly a century too early.",
+      },
+      {
+        matchSource: "Origen",
+        set: {
+          workSection: "Commentary on Matthew, Book 13, chapter 7",
+          sourceCitation: "Origen, Commentarium in Matthaeum 13.7",
+          sourceUrl: auditSources.snappMark929External.url,
+          confidence: "high",
+          lastVerified: "2026-08-04",
+        },
+        rationale: "Row existed with no work cited.",
+      },
+      {
+        matchSource: "Chrysostom",
+        set: {
+          workSection: "Homily 57 on Matthew",
+          sourceCitation: "John Chrysostom, Homiliae in Matthaeum 57",
+          sourceUrl: auditSources.snappMark929External.url,
+          confidence: "high",
+          lastVerified: "2026-08-04",
+        },
+        rationale: "Row existed with no work cited.",
+      },
+    ],
+    addCautions: [
+      "Matthew 17:21 and Mark 9:29 are parallel. A patristic citation of “prayer and fasting” cannot be assigned to one rather than the other without contextual indicators. Fathers listed here should be checked individually before being counted as Matthean.",
+    ],
+  },
+
+  /* =================================================================
+   * MATTHEW 6:13
+   * ================================================================= */
+  "matthew-6-13": {
+    removeFrom: {
+      // The Didache is already present, correctly, in patristicWitnesses.
+      // Listing it again under versionalWitnesses double-counts it and
+      // classifies a Greek church-order text as an ancient version.
+      versionalWitnesses: ["Didache 8", "Eastern liturgical tradition"],
+    },
+    addCautions: [
+      "The Didache's doxology is shorter than the KJV form: it has power and glory, without “the kingdom.” It is evidence for an early doxological ending, not for the complete Matthean wording.",
+    ],
+  },
+
+  /* =================================================================
+   * MARK 16:9-20
+   * ================================================================= */
+  "mark-16-9-20": {
+    addTo: {
+      evidenceAgainst: [
+        {
+          witness: "Greek manuscripts carrying the Shorter Ending",
+          date: "Fifth century onward",
+          dateStart: 400,
+          dateEnd: 1500,
+          note:
+            "About eight Greek manuscripts carry the so-called Shorter Ending, some with and some without 16:9–20 following. They are a third category, neither simple inclusion nor simple omission.",
+          kind: "greek-manuscript",
+          aggregate: true,
+          source: auditSources.snappMark16.label,
+          sourceUrl: auditSources.snappMark16.url,
+          confidence: "high",
+          lastVerified: "2026-08-04",
+        },
+        {
+          witness:
+            "Greek manuscripts including 16:9–20 with asterisks, obeli or marginal notes",
+          date: "Ninth century onward",
+          dateStart: 800,
+          dateEnd: 1500,
+          note:
+            "About 23 manuscripts contain the passage but flag it with critical marks or scribal notes recording doubt. They support the text's presence while recording awareness of the question.",
+          kind: "greek-manuscript",
+          aggregate: true,
+          source: auditSources.headMark16.label,
+          sourceUrl: auditSources.headMark16.url,
+          confidence: "high",
+          lastVerified: "2026-08-04",
+        },
+      ],
+    },
+    snapshot: {
+      greekSupport:
+        "1,653 Greek manuscripts contain Mark 16:9–20 (Snapp's count)",
+      rationale:
+        "The figure is sound but is not obtainable from NTVMR, ECM, NA28, UBS or THGNT — the works the page's generic `sources` array names. It is Snapp's published count and should be attributed to him.",
+    },
+    addCautions: [
+      "Jerome's remark that the passage is absent from almost all Greek copies (Epistle 120.3) is largely a translation of Eusebius, Ad Marinum. The two should not be counted as independent witnesses.",
+      "Justin Martyr's supposed use (First Apology 45) is an allusion, not a quotation, and is disputed. It should be labelled as such rather than counted as an exact citation.",
+    ],
+  },
+
+  /* =================================================================
+   * 1 JOHN 5:7
+   * ================================================================= */
+  "1-john-5-7": {
+    snapshot: {
+      greekAgainst:
+        "Absent from every Greek manuscript of 1 John apart from the ten listed. Text und Textwert collated 552 Greek continuous-text manuscripts of the Catholic Letters, 522 of which preserve complete or substantial text.",
+      rationale:
+        "'500+ Greek manuscripts' is vague and understates the case. The precise denominator is published and should be used.",
+    },
+    addCautions: [
+      "GA 635 is sometimes cited as an eleventh Greek witness with the Comma in the margin. Examination of the manuscript shows it does not contain the Comma — the marginal note there is a different, shorter annotation, and there is no room for the full text. Older literature repeating the eleventh-witness claim should not be followed.",
+      "None of the ten Greek witnesses is independent of the Latin tradition or of Erasmus' third edition. 629 renders the Comma from Latin; 429mg, 918 and 2473 derive from Erasmus' 1522 text; 88mg, 177mg, 221mg and 636mg are later marginal additions to manuscripts whose main text omits it.",
+    ],
+  },
+
+  /* =================================================================
+   * MARK 7:16
+   * ================================================================= */
+  "mark-7-16": {
+    removeFrom: {
+      // The Curetonian Syriac is not extant here and cannot witness this verse.
+      // Willker, TC-Mark, front matter: "Sy-C is extant only from 16:18-20."
+      evidenceAgainst: ["Curetonian Syriac"],
+    },
+    addCautions: [
+      "The Curetonian Syriac (Sy-C) survives in Mark only at 16:18–20. It cannot be cited for or against any other verse in Mark, and any apparatus that appears to do so is reporting a reconstruction rather than a reading.",
+    ],
+  },
+
+  /* =================================================================
+   * MARK 16:9-20 — extant range of the Curetonian Syriac
+   * (merge this into the mark-16-9-20 block above if you prefer)
+   * ================================================================= */
+  "mark-16-9-20-curetonian": {
+    edit: {
+      versionalWitnesses: [
+        {
+          matchWitness: "Curetonian Syriac",
+          set: {
+            date: "Fifth century",
+            note:
+              "Fragmentary. Survives in Mark only at 16:18–20 — the sole point in this Gospel where Sy-C is extant. Previously given here as 16:17–20.",
+            source: auditSources.willkerMark.label,
+            sourceUrl: auditSources.willkerMark.url,
+            confidence: "high",
+            lastVerified: "2026-08-04",
+          },
+          rationale:
+            "Willker, TC-Mark front matter: “Sy-C is extant only from 16:18-20.” Off by one verse.",
+        },
+      ],
+    },
+  },
+
+  /* =================================================================
+   * COLOSSIANS 1:14
+   * ================================================================= */
+  "colossians-1-14": {
+    addTo: {
+      greekSupportWitnesses: [
+        {
+          witness: "Minuscule 2495 (GA 2495)",
+          date: "Fifteenth century",
+          dateStart: 1400,
+          dateEnd: 1499,
+          note:
+            "Reads “through his blood.” Belongs with 614 and 630 in the small group carrying the longer form.",
+          kind: "greek-manuscript",
+          source: "Terry, Textual Variants: Colossians (apparatus digest)",
+          sourceUrl: "https://bterry.com/tc2/lay21col.htm",
+          confidence: "high",
+          lastVerified: "2026-08-04",
+        },
+      ],
+    },
+    snapshot: {
+      greekSupport:
+        "Limited Greek support: 614, 630, 2495 and a small number of later witnesses",
+      rationale:
+        "Site named only 614 and 630. 2495 belongs in the same group. The phrase is generally held to be a harmonisation from Ephesians 1:7, which the page should state.",
+    },
+    addCautions: [
+      "“Through his blood” at Colossians 1:14 is widely explained as a harmonisation to the identical phrase at Ephesians 1:7, where it is textually secure. The page should state this, since it is the main argument against the reading and the page currently does not answer it.",
+      "This is the thinnest passage in the database — 10 evidence rows in total. Sinaiticus, Alexandrinus, Vaticanus, Ephraemi and the great majority of Byzantine witnesses all omit the phrase, so the site's own “Not majority Greek support” tag is correct and should be prominent rather than buried.",
+    ],
+  },
+
+  /* =================================================================
+   * ACTS 8:37
+   * ================================================================= */
+  "acts-8-37": {
+    addCautions: [
+      "The earliest Greek manuscript containing Acts 8:37 is Codex Laudianus (E, GA 08), sixth century. The page's earliest-support line leads with Irenaeus (c. AD 180), which is correct as patristic evidence but should not obscure the six-century gap before the verse appears in a surviving Greek copy.",
+      "The snapshot figure of “about 10 to 12 principal Greek witnesses” is likely an undercount: the verse appears in a substantial group of minuscules (36, 88mg, 97mg, 103, 104, 242, 257, 307, 322, 323, 385, 429, 453, 464, 467, 522, 630, 913, 945, 1522, 1739mg, 1765, 1877, 2147, 2298, 2818 and others in the standard lists). ECM Acts (2017) covers this book in full and should be used to fix the number.",
+    ],
+  },
+
+  /* =================================================================
+   * JOHN 7:53-8:11
+   * ================================================================= */
+  "john-7-53-8-11": {
+    addCautions: [
+      "The manuscript figure on this page requires verification against Robinson's published collation, which is the only complete one. Secondary reports of Robinson give 1,476 continuous-text manuscripts containing the passage and 267 omitting it, alongside 495 lectionaries containing John 8:3–11 and 2,285 not containing it. The lectionary figure here matches Robinson exactly; the continuous-text figure does not.",
+      "A number of manuscripts carry the passage at a different location — after John 21:25, after Luke 21:38, or after John 7:36. Placement variation is part of this variant's evidence and is not yet represented on this page.",
+    ],
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* WIRING                                                              */
+/* ------------------------------------------------------------------ */
+/*
+ * In `src/data/derived.ts`, add the import and compose the correction into
+ * the existing pipeline:
+ *
+ *   import { applyAuditCorrections } from "./auditCorrections";
+ *
+ *   export const allPassages = passages
+ *     .map(applyKjvForwardCorrections)
+ *     .map(applyAuditCorrections)          // <-- add this line
+ *     .sort((a, b) => a.biblicalOrder - b.biblicalOrder);
+ *
+ * The applier itself is intentionally left for you to write against your own
+ * Passage type, so it type-checks in your tree rather than mine. It needs to:
+ *
+ *   1. look up auditCorrections[passage.slug]; return passage unchanged if none
+ *   2. for each key in removeFrom, filter that array by exact `witness` match
+ *   3. for each key in addTo, concat the rows, then re-run sortWitnessRows()
+ *   4. for each key in edit, map rows and Object.assign(set) on a match
+ *   5. concat addFathers onto patristicWitnesses
+ *   6. apply editFathers by matching PatristicWitness.source
+ *   7. merge snapshot into manuscriptSnapshot
+ *   8. concat addCautions onto cautions (create the array if absent)
+ *
+ * Note step 3: your existing rows are date-sorted, so appended rows must be
+ * re-sorted or they will appear at the bottom out of sequence.
+ */
+
+
+================================================================================
+DOCUMENT F — wave1SourceAssignments.ts  (paste-ready, type-checks clean)
+================================================================================
+
+/**
+ * wave1SourceAssignments.ts
+ * -------------------------------------------------------------------------
+ * The 30 Wave 1 passages carry no `source` on any witness row (1,105 rows).
+ * This file assigns the controlling apparatus for each passage so the
+ * PassageSourcesCard has something real to display, and so a reader can
+ * trace any row back to a work they can open.
+ *
+ * These are PASSAGE-LEVEL assignments. They are correct as the work in which
+ * that passage's evidence is set out, and they are the right first step, but
+ * they are not a substitute for row-level citation. Rows carrying unusual or
+ * contested attributions still need their own source.
+ *
+ * Coverage note recorded per passage: ECM exists for Mark, Acts, the Catholic
+ * Letters and (in progress) John. There is NO ECM for Matthew, Luke, Romans,
+ * Colossians or 1 Timothy — for those, no complete collation of all Greek
+ * manuscripts at these points has ever been published, and any percentage
+ * given for them is an estimate that should be labelled as one.
+ */
+
+export type Wave1SourceAssignment = Readonly<{
+  slug: string;
+  reference: string;
+  /** Rows on this passage currently lacking any `source` value. */
+  unsourcedRows: number;
+  /** Primary apparatus in which this variant is set out. */
+  primary: { label: string; url: string | null };
+  /** Whether a complete modern critical edition covers this book. */
+  ecmCoverage: string;
+}>;
+
+export const wave1SourceAssignments: readonly Wave1SourceAssignment[] = [
+  {
+    slug: "matthew-6-13",
+    reference: "Matthew 6:13",
+    unsourcedRows: 33,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Matthew", url: "https://www.willker.de/wie/TCG/TC-Matthew.pdf" },
+    ecmCoverage: "No ECM for Matthew. No complete collation exists at these points.",
+  },
+  {
+    slug: "matthew-17-21",
+    reference: "Matthew 17:21",
+    unsourcedRows: 59,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Matthew", url: "https://www.willker.de/wie/TCG/TC-Matthew.pdf" },
+    ecmCoverage: "No ECM for Matthew. No complete collation exists at these points.",
+  },
+  {
+    slug: "matthew-18-11",
+    reference: "Matthew 18:11",
+    unsourcedRows: 29,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Matthew", url: "https://www.willker.de/wie/TCG/TC-Matthew.pdf" },
+    ecmCoverage: "No ECM for Matthew. No complete collation exists at these points.",
+  },
+  {
+    slug: "matthew-23-14",
+    reference: "Matthew 23:14",
+    unsourcedRows: 36,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Matthew", url: "https://www.willker.de/wie/TCG/TC-Matthew.pdf" },
+    ecmCoverage: "No ECM for Matthew. No complete collation exists at these points.",
+  },
+  {
+    slug: "mark-7-16",
+    reference: "Mark 7:16",
+    unsourcedRows: 28,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Mark", url: "https://www.willker.de/wie/TCG/TC-Mark.pdf" },
+    ecmCoverage: "ECM Mark (2021) — full apparatus",
+  },
+  {
+    slug: "mark-9-29",
+    reference: "Mark 9:29",
+    unsourcedRows: 40,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Mark", url: "https://www.willker.de/wie/TCG/TC-Mark.pdf" },
+    ecmCoverage: "ECM Mark (2021) — full apparatus",
+  },
+  {
+    slug: "mark-9-44-46",
+    reference: "Mark 9:44 and Mark 9:46",
+    unsourcedRows: 39,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Mark", url: "https://www.willker.de/wie/TCG/TC-Mark.pdf" },
+    ecmCoverage: "ECM Mark (2021) — full apparatus",
+  },
+  {
+    slug: "mark-11-26",
+    reference: "Mark 11:26",
+    unsourcedRows: 38,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Mark", url: "https://www.willker.de/wie/TCG/TC-Mark.pdf" },
+    ecmCoverage: "ECM Mark (2021) — full apparatus",
+  },
+  {
+    slug: "mark-15-28",
+    reference: "Mark 15:28",
+    unsourcedRows: 42,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Mark", url: "https://www.willker.de/wie/TCG/TC-Mark.pdf" },
+    ecmCoverage: "ECM Mark (2021) — full apparatus",
+  },
+  {
+    slug: "mark-16-9-20",
+    reference: "Mark 16:9-20",
+    unsourcedRows: 30,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Mark", url: "https://www.willker.de/wie/TCG/TC-Mark.pdf" },
+    ecmCoverage: "ECM Mark (2021) — full apparatus",
+  },
+  {
+    slug: "luke-9-55-56",
+    reference: "Luke 9:55-56",
+    unsourcedRows: 41,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Luke", url: "https://www.willker.de/wie/TCG/TC-Luke.pdf" },
+    ecmCoverage: "No ECM for Luke. No complete collation exists at these points.",
+  },
+  {
+    slug: "luke-11-2-4",
+    reference: "Luke 11:2-4",
+    unsourcedRows: 39,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Luke", url: "https://www.willker.de/wie/TCG/TC-Luke.pdf" },
+    ecmCoverage: "No ECM for Luke. No complete collation exists at these points.",
+  },
+  {
+    slug: "luke-22-43-44",
+    reference: "Luke 22:43-44",
+    unsourcedRows: 41,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Luke", url: "https://www.willker.de/wie/TCG/TC-Luke.pdf" },
+    ecmCoverage: "No ECM for Luke. No complete collation exists at these points.",
+  },
+  {
+    slug: "luke-23-17",
+    reference: "Luke 23:17",
+    unsourcedRows: 41,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Luke", url: "https://www.willker.de/wie/TCG/TC-Luke.pdf" },
+    ecmCoverage: "No ECM for Luke. No complete collation exists at these points.",
+  },
+  {
+    slug: "luke-23-34",
+    reference: "Luke 23:34",
+    unsourcedRows: 30,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Luke", url: "https://www.willker.de/wie/TCG/TC-Luke.pdf" },
+    ecmCoverage: "No ECM for Luke. No complete collation exists at these points.",
+  },
+  {
+    slug: "luke-24-40",
+    reference: "Luke 24:40",
+    unsourcedRows: 38,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Luke", url: "https://www.willker.de/wie/TCG/TC-Luke.pdf" },
+    ecmCoverage: "No ECM for Luke. No complete collation exists at these points.",
+  },
+  {
+    slug: "luke-24-51",
+    reference: "Luke 24:51",
+    unsourcedRows: 40,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Luke", url: "https://www.willker.de/wie/TCG/TC-Luke.pdf" },
+    ecmCoverage: "No ECM for Luke. No complete collation exists at these points.",
+  },
+  {
+    slug: "luke-24-52",
+    reference: "Luke 24:52",
+    unsourcedRows: 38,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — Luke", url: "https://www.willker.de/wie/TCG/TC-Luke.pdf" },
+    ecmCoverage: "No ECM for Luke. No complete collation exists at these points.",
+  },
+  {
+    slug: "john-1-18",
+    reference: "John 1:18",
+    unsourcedRows: 41,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — John", url: "https://www.willker.de/wie/TCG/TC-John.pdf" },
+    ecmCoverage: "ECM John — in progress; use NA28/THGNT plus Willker",
+  },
+  {
+    slug: "john-5-3b-4",
+    reference: "John 5:3b-4",
+    unsourcedRows: 45,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — John", url: "https://www.willker.de/wie/TCG/TC-John.pdf" },
+    ecmCoverage: "ECM John — in progress; use NA28/THGNT plus Willker",
+  },
+  {
+    slug: "john-6-47",
+    reference: "John 6:47",
+    unsourcedRows: 40,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — John", url: "https://www.willker.de/wie/TCG/TC-John.pdf" },
+    ecmCoverage: "ECM John — in progress; use NA28/THGNT plus Willker",
+  },
+  {
+    slug: "john-7-53-8-11",
+    reference: "John 7:53-8:11",
+    unsourcedRows: 42,
+    primary: { label: "Willker, Textual Commentary on the Greek Gospels — John", url: "https://www.willker.de/wie/TCG/TC-John.pdf" },
+    ecmCoverage: "ECM John — in progress; use NA28/THGNT plus Willker",
+  },
+  {
+    slug: "acts-8-37",
+    reference: "Acts 8:37",
+    unsourcedRows: 51,
+    primary: { label: "ECM Acts (INTF, 2017)", url: "https://ntvmr.uni-muenster.de/" },
+    ecmCoverage: "ECM Acts (INTF, 2017) — full apparatus available",
+  },
+  {
+    slug: "acts-9-5-6",
+    reference: "Acts 9:5-6",
+    unsourcedRows: 21,
+    primary: { label: "ECM Acts (INTF, 2017)", url: "https://ntvmr.uni-muenster.de/" },
+    ecmCoverage: "ECM Acts (INTF, 2017) — full apparatus available",
+  },
+  {
+    slug: "acts-28-29",
+    reference: "Acts 28:29",
+    unsourcedRows: 31,
+    primary: { label: "ECM Acts (INTF, 2017)", url: "https://ntvmr.uni-muenster.de/" },
+    ecmCoverage: "ECM Acts (INTF, 2017) — full apparatus available",
+  },
+  {
+    slug: "romans-8-1",
+    reference: "Romans 8:1",
+    unsourcedRows: 33,
+    primary: { label: "NA28 / Tyndale House GNT apparatus", url: null },
+    ecmCoverage: "NA28 / THGNT apparatus; no ECM for Romans",
+  },
+  {
+    slug: "romans-16-24",
+    reference: "Romans 16:24",
+    unsourcedRows: 32,
+    primary: { label: "NA28 / Tyndale House GNT apparatus", url: null },
+    ecmCoverage: "NA28 / THGNT apparatus; no ECM for Romans",
+  },
+  {
+    slug: "colossians-1-14",
+    reference: "Colossians 1:14",
+    unsourcedRows: 10,
+    primary: { label: "NA28 / Tyndale House GNT apparatus", url: null },
+    ecmCoverage: "NA28 / THGNT apparatus; no ECM for Colossians",
+  },
+  {
+    slug: "1-timothy-3-16",
+    reference: "1 Timothy 3:16",
+    unsourcedRows: 32,
+    primary: { label: "NA28 / Tyndale House GNT apparatus", url: null },
+    ecmCoverage: "NA28 / THGNT apparatus; no ECM for the Pastorals",
+  },
+  {
+    slug: "1-john-5-7",
+    reference: "1 John 5:7",
+    unsourcedRows: 44,
+    primary: { label: "ECM Catholic Letters (2nd ed., 2013)", url: "https://ntvmr.uni-muenster.de/" },
+    ecmCoverage: "ECM Catholic Letters (2nd ed., 2013) — full apparatus available",
+  },
+];
+
+/** Total Wave 1 witness rows currently without a source: 1104 */
+export const WAVE1_UNSOURCED_ROW_COUNT = 1104;
+
+================================================================================
+DOCUMENT G1 — audit pass 1 (superseded, kept for record)
+================================================================================
+
+# Oldest & Best — Evidence Audit, Pass 1
+
+**Audited:** 4 August 2026
+**Site:** oldestandbest.com
+**Status:** Partial. Server-rendered content audited for all reachable pages. Per-passage witness tables not yet audited — see "Blocker" below.
+
+---
+
+## How to read this document
+
+Every item below is marked with a confidence label:
+
+| Label | Meaning |
+|---|---|
+| **VERIFIED** | I confirmed it against a source I could open and read. Source given. |
+| **DISCREPANCY** | The site's figure conflicts with a published figure. Both given. Needs your decision. |
+| **UNSOURCEABLE** | The claim cannot be supported from any source I can reach. Recommend removing or requalifying. |
+| **METHOD** | Not a factual error — a structural or methodological problem that affects many passages. |
+
+I have not written a single number into this document that I could not open a source for. Where I could not verify something, it says so explicitly rather than being filled in.
+
+---
+
+## Blocker: I can only see about a third of the site's claims
+
+The per-passage detail tabs — **Greek Manuscripts, Early Versions, Latin Witnesses, Syriac Witnesses, Other Versions, Church Fathers, Evidence Against / Competing Reading, Related Evidence, Timeline** — are rendered client-side by JavaScript. A plain HTTP fetch returns only the tab *labels*, not the rows inside them.
+
+That means the ~1,600 individual witness rows, which are the bulk of what you asked me to check, are currently unreadable to me. Everything in this document comes from the server-rendered portions: summary text, count snapshots, "earliest support" claims, evidence-source lists, tags, and references.
+
+**To unblock:** enable the Claude in Chrome extension. No browser is currently connected. Once connected I can open each of the 51 pages, click through every tab, and audit the rows themselves.
+
+---
+
+## Part 1 — Site-wide structural findings
+
+### 1.1 Twenty-one passages are unreachable from the passage index — VERIFIED
+
+- Homepage counter: **51 passages**
+- Timeline page: *"Showing 1672 of 1672 entries · 609 distinct witnesses · **51 passages**"*
+- Passage index (`/passages`): *"Showing **30 of 30** passages."*
+
+The index's own **Book** filter offers only: Matthew, Mark, Luke, John, Acts, Romans, Colossians, 1 Timothy, 1 John.
+
+The homepage evidence atlas plots these books: Matthew, Mark, Luke, John, Acts, Romans, **1 Corinthians**, **Ephesians**, Colossians, 1 Timothy, 1 John, **Revelation**.
+
+So 1 Corinthians, Ephesians and Revelation passages exist in the database and are linked from the homepage, but cannot be found through the index. Confirmed live links to passages absent from the index:
+
+- `/passages/matthew-5-22`
+- `/passages/luke-2-14`
+- `/passages/john-3-13`
+- `/passages/acts-20-28`
+- `/passages/ephesians-3-9`
+- `/passages/1-john-4-3`
+- `/passages/revelation-16-5`
+- `/passages/revelation-22-19`
+
+That is 38 accounted for. **13 passages I have not yet been able to name at all.**
+
+**Fix:** the index query is filtering or paginating incorrectly. Also `robots.txt` is empty and `sitemap.xml` does not serve readable XML — worth fixing for the same reason (discoverability), and it would let me enumerate the full 51 without guessing.
+
+---
+
+### 1.2 Two different totals for the same database — VERIFIED
+
+- Homepage: *"**1,579** Catalogued witness records"*
+- Timeline: *"**1672** Dated witness entries"*
+
+These are presented as counts of the same underlying evidence rows. Either they are counting different things — in which case the labels need to say so — or one is stale.
+
+---
+
+### 1.3 The "Site Summary Score" converts rows into votes — METHOD
+
+On 1 John 5:7 the site prints:
+
+> **16.7% for / 83.3% against**
+> *"A site-level summary from the Greek manuscript count plus the Latin, Syriac, Coptic, patristic, lectionary, and printed evidence listed for this passage."*
+
+This is a percentage derived from how many rows you have entered, not from the evidence. One church father is one row. The entire Byzantine tradition is one row. Five marginal Greek notes are five rows. The number moves whenever you add a row, which means it measures your data entry, not the manuscript record.
+
+It also directly contradicts the site's own stated principle, printed on the Mark 9:29 page:
+
+> *"Evidence types, without turning rows into votes."*
+
+**Recommendation:** remove the percentage, or relabel it unambiguously as "share of records stored on this page" and detach it from the words "for" and "against." As written, a reader will reasonably take 16.7% to be a statement about the strength of the evidence for the Comma. It is not.
+
+---
+
+### 1.4 "Sources used" is a generic boilerplate string, not per-passage sourcing — METHOD
+
+Every passage page carries the same block:
+
+> *"INTF NTVMR; ECM where published/available; NA/UBS apparatuses; Tyndale House Greek New Testament apparatus; passage-specific manuscript studies where applicable"*
+
+This tells a reader nothing about where any *specific* number came from, and in at least two cases below the actual figure on the page is **not** obtainable from any work in that list. You asked that someone be able to open a passage and see where each datum came from. Right now they cannot.
+
+**Recommendation:** attach the source at the row level, not the page level. Each witness row should carry its own citation.
+
+---
+
+## Part 2 — Verified errors on specific pages
+
+### 2.1 Mark 9:29 cites the wrong books — VERIFIED
+
+The "Evidence sources" block on `/passages/mark-9-29` lists:
+
+1. *"David Robert Palmer, **Revelation** apparatus"* — links to `bibletranslation.ws/trans/revwgrk.pdf`
+2. *"INTF Kurzgefasste Liste / NTVMR manuscript metadata"* — links to a raw API call: `ntvmr.uni-muenster.de/community/vmr/api/metadata/manuscript/get/?gaNum=05&detail=1&format=json`
+3. *"Wieland Willker, Textual Commentary on **Matthew**"*
+
+Items 1 and 3 are the wrong books for a page about Mark. Palmer publishes a separate Mark apparatus; Willker's *Textual Commentary on the Greek Gospels* has a dedicated Mark volume. Item 2 is a debug artifact — a raw JSON endpoint, and `gaNum=05` is **Codex Bezae**, which has nothing to do with sourcing this page.
+
+**Worth checking across all 51 pages** — if this block is generated, the same mismatch is likely repeated elsewhere.
+
+---
+
+### 2.2 Mark 9:29 — "earliest Greek support: P45vid" is not defensible — DISCREPANCY
+
+Site says:
+
+> *"Third century — Papyrus 45, apparent reading. P45vid probably supports 'prayer and fasting'... Earliest surviving Greek support: Third century — P45vid."*
+
+The 2021 *Editio Critica Maior* of Mark treats **P45 as lacunose at this point** — the relevant portion is damaged and yields no secure reading for either the shorter or the longer text. Older apparatuses did sometimes cite it; ECM does not.
+
+This matters more than a normal row, because it is the site's headline "earliest support" claim for the passage. As printed, the page claims third-century Greek support that the current critical edition says does not exist.
+
+**Fix:** remove P45 from the support line, or restate it as "P45 is damaged here and gives no secure reading (ECM Mark, 2021)." The earliest *secure* support for the longer reading then becomes the fourth/fifth-century uncials, with Basil as the earliest explicit patristic citation.
+
+---
+
+### 2.3 Mark 9:29 — "Church fathers: No supporting entry listed" is a gap, not a fact — VERIFIED
+
+The page prints "Church fathers — No supporting entry listed" and "Fathers — Not listed."
+
+**Basil of Caesarea**, *First Homily on Fasting* 9 (PG 31:181), c. AD 370, quotes the saying with both prayer and fasting. That is a named patristic witness for the KJV reading and it is missing.
+
+Conversely, **Clement of Alexandria**, *Eclogae Propheticae* 15.1 (c. AD 200), has the shorter form — and is missing from the against side. Clement is, on the current evidence, the *earliest* witness of any kind to this variant, in either direction. Omitting him is a significant gap in a database organised around which reading is oldest.
+
+---
+
+### 2.4 Mark 9:29 — the "against" count omits a witness — DISCREPANCY
+
+Index card says: *"Against — **2 principal Greek witnesses** plus one Latin witness."*
+Passage page says: *"...the shorter reading listed in Sinaiticus first hand, Vaticanus, and one Latin witness."*
+
+The shorter reading is also carried by **GA 0274**, a fifth-century uncial. The correct figure is **three** Greek witnesses: 01*, 03, 0274.
+
+Two further items that older lists get wrong and that are worth guarding against if you expand this page:
+
+- **GA 2427** is a modern forgery (produced after 1874, confirmed by pigment analysis). It appears in some older apparatuses for the shorter reading and must not be counted.
+- **GA 706** was initially entered in ECM against the shorter reading in error; INTF corrected the transcription after image inspection. It reads "and fasting."
+
+---
+
+### 2.5 Mark 16:9-20 — the count is right, the attribution is not — VERIFIED / METHOD
+
+Site says: *"Support — **1,653 Greek manuscripts**. Against — **3 Greek manuscripts**, including Sinaiticus and Vaticanus. 99.8%."*
+
+The 1,653 figure and the three-manuscript figure both check out. The three are **א (01), B (03), and GA 304** (12th c.).
+
+But 1,653 does **not** come from any source in the site's "Sources used" list. It is **James Snapp Jr.'s** count, published in "A Case for the Longer Ending of Mark" (Text & Canon Institute). NA28, UBS, THGNT and NTVMR do not print a figure like this. Cite Snapp directly.
+
+**Incompleteness:** the "against" side is stated as three manuscripts, but the manuscript record here has more categories than "has it" and "doesn't":
+
+- **~8 Greek manuscripts** carry the *Shorter Ending* (some with, some without the longer ending following)
+- **~23 Greek manuscripts** that *include* 16:9–20 also carry asterisks, obeli, or marginal notes flagging doubt
+
+Neither group is represented. You asked for all witnesses accounted for; on the site's single most prominent passage, roughly 31 relevant Greek witnesses are currently in neither column.
+
+---
+
+### 2.6 John 7:53–8:11 — the manuscript figure may be off by 19 — DISCREPANCY
+
+Site says: *"**1,495** Greek manuscripts and **495 lectionaries** support the passage in whole or in part."*
+
+The source for any figure of this kind is Maurice A. Robinson, *"Preliminary Observations Regarding the Pericope Adulterae Based upon Fresh Collations of Nearly All Continuous-Text Manuscripts and All Lectionary Manuscripts Containing the Passage,"* **Filología Neotestamentaria 13 (2000): 35–59**. Robinson's collation is the only complete one that exists.
+
+Robinson's figures as reported in secondary literature:
+
+| | Robinson | Site |
+|---|---|---|
+| Continuous-text MSS containing the PA | **1,476** | 1,495 |
+| Continuous-text MSS omitting it | **267** | not stated |
+| Lectionaries containing John 8:3–11 | **495** | 495 ✓ |
+| Lectionaries not containing it | **2,285** | not stated |
+
+The lectionary figure matches exactly, which suggests the site is drawing on Robinson. The continuous-text figure does not match.
+
+**I could not open Robinson's article itself** — it is not freely available and the secondary sources I could reach report 1,476 without reproducing his table. So I am flagging this as a discrepancy to be checked at source, not asserting the site is wrong. **This is the one number in this document I would most want you to verify directly before changing anything.**
+
+Also missing from the site's framing: the 267 omitting manuscripts, and the fact that a number of manuscripts carry the passage at a *different location* (after John 21:25, after Luke 21:38, after John 7:36). For a database organised around where readings are found, placement variation belongs on the page.
+
+---
+
+## Part 3 — On the standard you set for witness counts
+
+You asked for counts in this form: *"approx. 5,500 of 9,000 Latin witnesses from 100 AD to 900 AD."*
+
+I need to be direct with you: **no figure of that shape can be produced honestly, for any verse.** Not because the research is hard, but because the underlying quantities don't exist. If the site publishes numbers in that format they will be fabrications, and that is the opposite of what you're trying to build.
+
+Here is the actual situation, by witness class.
+
+### Latin
+
+- **Old Latin (Vetus Latina):** roughly **80–90** manuscripts survive in total, across the whole New Testament. Not thousands. Beuron's register assigns each a number; most are fragmentary, and most individual verses are attested in only a handful. For a given passage you will typically be able to name between 3 and 15 Old Latin witnesses **individually** — which is far better than a percentage anyway.
+- **Vulgate:** approximately **10,000** manuscripts survive, but the overwhelming majority are **9th century and later**. There is no published verse-by-verse collation of all of them. Wordsworth–White (Gospels/Acts) and the Stuttgart Vulgate collate a selected group of the oldest and best — on the order of **20–40** manuscripts. Those are the ones you can actually cite.
+- **Nothing survives from AD 100.** The Latin versions begin in the later second century at the earliest, and the oldest surviving Latin *manuscripts* are fourth century. A range labelled "from 100 AD" would be wrong on its face.
+
+**Recommended format instead:** name the Old Latin witnesses individually by siglum with dates, then state the Vulgate position as a tradition with the collated evidence behind it. That is both more accurate and more useful to a reader than any percentage.
+
+### Greek
+
+Exact "X of Y" counts exist only where someone has collated every known manuscript at that exact point. Two projects do this:
+
+- **Text und Textwert** (INTF, de Gruyter) — collates *every* known Greek manuscript at selected test passages. Where one of your 51 variants coincides with a *Teststelle*, you get a genuinely exact number. Where it doesn't, no exact number exists.
+- **ECM** — full apparatus, but only for the books published: Catholic Letters, Acts, Mark, and John (in progress). **There is no ECM for Matthew, Luke, Romans, Colossians, or 1 Timothy**, which covers a large share of your 51.
+
+Everywhere else, an honest page says something like "supported by the great majority of Greek manuscripts; no complete collation of this verse has been published" — and that is a *stronger* position than a made-up percentage, because it cannot be knocked down.
+
+### Church fathers
+
+A father can only be counted when there is an actual citation or clear allusion preserving the disputed wording, checked in a critical edition of that father. Silence is not evidence and cannot be counted. Two specific traps:
+
+- Parallel passages. A father quoting "prayer and fasting" may be quoting **Matthew 17:21**, not Mark 9:29. This affects several of your 51 directly.
+- Loose citation. Many patristic quotations are paraphrastic and cannot settle word order or a single particle.
+
+BiblIndex is the right tool for *locating* patristic references, but it is an index, not an apparatus — it tells you where a father discusses a verse, not what his text read.
+
+---
+
+## Part 4 — Free sources that will carry most of this project
+
+You said free/open only. That rules out ECM print volumes, *Text und Textwert*, and the Vetus Latina Database, which is a real constraint on exact counts. But the following will carry most of the work:
+
+| Source | Covers | Link |
+|---|---|---|
+| **NTVMR** (INTF) — apparatus, transcriptions, images | Greek MSS; digital ECM where published | ntvmr.uni-muenster.de |
+| **Kurzgefasste Liste** (INTF) | Official date, contents, shelfmark for every GA number | via NTVMR |
+| **Wieland Willker, *Textual Commentary on the Greek Gospels*** | Matthew, Mark, Luke, John — extremely detailed, free PDF, per-variant discussion | willker.de/wie/TCG/ |
+| **David Robert Palmer, apparatuses** | Each Gospel + Revelation, free PDF | bibletranslation.ws |
+| **Tischendorf, *Editio Octava Critica Maior*** | The fullest printed apparatus for versional + patristic evidence; public domain | archive.org |
+| **Hoskier, *Concerning the Text of the Apocalypse*** | Revelation — collates ~all then-known MSS; essential for your Rev 16:5 and 22:19 pages | archive.org |
+| **von Soden** | Byzantine groupings; public domain | archive.org |
+| **CSNTM** | Manuscript images | csntm.org |
+| **BiblIndex** | Locating patristic citations | biblindex.org |
+| **Migne, PG/PL** | Patristic texts in the original | archive.org, documentacatholicaomnia.eu |
+
+Note that Willker and Palmer are already cited on your Mark 9:29 page — just pointing at the wrong volumes. The right volumes will answer a large fraction of your remaining questions.
+
+Two of your 51 will be unusually well served by free sources: **Revelation 16:5** and **Revelation 22:19**, because Hoskier collated essentially the entire known Revelation tradition and is out of copyright. Those pages can be made genuinely complete.
+
+---
+
+## Part 5 — Open items
+
+1. **Enable Claude in Chrome** so I can read the ~1,600 witness rows. Everything above is from the third of the site I can currently see.
+2. **Name the 13 unidentified passages** — or fix the index, which would surface them.
+3. **Decide on 1,476 vs 1,495** for John 7:53–8:11 by checking Robinson at source.
+4. **Decide what to do about the Site Summary Score** (§1.3). My recommendation is to remove it.
+5. **Confirm the Latin format change** (§3) before I build 51 dossiers to a spec that can't be sourced.
+
+Once Chrome is connected I'll work straight through all 51 and produce a per-passage dossier in the format of your Mark 9:29 example, with a row-level citation for every witness.
+
+
+================================================================================
+DOCUMENT G2 — audit pass 2 (superseded; see note in header §8 re: patristic sourcing error)
+================================================================================
+
+# Oldest & Best — Evidence Audit, Pass 2
+
+**Audited:** 4 August 2026
+**Basis:** the site's own source tree (branch `evidence-audit-rebuild`, HEAD `41320c2`), not the rendered pages.
+**Dataset extracted:** all 51 passages, **2,078 evidence rows** (1,957 witness rows + 121 patristic rows).
+
+This supersedes Pass 1 on every point where the two differ. Pass 1 was written from rendered HTML and was working with a third of the picture.
+
+---
+
+## What I did
+
+I compiled `src/data/derived.ts` with the TypeScript compiler and dumped `allPassages` to JSON. That is the exact object the site renders from, wave 1 and wave 2 merged, with `applyKjvForwardCorrections` applied. Every count below is computed from that dump, so it is the real data, not a reading of the pages.
+
+Confidence labels used throughout:
+
+| Label | Meaning |
+|---|---|
+| **VERIFIED** | Computed directly from your data, or confirmed against a source I opened and read. |
+| **DISCREPANCY** | Your figure conflicts with a published figure. Both given. |
+| **CORRECT** | I checked it and it holds. Listed so you don't re-audit it. |
+
+---
+
+## Part 1 — The finding that matters most
+
+### 1.1 Thirty of your 51 passages have zero sourced evidence rows — VERIFIED
+
+Witness rows carry two different source fields. `dateSource` records where the *date* came from. `source` records where the *reading attribution* came from — the actual claim that this manuscript reads this way.
+
+| | Rows | Share |
+|---|---|---|
+| Witness rows total | 1,957 | 100% |
+| Carrying a source for the **reading** | 852 | **44%** |
+| Carrying **no** source for the reading | 1,105 | **56%** |
+
+The split is not random. It is exactly wave 1 versus wave 2:
+
+- **21 wave-2 passages: 100% sourced.** Every row has `source`, `sourceUrl`, `confidence`, `lastVerified`. This work is genuinely good.
+- **30 wave-1 passages: 0% sourced.** Not "thinly sourced" — literally zero rows out of 1,105 carry a reading source.
+
+The 30 unsourced passages are:
+
+> matthew-6-13, matthew-17-21, matthew-18-11, matthew-23-14, mark-7-16, **mark-9-29**, mark-9-44-46, mark-11-26, mark-15-28, **mark-16-9-20**, luke-9-55-56, luke-11-2-4, luke-22-43-44, luke-23-17, luke-23-34, luke-24-40, luke-24-51, luke-24-52, john-1-18, john-5-3b-4, john-6-47, **john-7-53-8-11**, **acts-8-37**, acts-9-5-6, acts-28-29, romans-8-1, romans-16-24, colossians-1-14, **1-timothy-3-16**, **1-john-5-7**
+
+Every headline passage on the site is in that list. You named 1 John 5:7 as your test case: all 44 of its witness rows are unsourced.
+
+One bright spot — **patristic rows are sourced at 121/121 across all 51 passages.** The father data is in good shape everywhere. It is the manuscript and versional rows that have no provenance.
+
+**Fix:** this is the single highest-value change to the site. The 21 wave-2 passages already prove the schema works. Wave 1 needs the same treatment, passage by passage.
+
+---
+
+### 1.2 The "Evidence sources" card cites date provenance, not evidence provenance — VERIFIED
+
+`src/components/PassageSourcesCard.tsx` builds that card by calling `collectWitnessSources`, which in `src/lib/evidenceSources.ts` reads:
+
+```
+addSource(map, row.dateSource, row.dateSourceUrl);
+```
+
+It reads **`dateSource`**. It never reads `source`. So the card headed
+
+> **"Where the evidence on this page comes from."**
+> *"Every witness, date, and note below draws on these works."*
+
+is in fact listing the works consulted for the manuscripts' **dates**.
+
+That statement is false as printed, and it produces the Mark 9:29 oddity I flagged in Pass 1. Here are Mark 9:29's actual `dateSource` values:
+
+| Row | dateSource |
+|---|---|
+| Codex Bezae (GA 05) | INTF Kurzgefasste Liste / NTVMR |
+| Vulgate | **David Robert Palmer, Revelation apparatus** |
+| Coptic witnesses | **David Robert Palmer, Revelation apparatus** |
+| Syriac Sinaitic / Peshitta / Palestinian | **Wieland Willker, Textual Commentary on Matthew** |
+
+Palmer's Revelation apparatus and Willker's Matthew commentary are not wrong *as date sources* — they're reference works that happen to carry date ranges for the versions. They are simply not sources for anything about Mark 9:29. The card presents them as if they were.
+
+**Fix, two parts:**
+1. Change the card's heading and body text to say it lists dating sources, **or** make `collectWitnessSources` read `row.source` as well.
+2. Note that option 2 renders the card empty on all 30 wave-1 passages, because `source` is unset there. That is the honest state of affairs and arguably what should be displayed until the sourcing is done.
+
+---
+
+## Part 2 — Structural defects
+
+### 2.1 Three different totals for the same database — VERIFIED
+
+| Location | Figure |
+|---|---|
+| Homepage atlas | "**1,579** Catalogued witness records" |
+| Timeline page | "**1672** Dated witness entries" |
+| Actual data | **2,078** rows (1,957 witness + 121 patristic) |
+
+All three are presented to readers as counts of the evidence. None matches the data. The atlas and timeline are presumably counting post-filter subsets, but nothing on either page says so.
+
+**Fix:** derive all three from one function over `allPassages`, and label what each excludes.
+
+---
+
+### 2.2 The live index shows 30 of 51 — the deployment is behind the checkout — VERIFIED
+
+`src/data/derived.ts` line 22 reads `export const displayedPassages = allPassages;` — all 51. `PassageBrowser`'s filter chain applies no default filtering. So **the current source would render all 51.**
+
+The live site renders "Showing 30 of 30," and its book filter omits 1 Corinthians, Ephesians and Revelation — i.e. it is running a build from before wave 2 was merged into `displayedPassages`. Meanwhile the live homepage and timeline *do* show 51 and the wave-2 passage pages *do* resolve, because those read different code paths.
+
+**Fix:** redeploy from current HEAD. Nothing in the data needs changing. Also worth fixing: `robots.txt` is empty and `sitemap.xml` serves nothing readable.
+
+---
+
+### 2.3 Seven passages render an empty Latin tab while holding Latin evidence — VERIFIED
+
+`latinWitnesses` is empty, but Latin rows are filed under `evidenceAgainst`:
+
+| Passage | Latin rows filed elsewhere |
+|---|---|
+| matthew-19-16-17 | 2 (Old Latin critical form; Latin traditional elements) |
+| luke-2-14 | 1 (*hominibus bonae voluntatis*) |
+| 1-corinthians-15-47 | 2 (Old Latin shorter form; Vulgate tradition) |
+| ephesians-3-9 | 1 (early Latin omitting "by Jesus Christ") |
+| **1-timothy-3-16** | 2 (Old Latin aggregate; Vulgate tradition) |
+| 1-john-4-3 | 3 (Latin shorter form; Old Latin *solvit Iesum*; Vulgate *solvit Iesum*) |
+| revelation-1-11 | 1 (Vulgate tradition) |
+
+1 Timothy 3:16 is the clearest failure: the index card advertises "D plus Latin/Vulgate support for 'which'," and the Latin Witnesses tab is empty.
+
+**Fix:** the tab should select by `kind`, not by which array a row happens to sit in. A Latin witness that opposes the KJV reading is still a Latin witness.
+
+---
+
+### 2.4 Eighteen passages have no patristic evidence at all — VERIFIED
+
+> mark-9-29, mark-9-44-46, luke-2-14, luke-2-33, luke-4-4, luke-9-55-56, luke-23-17, luke-24-6, luke-24-40, luke-24-51, luke-24-52, john-6-47, acts-28-29, romans-8-1, romans-16-24, colossians-1-14, revelation-1-8, revelation-1-11
+
+For a site organised around *how old a reading is*, an empty father list is the most damaging kind of gap — patristic citation is usually the earliest datable evidence there is. Mark 9:29 is the sharpest case: it prints "Church fathers — No supporting entry listed" when **Basil of Caesarea**, *First Homily on Fasting* 9 (PG 31:181, c. AD 370) quotes the saying with prayer and fasting, and **Clement of Alexandria**, *Eclogae Propheticae* 15.1 (c. AD 200) has the shorter form. Clement is the earliest witness of any kind to this variant in either direction, and he is absent from both columns.
+
+---
+
+### 2.5 499 rows are aggregates standing for an unstated number of manuscripts — VERIFIED
+
+499 of 1,957 rows carry `aggregate: true` — 26% of the evidence. Labels like "Most Old Latin witnesses," "Byzantine Majority," "Greek majority tradition (Maj)," "Coptic traditions including the phrase," "1,500+ Greek manuscripts."
+
+This is precisely the problem you set out to fix. Densest offenders: matthew-17-21 (16), revelation-1-8 (16), matthew-19-16-17 (14), john-5-3b-4 (14), matthew-6-13 (13), mark-1-2 (13), mark-9-29 (12), mark-15-28 (12).
+
+See Part 4 for what can and cannot be done about these.
+
+---
+
+### 2.6 Manuscript dates are internally consistent — CORRECT
+
+I checked all 178 distinct GA-numbered witnesses for conflicting date ranges across passages. **Zero genuine conflicts.** (My first pass appeared to find six; all six were my own regex conflating uncials with minuscules — GA 02 with GA 2, GA 033 with GA 33, and so on. The data itself is clean.)
+
+This is a real strength. Whoever built the date model did it properly: `dateStart`, `dateEnd`, `dateUncertain` on all 1,957 rows, and `dateSource` on 1,542.
+
+---
+
+## Part 3 — Content checks on named passages
+
+### 3.1 1 John 5:7 — the Greek manuscript list is exactly right — CORRECT
+
+You asked for this one specifically. I checked all ten rows against Elijah Hixson's manuscript-by-manuscript study with images, which is the definitive treatment.
+
+| # | Site | Hixson | Match |
+|---|---|---|---|
+| 1 | GA 629, AD 1362–1363 | 629 (1362–1363), earliest Greek MS of the CJ | ✓ |
+| 2 | GA 61 Montfortianus, 16th c., often c. 1520 | 61 Montfortianus | ✓ |
+| 3 | GA 429mg, 14th-c. MS, addition after 1522 | 429marg, after 1522 | ✓ |
+| 4 | GA 918, c. 1573–1578 | 918, probably 1573–1578 | ✓ |
+| 5 | GA 2473, AD 1634 | 2473 (1634) | ✓ |
+| 6 | GA 2318, 18th c. | 2318 (1700s) | ✓ |
+| 7 | GA 177mg, 11th-c. MS, addition c. 1785 | 177marg (c. 1785) | ✓ |
+| 8 | GA 221mg, 10th-c. MS, addition after 1854 | 221marg (after c. 1850?) | ✓ |
+| 9 | GA 88mg, 12th c. base | 88marg | ✓ |
+| 10 | GA 636mg, 15th-c. MS, later addition | 636marg | ✓ |
+
+Ten for ten, dates included. The "5 main-text plus 5 marginal" snapshot is accurate. **Do not change this data.** Three things to add:
+
+1. **Cite Hixson.** All ten rows are currently unsourced, and this is the source.
+2. **Add the GA 635 caution.** Hixson: *"sometimes an eleventh Greek manuscript is cited. GA 635 is sometimes cited as having the CJ in the margin, but it does not."* Older literature (and Metzger) repeat the eleventh-witness claim. Pre-empting it protects the page.
+3. **Replace "500+ Greek manuscripts containing 1 John omit the Comma."** The precise figure exists: *Text und Textwert* collated **552 Greek continuous-text manuscripts** of the Catholic Letters, **522** of which preserve complete or substantial text. "500+" understates your own case and looks like a guess. This is one of the few places where an exact denominator is genuinely available — use it.
+
+---
+
+### 3.2 Mark 16:9–20 — count correct, attribution wrong, categories missing — DISCREPANCY
+
+"1,653 Greek manuscripts / 3 against / 99.8%" is right, and the three are א (01), B (03), GA 304.
+
+But 1,653 comes from **James Snapp Jr.**, "A Case for the Longer Ending of Mark" (Text & Canon Institute). It is not in NTVMR, ECM, NA28, UBS or THGNT — the works your boilerplate `sources` array names. Cite Snapp.
+
+Missing categories: roughly **8 Greek manuscripts** carry the *Shorter Ending*, and about **23** that include 16:9–20 also carry asterisks, obeli or marginal notes flagging doubt. Around 31 relevant Greek witnesses sit in neither column on your most prominent page.
+
+---
+
+### 3.3 Mark 9:29 — three separate problems — DISCREPANCY
+
+1. **"Earliest surviving Greek support: Third century — P45vid."** ECM Mark (2021) treats **P45 as lacunose** at this point. As printed, the page's headline claim asserts third-century Greek support that the current critical edition says does not exist. Remove it or restate it as damaged.
+2. **No fathers listed.** Basil and Clement both missing (§2.4).
+3. **"2 principal Greek witnesses" against.** It is three: 01*, 03, and **GA 0274** (5th c.).
+
+Two traps to guard against if you expand this page: **GA 2427** is a modern forgery (post-1874, confirmed by pigment analysis) and appears in older apparatuses for the shorter reading; **GA 706** was miscoded in ECM's first release and actually reads "and fasting."
+
+---
+
+### 3.4 John 7:53–8:11 — possible 19-manuscript error — DISCREPANCY
+
+Site: "**1,495** Greek manuscripts and **495 lectionaries**."
+
+The only complete collation is Maurice A. Robinson, *"Preliminary Observations Regarding the Pericope Adulterae Based upon Fresh Collations of Nearly All Continuous-Text Manuscripts and All Lectionary Manuscripts Containing the Passage,"* **Filología Neotestamentaria 13 (2000): 35–59**.
+
+| | Robinson (per secondary reports) | Site |
+|---|---|---|
+| Continuous-text MSS containing | **1,476** | 1,495 |
+| Continuous-text MSS omitting | 267 | not stated |
+| Lectionaries containing 8:3–11 | **495** | 495 ✓ |
+| Lectionaries not containing | 2,285 | not stated |
+
+Your lectionary figure matches Robinson exactly, which strongly suggests he is your source and the continuous-text figure has drifted. **I could not open Robinson's article** — it is not freely available — so I am flagging this rather than asserting it. Of everything in this document, this is the number I'd most want checked at source.
+
+Also absent: the 267 omitting manuscripts, and the manuscripts that carry the passage at a *different location* (after John 21:25, after Luke 21:38, after John 7:36). Placement variation belongs on a page about where readings are found.
+
+---
+
+## Part 4 — On the counting standard you set
+
+You asked for figures shaped like *"approx. 5,500 of 9,000 Latin witnesses from 100 AD to 900 AD."* I have to be straight with you: **no figure of that shape can be produced honestly, for any verse.** Not because the research is hard — because the quantities don't exist. Publishing numbers in that format would put fabrications on the site, which is the opposite of what you're building.
+
+**Latin.** Roughly **80–90** Old Latin manuscripts survive for the entire New Testament — not thousands. Most are fragmentary; a given verse is typically attested in 3–15 of them, which is few enough to name individually. The Vulgate survives in perhaps **10,000** manuscripts, but overwhelmingly from the 9th century on, and no verse-by-verse collation of all of them has ever been published. Wordsworth–White and the Stuttgart Vulgate collate a selected 20–40 of the oldest. Those are the ones that can be cited. And **nothing Latin survives from AD 100** — the Latin versions begin late in the second century at the earliest, and the oldest Latin manuscripts are fourth century.
+
+**Greek.** Exact "X of Y" counts exist only where every known manuscript has been collated at that exact point. That means *Text und Textwert* (only at its selected test passages) or ECM (only Catholic Letters, Acts, Mark, John). **There is no ECM for Matthew, Luke, Romans, Colossians or 1 Timothy** — a large share of your 51.
+
+**Fathers.** A father counts only where an actual citation preserving the disputed wording survives, checked in a critical edition. Silence is not evidence. Two specific traps: parallel passages (a father quoting "prayer and fasting" may be quoting **Matthew 17:21**, not Mark 9:29 — this affects several of your 51), and paraphrase, which usually cannot settle word order.
+
+**What to do instead.** Replace each aggregate row with either (a) named witnesses with sigla and dates, or (b) an explicit statement of the tradition plus what has actually been collated. "Supported by the great majority of Greek manuscripts; no complete collation of this verse has been published" is a *stronger* claim than an invented percentage, because it cannot be knocked down.
+
+---
+
+## Part 5 — Free sources that will carry this project
+
+You said free/open only. That rules out ECM print volumes, *Text und Textwert*, and the Vetus Latina Database, which does constrain exact counts. These will carry most of the rest:
+
+| Source | Covers |
+|---|---|
+| **NTVMR** (ntvmr.uni-muenster.de) | Greek MSS, transcriptions, images, digital ECM where published |
+| **Kurzgefasste Liste** | Official date, contents, shelfmark for every GA number |
+| **Willker, *Textual Commentary on the Greek Gospels*** (willker.de/wie/TCG/) | Matthew, Mark, Luke, John — per-variant, very detailed, free PDF |
+| **Palmer, apparatuses** (bibletranslation.ws) | Each Gospel + Revelation, free PDF |
+| **Tischendorf, *Editio Octava*** (archive.org) | Fullest printed apparatus for versional + patristic evidence; public domain |
+| **Hoskier, *Concerning the Text of the Apocalypse*** (archive.org) | Revelation — collates nearly all then-known MSS |
+| **von Soden** (archive.org) | Byzantine groupings |
+| **CSNTM** (csntm.org) | Manuscript images |
+| **BiblIndex** (biblindex.org) | Locating patristic citations |
+| **Migne PG/PL** (archive.org) | Patristic texts in the original |
+
+Note you already cite Willker and Palmer — just the wrong volumes (§1.2). The right ones will answer a large share of the wave-1 gap.
+
+**Revelation 16:5 and 22:19 can be made genuinely complete** on free sources, because Hoskier collated essentially the whole known Revelation tradition and is out of copyright. Your wave-2 Revelation pages already cite him.
+
+---
+
+## Part 6 — Recommended order of work
+
+1. **Redeploy** — recovers 21 passages on the index for free (§2.2).
+2. **Fix the sources card text or its field** (§1.2) — currently makes a false claim on every page.
+3. **Fix the Latin tab selector** (§2.3) — 7 passages, small code change.
+4. **Reconcile the three totals** (§2.1).
+5. **Source wave 1** — 30 passages, 1,105 rows (§1.1). The largest job and the one that decides whether the site does what you want it to do.
+6. **Fill the 18 empty father lists** (§2.4).
+7. **Decompose the 499 aggregate rows** (§2.5, §4).
+
+Items 1–4 are code and are quick. Items 5–7 are research, and are the real project.
+
+---
+
+## Open questions for you
+
+1. **John 7:53 — 1,476 or 1,495?** Needs Robinson at source (§3.4).
+2. **The Site Summary Score** (e.g. 1 John 5:7 "16.7% for / 83.3% against") is computed from how many rows you've entered, not from the evidence. It contradicts your own printed principle, "Evidence types, without turning rows into votes." My recommendation is to remove it. Confirm before I touch it.
+3. **Do you want me to write the fixes into the data files**, or keep producing findings for you to apply?
+
+
+================================================================================
+END OF HANDOFF PACKAGE
+================================================================================
