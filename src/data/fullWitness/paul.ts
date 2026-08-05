@@ -12,6 +12,32 @@ const COMPAUL = {
   label: "Official COMPAUL Latin transcriptions",
   url: "https://itseeweb.cal.bham.ac.uk/epistulae/transcriptions/compaul/compaul.xml",
 };
+const ROMANS_POSITIVE = {
+  label: "IGNTP/ITSEE Romans ECM-preparation apparatus, positive apparatus",
+  url: "https://itseeweb.cal.bham.ac.uk/epistulae/apparatus/romans/positive/",
+};
+const ROMANS_NEGATIVE = {
+  label: "IGNTP/ITSEE Romans ECM-preparation apparatus, negative apparatus",
+  url: "https://itseeweb.cal.bham.ac.uk/epistulae/apparatus/romans/negative/",
+};
+const ROMANS_SYNOPSIS = {
+  label: "IGNTP/ITSEE Romans direct-transcription synopsis",
+  url: "https://itseeweb.cal.bham.ac.uk/epistulae/synopsis/romans/index.html",
+};
+const COMPAUL_ROMANS = {
+  label: "Official COMPAUL Latin transcriptions, Romans files",
+  url: COMPAUL.url,
+  locator: "Individual Romans files follow .../transcriptions/06_VL61.xml",
+};
+const COMPAUL_1COR = {
+  label: "Official COMPAUL Latin transcriptions, 1 Corinthians files",
+  url: COMPAUL.url,
+  locator: "Individual 1 Corinthians files follow .../transcriptions/07_VL61.xml",
+};
+const INTF_ECM = {
+  label: "INTF, Editio Critica Maior project status (Pauline letters in preparation with ITSEE/IGNTP)",
+  url: "https://www.uni-muenster.de/INTF/en/forschung/ecm/index.html",
+};
 const ROMANS_SCOPE =
   "The official Romans ECM-preparation apparatus: 152 selected witnesses. Counts are reading states and preserve hands, corrections, lectionary occurrences and deficiencies.";
 const SYNOPSIS_SCOPE =
@@ -31,7 +57,7 @@ export const paulWitnesses: FullWitnessEntry[] = [
       supportCategory: "Extensive Greek support in the selected Romans corpus, including corrected early codices",
       mainEvidenceAgainst: ["01*", "Codex Vaticanus (03)", "04C2", "1739"],
     },
-    sources: [ROMANS, COMPAUL, PAUL_PORTAL],
+    sources: [ROMANS, ROMANS_POSITIVE, ROMANS_NEGATIVE, ROMANS_SYNOPSIS, COMPAUL, COMPAUL_ROMANS, PAUL_PORTAL, INTF_ECM],
     notes: ["33V and 2659K* use an infinitive and are related rather than exact.", "0311 has two partial hand states and is not a clean vote."],
     units: [
       {
@@ -47,6 +73,10 @@ export const paulWitnesses: FullWitnessEntry[] = [
           { label: "COMPAUL Latin exact full clause", tone: "support", witnesses: "VL61 VL76" },
           { label: "COMPAUL Latin flesh-only form", tone: "related", witnesses: "VL135 VL251 VL51 VL54 VL58 VL78 VL88 VL75C VL86C" },
           { label: "COMPAUL Latin omission", tone: "competing", witnesses: "VL77 VL89 VL75* VL86*" },
+          { label: "Latin edition text", tone: "competing", reading: "qui non secundum carnem ambulant", aggregates: "Stuttgart Vulgate electronic text", note: "The Stuttgart Vulgate electronic text has the flesh-only form, not the full KJV clause." },
+          { label: "Latin patristic lemma traditions", tone: "related", aggregates: "Ambrosiaster editorial lemma; Pelagius editorial lemma", note: "Ambrosiaster’s lemma is short, with a variant adding the flesh clause only; Pelagius’s lemma is flesh-only, with edition variant B adding sed secundum spiritum." },
+          { label: "Whole-verse deficient", tone: "neutral", aggregates: "The official Romans apparatus’s whole-verse deficient list for this verse", note: "Deficient rows are kept separate from the subunit lacunae and are not counted as omissions." },
+          { label: "Not among the official selected rows", tone: "neutral", witnesses: "614", note: "614 is not one of the 152 selected witnesses of the official Romans apparatus; absence from the corpus is not a reading." },
         ],
       },
     ],
@@ -65,7 +95,7 @@ export const paulWitnesses: FullWitnessEntry[] = [
       supportCategory: "Broad Greek support in the official selected Romans apparatus",
       mainEvidenceAgainst: ["01*", "Codex Alexandrinus (02)", "Codex Vaticanus (03)", "04*"],
     },
-    sources: [ROMANS, COMPAUL, { label: "Chrysostom, Homily 25 on Romans", url: "https://www.newadvent.org/fathers/210225.htm" }],
+    sources: [ROMANS, ROMANS_POSITIVE, ROMANS_NEGATIVE, ROMANS_SYNOPSIS, COMPAUL, COMPAUL_ROMANS, PAUL_PORTAL, INTF_ECM, { label: "Chrysostom, Homily 25 on Romans", url: "https://www.newadvent.org/fathers/210225.htm" }],
     notes: ["0209V reads God, not Christ.", "01 and 04 each preserve first-hand God and corrected Christ states."],
     units: [
       {
@@ -80,6 +110,10 @@ export const paulWitnesses: FullWitnessEntry[] = [
           { label: "COMPAUL Latin Christ", tone: "support", witnesses: "VL54 VL58 VL64 VL79" },
           { label: "COMPAUL Latin God", tone: "competing", witnesses: "VL135 VL51 VL61 VL67 VL75 VL76 VL77 VL78 VL88 VL89" },
           { label: "COMPAUL Latin lacuna", tone: "neutral", witnesses: "VL86" },
+          { label: "Latin edition text", tone: "competing", reading: "dei", aggregates: "Stuttgart Vulgate electronic text", note: "The Stuttgart Vulgate reads dei." },
+          { label: "Ambrosiaster editorial text", tone: "related", aggregates: "Ambrosiaster editorial lemma", note: "Ambrosiaster’s editorial text reads christi, with a dei variant: a mixed edition." },
+          { label: "Pelagius editorial lemma", tone: "competing", reading: "dei", aggregates: "Pelagius editorial lemma", note: "Pelagius’s editorial lemma reads dei." },
+          { label: "Whole-verse deficient", tone: "neutral", aggregates: "The official Romans apparatus’s whole-verse deficient list for this verse", note: "Kept separate from P46, whose surrounding verse survives but whose key noun is lacunose." },
         ],
       },
     ],
@@ -101,7 +135,16 @@ export const paulWitnesses: FullWitnessEntry[] = [
       supportCategory: "A large exact group in the complete 152-witness selected apparatus",
       mainEvidenceAgainst: ["P46", "P61", "Codex Sinaiticus (01)", "Codex Vaticanus (03)"],
     },
-    sources: [ROMANS, COMPAUL, PAUL_PORTAL],
+    sources: [
+      ROMANS,
+      ROMANS_POSITIVE,
+      ROMANS_NEGATIVE,
+      { ...ROMANS_SYNOPSIS, locator: "Verse-24 rows for 33, 104 and 025" },
+      COMPAUL,
+      COMPAUL_ROMANS,
+      PAUL_PORTAL,
+      INTF_ECM,
+    ],
     notes: ["GA 630 is related, not exact: it reads μεθ’ ὑμῶν and omits amen.", "Witnesses that also copy the benediction later are not described as relocating it away from verse 24."],
     units: [
       {
@@ -116,6 +159,8 @@ export const paulWitnesses: FullWitnessEntry[] = [
           { label: "COMPAUL Latin exact", tone: "support", witnesses: "VL135 VL51 VL54 VL58 VL75 VL86 VL88" },
           { label: "COMPAUL Latin related", tone: "related", witnesses: "VL61 VL76 VL77 VL78" },
           { label: "COMPAUL Latin omission", tone: "competing", witnesses: "VL89" },
+          { label: "Latin edition text", tone: "competing", aggregates: "Stuttgart Vulgate electronic text", note: "The Stuttgart Vulgate electronic text marks the verse absent." },
+          { label: "Pelagius editorial lemma", tone: "related", aggregates: "Pelagius editorial lemma", note: "Pelagius’s lemma is the full benediction; its edition records variants omitting Jesus Christ and/or amen." },
         ],
       },
     ],
@@ -137,9 +182,12 @@ export const paulWitnesses: FullWitnessEntry[] = [
     sources: [
       { label: "IGNTP/ITSEE 1 Corinthians direct-transcription synopsis", url: "https://itseeweb.cal.bham.ac.uk/epistulae/synopsis/1Cor/index.html" },
       COMPAUL,
+      COMPAUL_1COR,
+      PAUL_PORTAL,
+      INTF_ECM,
       { label: "Tertullian, works cited", url: "https://www.newadvent.org/fathers/0315.htm" },
     ],
-    notes: ["424* contains the phrase; 424C deletes it.", "All eleven collatable COMPAUL Latin rows have the short form."],
+    notes: ["424* contains the phrase; 424C deletes it.", "All eleven collatable COMPAUL Latin rows have the short form.", "1751 has the exact unit reading but duplicates an earlier clause in the verse."],
     units: [
       {
         id: "lord",
@@ -152,6 +200,7 @@ export const paulWitnesses: FullWitnessEntry[] = [
           { label: "P46 distinct spiritual reading", tone: "related", witnesses: "P46" },
           { label: "Not present in the verse", tone: "neutral", witnesses: "P11 P15 P34 P61 P68 P123 P129 015 016 048 088 0121 0185 0199 0201 0222 0270 0278 0285 0289 06S 06S1 441 1506 1838 L156 L169 L1126 L1178 L1188 L1298 L2058" },
           { label: "COMPAUL Latin short form", tone: "competing", witnesses: "VL251 VL51 VL54 VL58 VL61 VL75 VL76 VL77 VL78 VL88 VL89" },
+          { label: "Latin edition and lemma texts", tone: "competing", reading: "short form without ὁ κύριος", aggregates: "Stuttgart Vulgate electronic text; Ambrosiaster editorial lemma; Pelagius editorial lemma", note: "All three are short edition texts, distinct from the eleven COMPAUL manuscript rows." },
         ],
       },
     ],
@@ -177,8 +226,11 @@ export const paulWitnesses: FullWitnessEntry[] = [
     },
     sources: [
       { label: "IGNTP/ITSEE Ephesians ECM-preparation apparatus", url: "https://itseeweb.cal.bham.ac.uk/epistulae/apparatus/ephesians/introduction.html" },
+      { label: "IGNTP/ITSEE Ephesians apparatus conventions and instructions", url: "https://itseeweb.cal.bham.ac.uk/epistulae/apparatus/ephesians/instructions.html" },
+      { label: "IGNTP/ITSEE Ephesians direct-transcription synopsis", url: "https://itseeweb.cal.bham.ac.uk/epistulae/synopsis/ephesians/index.html" },
       { label: "Chrysostom, Homily 7 on Ephesians", url: "https://www.newadvent.org/fathers/230107.htm" },
       PAUL_PORTAL,
+      INTF_ECM,
     ],
     notes: ["69* reads οἰκονομία and 69C reads κοινωνία.", "1505 omits διὰ Ἰησοῦ Χριστοῦ; 0278 has the phrase in reversed order."],
     units: [
@@ -190,6 +242,7 @@ export const paulWitnesses: FullWitnessEntry[] = [
           { label: "κοινωνία", tone: "support", witnesses: "69C" },
           { label: "οἰκονομία", tone: "competing", witnesses: "P46V 01 02 03 04 06 012 020 025 044 049 075 0150 1 6 33 35 38 61 69* 81 88 93 94V 104 181 218 256 263 326 330 365 383 398 424 436 442 451 459 462 467 606 629 636 664 665 915 1069 1108 1115 1127 1175 1241 1319 1398 1505 1573 1611 1617 1739 1751 1831 1834 1836 1837 1838 1877 1881 1893 1908 1910 1912 1918 1939 1962 1963 1985 1987 1991 1996 1999 2004 2011 2012 2127 2138 2180 2243 2344 2352 2400 2464 2492 2495 2516 2523 2544 2576 2805 2853 2865 L156 L169 L587 L809 L1159 L1178 L1188 L1440 L2010 L2058" },
           { label: "Lacunose at the noun", tone: "neutral", witnesses: "0278" },
+          { label: "Whole-verse deficient", tone: "neutral", aggregates: "19 whole-verse deficient witnesses in the official Ephesians apparatus", note: "Held separate from 0278, which is lacunose only at the noun." },
         ],
       },
       {
@@ -200,11 +253,13 @@ export const paulWitnesses: FullWitnessEntry[] = [
           { label: "Exact KJV order", tone: "support", witnesses: "06C2 020 049 1 6 35 38 61 69 88 93 94 104 181 218 326 330 383 398 424 436 451 459 462 467 606 629C 636 664 665 1069 1115 1127 1241 1617 1751 1831 1836 1837 1838 1877 1881 1893 1910-2 1912 1918 1939 1963 1985 1987 1991 1996 1999 2004 2011 2012 2138 2180 2243 2344 2352 2400 2523 2544 2576 2805 2853 2865 L156 L169 L587 L809 L1159 L1178 L1188 L1440 L2010 L2058" },
           { label: "Reversed διὰ Χριστοῦ Ἰησοῦ", tone: "related", witnesses: "0278" },
           { label: "Phrase omitted", tone: "competing", witnesses: "P46 01 02 03 04 06* 012 025 044 075 0150 33 81 256 263 365 442 629* 915 1108 1175 1319 1398 1505 1573 1611 1739 1834 1908 1910-1 1962 2127 2464 2492 2495 2516" },
+          { label: "Whole-verse deficient", tone: "neutral", aggregates: "19 whole-verse deficient witnesses in the official Ephesians apparatus", note: "These rows are not placed under omission." },
         ],
       },
     ],
     fathers: [
       { author: "Chrysostom", work: "Homily 7 on Ephesians", date: "c. AD 400", use: "Textual comment", reading: "Related", locator: "Ephesians 3:9 exposition", url: "https://www.newadvent.org/fathers/230107.htm" },
+      { author: "Chrysostom", work: "Homily 7 on Ephesians", date: "c. AD 400", use: "Close quotation", reading: "Supports the KJV reading", locator: "Homily 7 on Ephesians, later exposition: “who created all things by Jesus Christ”", url: "https://www.newadvent.org/fathers/230107.htm", transmission: "Cited from the received English translation; the Greek edition is not collated here" },
     ],
   },
   {
@@ -223,6 +278,7 @@ export const paulWitnesses: FullWitnessEntry[] = [
     sources: [
       { label: "IGNTP/ITSEE Colossians direct-transcription synopsis", url: "https://itseeweb.cal.bham.ac.uk/epistulae/synopsis/colossians/index.html" },
       PAUL_PORTAL,
+      INTF_ECM,
     ],
     notes: ["2495 omits the phrase; 2464 is partial rather than exact.", "424 has two exact states separated by a correction that deletes the phrase."],
     units: [
@@ -235,6 +291,7 @@ export const paulWitnesses: FullWitnessEntry[] = [
           { label: "Related or partial forms", tone: "related", witnesses: "1175 1319C 1919 2086 1939 1963 1996 1999 2012 2464 2805*" },
           { label: "Named corrected non-exact states", tone: "competing", witnesses: "424C-delete 1319* 1509* 1848C-delete 2011* 2544*", aggregates: "144 further uncorrected present rows without the blood phrase" },
           { label: "Absent from the verse", tone: "neutral", witnesses: "P46 P61 015 016 048 0198 0208 0278 0289 2834 L1126" },
+          { label: "Not rows in this official synopsis corpus", tone: "neutral", witnesses: "614 630", note: "614 and 630 have no rows in the official Colossians direct-transcription synopsis; absence from the corpus is not a reading." },
         ],
       },
     ],
@@ -256,6 +313,8 @@ export const paulWitnesses: FullWitnessEntry[] = [
     sources: [
       { label: "IGNTP/ITSEE 1 Timothy direct-transcription synopsis", url: "https://itseeweb.cal.bham.ac.uk/epistulae/synopsis/1timothy/index.html" },
       PAUL_PORTAL,
+      { label: "Chrysostom, Homily 11 on 1 Timothy", url: "https://www.newadvent.org/fathers/230611.htm" },
+      INTF_ECM,
     ],
     notes: ["The early codices 01, 02, 04 and 06 preserve corrected hand changes at the subject.", "061 is supplied and related, not a clean fifth-century θεός witness."],
     units: [
@@ -273,6 +332,8 @@ export const paulWitnesses: FullWitnessEntry[] = [
         ],
       },
     ],
-    fathers: [],
+    fathers: [
+      { author: "Chrysostom", work: "Homily 11 on 1 Timothy", date: "c. AD 400", use: "Close quotation", reading: "Related", locator: "Homily 11 on 1 Timothy, on 3:16", url: "https://www.newadvent.org/fathers/230611.htm", transmission: "The received English translation prints “God [He who] was manifest”; the underlying Greek edition is not collated here" },
+    ],
   },
 ];

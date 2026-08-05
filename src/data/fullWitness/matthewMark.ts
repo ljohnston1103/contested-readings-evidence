@@ -14,6 +14,19 @@ const VETUS_LATINA = {
   url: "https://itseeweb.cal.bham.ac.uk/vetuslatina/GospelMSS/",
   locator: "Identity and physical date of the named Old Latin manuscripts",
 };
+const LAPAROLA = {
+  label: "LaParola Münster-linked verse apparatus",
+  url: "https://www.laparola.net/greco/index.php",
+};
+const BL_CURETONIAN = {
+  label: "British Library Archives and Manuscripts record, Curetonian Syriac (Add MS 14451)",
+  url: "https://searcharchives.bl.uk/catalog/040-002086117",
+  locator: "Physical date of the Curetonian manuscript, c. AD 450–470",
+};
+const WILLKER_MAE2 = {
+  label: "Wieland Willker, study of Middle Egyptian mae-2 (Schøyen MS 2650)",
+  url: "https://www.willker.de/wie/TCG/Mt-mae-2.pdf",
+};
 const DECM = {
   label: "Digital Editio Critica Maior, Mark (INTF)",
   url: "https://ntvmr.uni-muenster.de/ecm",
@@ -54,8 +67,21 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
     },
     sources: [
       { ...WILLKER_MATTHEW, locator: "TVU 10, PDF p. 24" },
+      {
+        ...LAPAROLA,
+        locator: "Matthew 1:25 — subvariant separation and patristic/versional index",
+      },
       INTF_LISTE,
       VETUS_LATINA,
+      {
+        ...BL_CURETONIAN,
+        locator:
+          "Physical date of the Curetonian manuscript, c. AD 450–470, distinct from the Old Syriac translation date",
+      },
+      {
+        ...WILLKER_MAE2,
+        locator: "Identity and date of mae-1 (Codex Scheide) and mae-2 (Schøyen MS 2650)",
+      },
       {
         label: "New Advent Fathers of the Church",
         url: "https://www.newadvent.org/fathers/",
@@ -125,7 +151,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
             label: "Syriac and Coptic",
             tone: "competing",
             reading: "short forms",
-            witnesses: "Sinaitic Curetonian mae-1",
+            witnesses: "Sinaitic Curetonian Bohairic mae-1",
             note: "Sinaitic Syriac reads the equivalent of “a son to him”; Bohairic reads “the son”.",
           },
           {
@@ -196,8 +222,13 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
     },
     sources: [
       { ...WILLKER_MATTHEW, locator: "TVU 36, PDF p. 67" },
+      {
+        ...LAPAROLA,
+        locator: "Matthew 5:22 — the W/032 assignment and versional leads",
+      },
       INTF_LISTE,
       VETUS_LATINA,
+      BL_CURETONIAN,
       {
         label: "New Advent Fathers of the Church",
         url: "https://www.newadvent.org/fathers/",
@@ -239,6 +270,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
             label: "Coptic and other versions",
             tone: "support",
             witnesses: "Sahidic Bohairic Middle-Egyptian Gothic",
+            aggregates: "Armenian · Georgian",
           },
           {
             label: "Greek manuscripts",
@@ -252,6 +284,12 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
             witnesses: "aur (VL15)",
             aggregates: "principal Vulgate text · Ethiopic",
             note: "Some Vulgate manuscripts include the word.",
+          },
+          {
+            label: "Greek manuscripts — assignment disputed",
+            tone: "neutral",
+            witnesses: "032",
+            note: "LaParola assigns 032 to inclusion; Willker's compact line places it in both columns.",
           },
           { label: "Lacunose", tone: "neutral", witnesses: "04 22" },
         ],
@@ -341,7 +379,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
     scope: WILLKER_SCOPE,
     snapshot: {
       greekSupport:
-        "14 named Greek witnesses plus Family 13 and the Byzantine tradition carry the full combination",
+        "13 named Greek witnesses plus Family 13 and the Byzantine tradition carry the full combination",
       greekAgainst: "7 named Greek witnesses plus Family 1 carry the short endpoint",
       supportCategory: "Byzantine and fifth-century Greek support across all three clauses",
       mainEvidenceAgainst: [
@@ -355,6 +393,11 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
       { ...WILLKER_MATTHEW, locator: "TVU 45, PDF p. 82" },
       INTF_LISTE,
       VETUS_LATINA,
+      BL_CURETONIAN,
+      {
+        ...WILLKER_MAE2,
+        locator: "Identity and date of mae-2 (Schøyen MS 2650)",
+      },
       {
         label: "New Advent Fathers of the Church",
         url: "https://www.newadvent.org/fathers/",
@@ -401,7 +444,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
           {
             label: "Syriac and Coptic",
             tone: "competing",
-            witnesses: "Sinaitic Curetonian Sahidic mae-2",
+            witnesses: "Sinaitic Curetonian Sahidic Bohairic-strand mae-2",
           },
           { label: "Lacunose", tone: "neutral", witnesses: "04" },
         ],
@@ -433,7 +476,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
           {
             label: "Old Latin, Syriac and Coptic",
             tone: "competing",
-            witnesses: "k (VL1) Sinaitic Curetonian Sahidic mae-2",
+            witnesses: "k (VL1) Sinaitic Curetonian Sahidic Bohairic-strand mae-2",
           },
           { label: "Lacunose", tone: "neutral", witnesses: "04" },
         ],
@@ -473,6 +516,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
             tone: "competing",
             witnesses: "Sinaitic Curetonian Sahidic",
           },
+          { label: "Lacunose", tone: "neutral", witnesses: "04" },
         ],
       },
     ],
@@ -556,6 +600,15 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
       INTF_LISTE,
       VETUS_LATINA,
       {
+        ...BL_CURETONIAN,
+        locator:
+          "Physical date of the Curetonian manuscript, c. AD 450–470 (Curetonian carries the partial kingdom + glory + Amen doxology)",
+      },
+      {
+        ...WILLKER_MAE2,
+        locator: "Identity and date of mae-1 (Codex Scheide) and mae-2 (Schøyen MS 2650)",
+      },
+      {
         label: "New Advent Fathers of the Church",
         url: "https://www.newadvent.org/fathers/",
         locator: "Didache 8.2; Tertullian, De oratione 8; Chrysostom, Hom. in Matt. 19.10",
@@ -627,7 +680,8 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
           {
             label: "Coptic and other evidence",
             tone: "competing",
-            witnesses: "Bohairic-strand mae-1 mae-2 Megara-ostracon",
+            witnesses:
+              "Bohairic-strand mae-1 mae-2 Syriac-Diatessaron-descendant Megara-ostracon",
             note: "The Megara ostracon is fourth-century Greek and ends at “evil”.",
           },
           { label: "Lacunose", tone: "neutral", witnesses: "04" },
@@ -720,8 +774,13 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
     },
     sources: [
       { ...WILLKER_MATTHEW, locator: "TVU 230, PDF p. 362" },
+      {
+        ...LAPAROLA,
+        locator: "Matthew 17:21 — lectionary 253 (dated 1020) listed as omission",
+      },
       INTF_LISTE,
       VETUS_LATINA,
+      BL_CURETONIAN,
       {
         label: "New Advent Fathers of the Church",
         url: "https://www.newadvent.org/fathers/",
@@ -731,6 +790,11 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
         label: "Wieland Willker, study of Middle Egyptian mae-2 (Schøyen MS 2650)",
         url: "https://www.willker.de/wie/TCG/Mt-mae-2.pdf",
         locator: "Identity and date of mae-2",
+      },
+      {
+        label: "Tyndale Bulletin study of the Schøyen Middle Egyptian codex (mae-2)",
+        url: "https://www.galaxie.com/article/tynbul65-1-11",
+        locator: "Orientation on the identity and early-fourth-century date of mae-2",
       },
     ],
     notes: [
@@ -828,8 +892,17 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
     },
     sources: [
       { ...WILLKER_MATTHEW, locator: "TVU 237, PDF p. 377" },
+      {
+        ...LAPAROLA,
+        locator: "Matthew 18:11 — subvariant separation for the ζητῆσαι καί expansion",
+      },
       INTF_LISTE,
       VETUS_LATINA,
+      BL_CURETONIAN,
+      {
+        ...WILLKER_MAE2,
+        locator: "Identity and date of mae-1 (Codex Scheide) and mae-2 (Schøyen MS 2650)",
+      },
       {
         label: "New Advent Fathers of the Church",
         url: "https://www.newadvent.org/fathers/",
@@ -863,7 +936,8 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
             tone: "related",
             reading: "ζητῆσαι καὶ σῶσαι — the Luke-expanded form",
             witnesses: "011 019C 021 157 346 579 713 892mg",
-            aggregates: "about 250 later manuscripts cited collectively · Syriac Harklean",
+            aggregates:
+              "about 250 later manuscripts cited collectively · Syriac Harklean · a Bohairic strand · Ethiopic evidence",
           },
           {
             label: "Greek manuscripts",
@@ -919,7 +993,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
     scope: WILLKER_SCOPE,
     snapshot: {
       greekSupport:
-        "17 named Greek witnesses at verse 16 and 13 at verse 17, plus Family 13 and the Byzantine tradition",
+        "16 named Greek witnesses at verse 16 and 13 at verse 17, plus Family 13 and the Byzantine tradition",
       greekAgainst:
         "6 named Greek witnesses at verse 16 and 10 at verse 17, plus Family 1",
       supportCategory: "Byzantine support at both units",
@@ -934,6 +1008,11 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
       { ...WILLKER_MATTHEW, locator: "TVU 257, PDF p. 403" },
       INTF_LISTE,
       VETUS_LATINA,
+      BL_CURETONIAN,
+      {
+        ...WILLKER_MAE2,
+        locator: "Identity and date of mae-1 (Codex Scheide)",
+      },
       {
         label: "New Advent Fathers of the Church",
         url: "https://www.newadvent.org/fathers/",
@@ -962,11 +1041,22 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
             witnesses: "Sinaitic Curetonian Christian-Palestinian-Aramaic Bohairic-strand mae-1",
           },
           {
+            label: "Latin",
+            tone: "support",
+            aggregates: "much of the Latin tradition",
+          },
+          {
             label: "Greek manuscripts",
             tone: "competing",
             reading: "διδάσκαλε, τί ἀγαθὸν ποιήσω…",
             witnesses: "01 03 05 019 22 892*",
             aggregates: "Family 1 · several further manuscripts cited collectively",
+          },
+          {
+            label: "Old Latin, Coptic and other versions",
+            tone: "competing",
+            witnesses: "Bohairic-strand Georgian Ethiopic",
+            aggregates: "some Old Latin",
           },
         ],
       },
@@ -978,7 +1068,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
           {
             label: "Greek manuscripts",
             tone: "support",
-            witnesses: "04 017 028 032 037 33 118 372 565 1071 1241 1424 2737",
+            witnesses: "04 017 032 037 28 33 118 372 565 1071 1241 1424 2737",
             aggregates: "Family 13 · Byz",
           },
           {
@@ -1000,9 +1090,20 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
             aggregates: "Family 1 · five further manuscripts cited collectively",
           },
           {
+            label: "Syriac and Coptic",
+            tone: "competing",
+            witnesses: "Sinaitic Curetonian Christian-Palestinian-Aramaic Bohairic-strand mae-1",
+          },
+          {
             label: "Old Latin",
             tone: "competing",
             witnesses: "a (VL3) d (VL5)",
+          },
+          {
+            label: "Latin",
+            tone: "related",
+            reading: "the competing question with “God” or “Father” added at the end",
+            aggregates: "Latin tradition",
           },
         ],
       },
@@ -1064,8 +1165,17 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
     },
     sources: [
       { ...WILLKER_MATTHEW, locator: "TVU 324, PDF p. 521" },
+      {
+        ...LAPAROLA,
+        locator: "Matthew 23:14 — presence and verse-order subvariants",
+      },
       INTF_LISTE,
       VETUS_LATINA,
+      BL_CURETONIAN,
+      {
+        ...WILLKER_MAE2,
+        locator: "Identity and date of mae-1 (Codex Scheide) and mae-2 (Schøyen MS 2650)",
+      },
       {
         label: "New Advent Fathers of the Church",
         url: "https://www.newadvent.org/fathers/",
@@ -1207,6 +1317,15 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
       },
       INTF_LISTE,
       VETUS_LATINA,
+      {
+        ...BL_CURETONIAN,
+        locator:
+          "Physical date of the Curetonian manuscript, c. AD 450–470; it is lacunose at Matthew 27:35",
+      },
+      {
+        ...WILLKER_MAE2,
+        locator: "Identity and date of mae-1 (Codex Scheide)",
+      },
       {
         label: "Eusebius, Demonstratio Evangelica, book 10",
         url: "https://demonax.info/doku.php?id=text:demonstration_of_the_gospel_book_10",
@@ -1491,6 +1610,13 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
         url: "https://intf.uni-muenster.de/patristik/index2.php?submit=10876",
         transmission: "Rufinus's Latin translation",
       },
+      { author: "Origen", work: "Commentary on John 1.13.81", date: "Third century", use: "Direct quotation", reading: "Competing reading", locator: "GCS 10,18.19, INTF 10886", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=10886" },
+      { author: "Pseudo-Athanasius", work: "Synopsis 98", date: "Late antiquity", use: "Direct quotation", reading: "Competing reading", locator: "PG 28,292A1, CPG 2249, INTF 11855", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11855" },
+      { author: "Serapion of Thmuis", work: "Contra Manichaeos 25", date: "Fourth century", use: "Direct quotation", reading: "Competing reading", locator: "Casey HThS 15,41.15, CPG 2485, INTF 9959", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=9959" },
+      { author: "Severian of Gabala", work: "In sigillum librorum 5", date: "Late fourth century", use: "Direct quotation", reading: "Competing reading", locator: "PG 63,541.9, CPG 4209, INTF 10588", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=10588" },
+      { author: "Titus of Bostra", work: "Manichaean work appendix", date: "Fourth century", use: "Direct quotation", reading: "Competing reading", locator: "Lagarde 81.23, CPG 3575, INTF 9918", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=9918" },
+      { author: "Hesychius of Jerusalem", work: "Collection of Difficulties 1", date: "Fifth century", use: "Textual comment", reading: "Competing reading", locator: "PG 93,1392B3 and 1393A1, CPG 6561, INTF 10387 and 11798", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=10387" },
+      { author: "Anastasius Sinaita", work: "Quaestiones, embedded Irenaeus material", date: "Seventh century", use: "Derivative use", reading: "Related", locator: "PG 89,797D8, CPG 7746, INTF 11051", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11051" },
     ],
   },
   {
@@ -1817,6 +1943,11 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
         locator: "Westerink (1986),127.161, CPG 9510, INTF 11379",
         url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11379",
       },
+      { author: "Basil of Caesarea", work: "Prologus 8.4", date: "Fourth century", use: "Parallel tradition", reading: "Related", locator: "PG 31,685.11, CPG 2886, INTF 11427", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11427" },
+      { author: "Basil of Caesarea", work: "Sermones morales 14.3", date: "Fourth century", use: "Parallel tradition", reading: "Related", locator: "PG 32,1301B11, CPG 2908, INTF 11428", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11428" },
+      { author: "John Chrysostom", work: "Homilies on 1 Thessalonians 5", date: "Late fourth century", use: "Parallel tradition", reading: "Related", locator: "Field 5 (1855),371.8, CPG 4434, INTF 9948", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=9948" },
+      { author: "John Chrysostom", work: "Homilies on Romans 12 and 26", date: "Late fourth century", use: "Parallel tradition", reading: "Related", locator: "INTF 9867, 9870 and 9871", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=9867" },
+      { author: "Pseudo-Isaiah material", work: "Besson 202.6", date: "Late antiquity", use: "Parallel tradition", reading: "Related", locator: "CPG 7869, INTF 11761", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11761" },
     ],
   },
   {
@@ -2003,6 +2134,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
         locator: "PG 89,840C12, CPG 7750, INTF 12362",
         url: "https://intf.uni-muenster.de/patristik/index2.php?submit=12362",
       },
+      { author: "Pseudo-Anastasius material", work: "Mark 11:26 parallel record", date: "Late antique or Byzantine", use: "Parallel tradition", reading: "Related", locator: "PG 59,566.67, CPG 4583, INTF 12363", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=12363" },
     ],
   },
   {
@@ -2101,6 +2233,8 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
         locator: "Marcovich 571.17 and 115.27, CPG 1476, INTF 12061 and 11189",
         url: "https://intf.uni-muenster.de/patristik/index2.php?submit=12061",
       },
+      { author: "Anonymous", work: "Dialogus cum Iudaeis 9", date: "Later sixth century", use: "Parallel tradition", reading: "Related", locator: "CCSG 30,80.33, CPG 7803, INTF 11636", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11636" },
+      { author: "Severian of Gabala", work: "In filium? 3", date: "Late fourth century", use: "Allusion", reading: "Related", locator: "PG 59,636.6, CPG 4200, INTF 10292", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=10292" },
     ],
   },
   {
@@ -2268,6 +2402,13 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
         locator: "INTF 11540 and 11541",
         url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11540",
       },
+      { author: "Justin Martyr", work: "Record attached to Mark 16:20", date: "Second century", use: "Allusion", reading: "Related", locator: "INTF 12554", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=12554" },
+      { author: "Pseudo-Clement", work: "Epitome records at Mark 16:16", date: "Late antique", use: "Derivative use", reading: "Related", locator: "INTF 9381 and 9382", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=9381" },
+      { author: "Acts of Pilate", work: "Records at Mark 16:15–19", date: "Late antique", use: "Parallel tradition", reading: "Related", locator: "INTF 11946–11953", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11946" },
+      { author: "Asterius", work: "Record at Mark 16:17", date: "Fourth century", use: "Close quotation", reading: "Related", locator: "INTF 9980", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=9980" },
+      { author: "Philostorgius", work: "Church History, record at Mark 16:17", date: "Fifth century", use: "Close quotation", reading: "Related", locator: "INTF 10820", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=10820" },
+      { author: "Nestorius", work: "Sermon material at Mark 16:20", date: "Fifth century", use: "Close quotation", reading: "Related", locator: "INTF 10795", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=10795" },
+      { author: "Cyril of Alexandria", work: "Anti-Nestorian material at Mark 16:20", date: "Fifth century", use: "Close quotation", reading: "Related", locator: "INTF 11234", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=11234" },
     ],
   },
 ];

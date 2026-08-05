@@ -77,6 +77,7 @@ export const actsWitnesses: FullWitnessEntry[] = [
         locator: "INTF record 1569; SC 211, 214.4",
         url: "https://intf.uni-muenster.de/patristik/index2.php?submit=1569",
       },
+      { author: "Irenaeus", work: "Against Heresies 4.23.2", date: "c. AD 180", use: "Allusion", reading: "Related", locator: "SC 100, 696.50, INTF record 3171", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=3171", transmission: "Latin" },
       {
         author: "Chrysostom",
         work: "Homilies on Acts 19.1",
@@ -128,6 +129,13 @@ export const actsWitnesses: FullWitnessEntry[] = [
     fathers: [
       { author: "Chrysostom", work: "Homilies on Acts 19.3", date: "c. AD 400", use: "Direct quotation", reading: "Competing reading", locator: "INTF record 4668; PG 60, 153.9", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=4668" },
       { author: "Cyril of Alexandria", work: "Thesaurus", date: "c. AD 425", use: "Direct quotation", reading: "Competing reading", locator: "INTF record 4178; PG 75, 500B2", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=4178" },
+      { author: "Pseudo-Chrysostom", work: "Psalm 50 material", date: "Late antique", use: "Close quotation", reading: "Competing reading", locator: "PG 55, 530.49, INTF record 7742", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=7742" },
+      { author: "Chrysostom", work: "Acts 9:6 record", date: "c. AD 400", use: "Direct quotation", reading: "Competing reading", locator: "INTF record 4669", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=4669" },
+      { author: "Cyril of Alexandria", work: "Acts 9:6 record", date: "Fifth century", use: "Direct quotation", reading: "Competing reading", locator: "INTF record 4179", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=4179" },
+      { author: "Epiphanius", work: "Acts 9:6 records", date: "Fourth century", use: "Close quotation", reading: "Competing reading", locator: "INTF records 1024 and 1025", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=1024" },
+      { author: "Pseudo-Caesarius", work: "Acts 9:6 record", date: "Late antique", use: "Close quotation", reading: "Competing reading", locator: "INTF record 6834", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=6834" },
+      { author: "Pseudo-Didymus", work: "Acts 9:6 record", date: "Late antique", use: "Close quotation", reading: "Competing reading", locator: "INTF record 9158", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=9158" },
+      { author: "Pseudo-Chrysostom", work: "Acts 9:6 record", date: "Late antique", use: "Close quotation", reading: "Competing reading", locator: "INTF record 7745", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=7745" },
     ],
   },
   {
@@ -147,6 +155,7 @@ export const actsWitnesses: FullWitnessEntry[] = [
     sources: [
       { ...ECM_ACTS, url: "https://ntvmr.uni-muenster.de/ecm?segment=28&verse=Acts.20.28", locator: "Acts 20:28" },
       { label: "Official Vetus Latina collation for Acts 20:28", url: "https://download.uni-mainz.de/fb07-klassphil-nttf/Apostelgeschichte/Act%2020/Act%2020_28.pdf", locator: "p. 1, column 30" },
+      INTF_LISTE,
       INTF_PATRISTIC,
     ],
     notes: [
@@ -181,6 +190,15 @@ export const actsWitnesses: FullWitnessEntry[] = [
       { author: "Athanasius", work: "Sermon 1.6.6", date: "4th century", use: "Direct quotation", reading: "Supports the KJV reading", locator: "INTF record 8183; Wyrwa I.1, 464.29", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=8183" },
       { author: "Basil", work: "Regulae 80.16", date: "4th century", use: "Direct quotation", reading: "Supports the KJV reading", locator: "INTF record 91; PG 31, 865B9", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=91" },
       { author: "Chrysostom", work: "Homilies on Acts 44.2", date: "c. AD 400", use: "Direct quotation", reading: "Supports the KJV reading", locator: "INTF records 6428–6429; PG 60, 310.23", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=6428" },
+      { author: "Chrysostom", work: "Purchase-clause quotation", date: "c. AD 400", use: "Close quotation", reading: "Related", locator: "INTF record 6432", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=6432" },
+      { author: "Antiochus", work: "Pandecta 122", date: "Seventh century", use: "Direct quotation", reading: "Supports the KJV reading", locator: "PG 89, 1812B10, INTF records 8320 and 8273", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=8320" },
+      { author: "John Damascene", work: "Sacra Parallela E17", date: "Eighth century", use: "Direct quotation", reading: "Supports the KJV reading", locator: "PG 95, 1539B7, INTF record 8434", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=8434" },
+      { author: "Cyril of Alexandria", work: "Theotokos 3.22", date: "Fifth century", use: "Direct quotation", reading: "Related", locator: "ACO I.1.7, 29.14, INTF record 4573", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=4573" },
+      { author: "Ammonius of Alexandria", work: "Fragmenta in Acta 20:28", date: "Late antiquity", use: "Textual comment", reading: "Competing reading", locator: "PG 85, 1581A11, INTF record 2672", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=2672" },
+      { author: "Pseudo-Didymus", work: "De Trinitate 2.8.2", date: "Late antiquity", use: "Direct quotation", reading: "Competing reading", locator: "PG 39, 621B7, INTF record 9143", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=9143" },
+      { author: "Didymus the Blind", work: "Commentary on Zechariah 2.153.259", date: "Fourth century", use: "Close quotation", reading: "Related", locator: "INTF record 772", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=772" },
+      { author: "Pseudo-Athanasius", work: "De incarnatione contra Apollinarium 1.13", date: "Late antiquity", use: "Close quotation", reading: "Related", locator: "INTF record 482", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=482" },
+      { author: "Theodoret", work: "Commentary on Philippians 1:1f", date: "Fifth century", use: "Close quotation", reading: "Related", locator: "INTF record 2454", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=2454" },
       { author: "Irenaeus", work: "Against Heresies 3.14.2", date: "c. AD 180", use: "Direct quotation", reading: "Competing reading", locator: "INTF record 3320; SC 211, 264.59", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=3320", transmission: "Latin" },
       { author: "Theodoret", work: "Theologia Trinitatis 26", date: "5th century", use: "Direct quotation", reading: "Competing reading", locator: "INTF record 2510; PG 75, 1185B6", url: "https://intf.uni-muenster.de/patristik/index2.php?submit=2510" },
     ],

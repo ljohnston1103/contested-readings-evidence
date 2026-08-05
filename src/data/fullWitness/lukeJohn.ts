@@ -28,6 +28,27 @@ const VL_JOHN = {
   label: "ITSEE Vetus Latina John synopsis",
   url: "https://itseeweb.cal.bham.ac.uk/iohannes/vetuslatina/edition/",
 };
+const ECM_JOHN_INTRO = {
+  label: "IGNTP/ITSEE ECM John introduction and corpus scope",
+  url: "https://itseeweb.cal.bham.ac.uk/iohannes/ECMGreek/introduction.html",
+  locator: "Selected corpus of 236 Greek manuscripts including 22 supplements",
+};
+const ECM_JOHN_INSTRUCTIONS = {
+  label: "IGNTP/ITSEE ECM John encoding instructions",
+  url: "https://itseeweb.cal.bham.ac.uk/iohannes/ECMGreek/instructions.html",
+};
+const VL_JOHN_REGISTER = {
+  label: "ITSEE Vetus Latina John manuscript register",
+  url: "https://itseeweb.cal.bham.ac.uk/iohannes/vetuslatina/manuscripts.html",
+};
+const SAHIDIC_JOHN_XML = {
+  label: "Official Sahidic John XML dataset (University of Birmingham eData 1042)",
+  url: "https://edata.bham.ac.uk/1042/",
+};
+const PROTO_BOHAIRIC = {
+  label: "Schulz, proto-Bohairic appendix to the 2021 Sahidic critical edition",
+  url: "https://doi.org/10.1515/9783110592153-007",
+};
 const SAHIDIC_JOHN = {
   label:
     "Förster, Sänger-Böhm and Schulz, Kritische Edition der sahidischen Version des Johannesevangeliums (2021)",
@@ -189,6 +210,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             tone: "related",
             reading: "ὁ πατὴρ αὐτοῦ καὶ ἡ μήτηρ αὐτοῦ",
             witnesses: "01* 019 Sinaitic-Syriac Harklean-margin",
+            aggregates: "a Vulgate manuscript",
           },
           { label: "Lacunose", tone: "neutral", witnesses: "04 033" },
         ],
@@ -272,7 +294,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
     scope: LUKE_SCOPE,
     snapshot: {
       greekSupport:
-        "9 named Greek witnesses at addition A and 6 at addition B, plus Families 1 and 13 and Willker's printed Byzantine subgroup of about 1,300",
+        "9 named Greek witnesses at addition A and 7 at addition B, plus Families 1 and 13 and Willker's printed Byzantine subgroup of about 1,300",
       greekAgainst:
         "23 named Greek witnesses plus Willker's printed Byzantine subgroup of about 430",
       supportCategory: "Byzantine subgroup, Old Latin and Syriac support",
@@ -314,19 +336,21 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
           {
             label: "Syriac and other versions",
             tone: "support",
-            witnesses: "Curetonian Peshitta Harklean Palestinian-Syriac Armenian Gothic vgWW",
+            witnesses:
+              "Curetonian Peshitta Harklean Palestinian-Syriac Armenian Gothic Bohairic-part Diatessaron-Arabic vgWW",
           },
           {
             label: "Greek manuscripts",
             tone: "competing",
             witnesses:
-              "P75 01 02 03 04 019 032 037 040 044 047 0211 28 33 157 565 892 1071 1241 1342 1424 2786",
+              "P45 P75 01 02 03 04 019 032 037 040 044 047 0211 28 33 157 565 892 1071 1241 1342 1424 2786",
             aggregates: "Maj-part430",
           },
           {
             label: "Old Latin, Syriac and Coptic",
             tone: "competing",
-            witnesses: "g1 (VL7) l (VL11) Sinaitic Sahidic vgSt Ethiopic-manuscripts",
+            witnesses:
+              "g1 (VL7) l (VL11) Sinaitic Sahidic vgSt Ethiopic-manuscripts Codex-Fuldensis",
           },
           {
             label: "Assignment open in the printed source",
@@ -351,8 +375,20 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
           {
             label: "Greek manuscripts",
             tone: "support",
-            witnesses: "017 021 024 030 2 700",
+            witnesses: "017 021 024 030 2 579 700",
             aggregates: "Family 1 · Family 13 · Maj-part1300",
+          },
+          {
+            label: "Old Latin",
+            tone: "support",
+            witnesses:
+              "a (VL3) aur (VL15) b (VL4) c (VL6) e (VL2) f (VL10) q (VL13) r1 (VL14)",
+          },
+          {
+            label: "Syriac and other versions",
+            tone: "support",
+            witnesses:
+              "Curetonian Peshitta Harklean Palestinian-Syriac Armenian Gothic Diatessaron-Arabic",
           },
           {
             label: "Coptic and Vulgate",
@@ -363,13 +399,14 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             label: "Greek manuscripts",
             tone: "competing",
             witnesses:
-              "P45 P75 01 02 03 04 05 019 032 037 040 044 047 0211 28 33 157 565 669 892 1071 1241 1342 1424 2786",
+              "P45 P75 01 02 03 04 05 019 032 037 040 044 047 0211 28 33 157 565 669 892 1071 1241 1342 1424 1675 2786",
             aggregates: "Maj-part430",
           },
           {
             label: "Old Latin, Syriac and Coptic",
             tone: "competing",
-            witnesses: "d (VL5) g1 (VL7) l (VL11) Sinaitic Sahidic vgSt",
+            witnesses:
+              "d (VL5) g1 (VL7) l (VL11) Sinaitic Sahidic vgSt Ethiopic-manuscripts Codex-Fuldensis",
           },
         ],
       },
@@ -396,7 +433,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
     scope: LUKE_SCOPE,
     snapshot: {
       greekSupport:
-        "14 named Greek witnesses at the address, 15 at “Thy will be done”, and 17 at the deliverance clause, plus Family 13 and the Maj group",
+        "15 named Greek witnesses at the address, 16 at “Thy will be done”, and 18 at the deliverance clause, plus Family 13 and the Maj group",
       greekAgainst: "7 named Greek witnesses plus Family 1",
       supportCategory: "Byzantine tradition across all three clauses",
       mainEvidenceAgainst: [
@@ -421,7 +458,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
           {
             label: "Greek manuscripts",
             tone: "support",
-            witnesses: "02 04 05 024 032 037 040 044 070 157 579 892 1241 33V",
+            witnesses: "02 04 05 024 032 037 038 040 044 070 157 579 892 1241 33V",
             aggregates: "Family 13 · Maj",
           },
           {
@@ -435,13 +472,14 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             tone: "related",
             reading: "Πάτερ ἡμῶν only",
             witnesses: "019 Armenian",
+            aggregates: "several further manuscripts cited collectively",
           },
           {
             label: "Greek manuscripts",
             tone: "competing",
             reading: "Πάτερ",
             witnesses: "P75 01 03 019 22 700 1342",
-            aggregates: "Family 1",
+            aggregates: "Family 1 · several further manuscripts cited collectively",
           },
           {
             label: "Latin and Syriac",
@@ -459,7 +497,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
           {
             label: "Greek manuscripts",
             tone: "support",
-            witnesses: "01 02 04 05 024 032 037 040 044 070 157 579 700 892 33V",
+            witnesses: "01 02 04 05 024 032 037 038 040 044 070 157 579 700 892 33V",
             aggregates: "Family 13 · Maj",
           },
           {
@@ -479,7 +517,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             label: "Greek manuscripts",
             tone: "competing",
             witnesses: "P75 03 019 22 1342",
-            aggregates: "Family 1",
+            aggregates: "Family 1 · several further manuscripts cited collectively",
           },
           {
             label: "Syriac and other versions",
@@ -497,7 +535,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
           {
             label: "Greek manuscripts",
             tone: "support",
-            witnesses: "02 04 05 010 011 012 013 017 032 037 038 041 044 070 33 565 892",
+            witnesses: "02 04 05 07 010 011 012 013 017 032 037 038 041 044 070 33 565 892",
             aggregates: "Family 13 · Maj · lectionary evidence grouped in the apparatus",
           },
           {
@@ -541,6 +579,12 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             label: "Greek manuscripts",
             tone: "related",
             witnesses: "700 162",
+          },
+          {
+            label: "Greek manuscripts",
+            tone: "related",
+            reading: "a related “upon us let your kingdom come” form",
+            witnesses: "05",
           },
           {
             label: "Old Latin",
@@ -700,6 +744,32 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
         reading: "Competing reading",
         locator: "PO 14:245–246",
         transmission: "Preserved through Severus",
+      },
+      {
+        author: "Gregory Nazianzen",
+        work: "Theological Oration IV.16",
+        date: "Late fourth century",
+        use: "Indirect report",
+        reading: "Supports the KJV reading",
+        locator: "Theological Oration IV.16, reported by Severus",
+        transmission: "Preserved through Severus",
+      },
+      {
+        author: "John Chrysostom",
+        work: "Homily on “Father, if possible, let this cup pass from me”",
+        date: "Late fourth century",
+        use: "Indirect report",
+        reading: "Supports the KJV reading",
+        locator: "Homily on “Father, if possible…”, reported by Severus",
+        transmission: "Preserved through Severus",
+      },
+      {
+        author: "Athanasius",
+        work: "Against the Arians 3",
+        date: "Fourth century",
+        use: "Allusion",
+        reading: "Related",
+        locator: "PG 26:440",
       },
     ],
   },
@@ -956,6 +1026,14 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
         use: "Direct quotation",
         reading: "Supports the KJV reading",
         locator: "PG 62:55.9; PG 49:405; PG 51:111",
+      },
+      {
+        author: "John Chrysostom",
+        work: "Homily on “Father, if possible, let this cup pass from me”, §4",
+        date: "Late fourth century",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator: "Homily on “Father, if possible…”, §4",
       },
       {
         author: "Jerome",
@@ -1297,6 +1375,17 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
       { ...SAHIDIC_JOHN, locator: "John 1:18" },
       INTF_LISTE,
       { ...NEWADVENT, locator: "Tertullian, Adv. Prax. 15; Hilary, De Trinitate 5.33–34" },
+      ECM_JOHN_INTRO,
+      {
+        ...ECM_JOHN_INSTRUCTIONS,
+        locator: "Meaning of the state suffixes * C S r V used in the rosters",
+      },
+      {
+        ...VL_JOHN_REGISTER,
+        locator: "Identity and physical date of the VL sigla named at John 1:18",
+      },
+      { ...SAHIDIC_JOHN_XML, locator: "Raw Sahidic John 1:18 verse files" },
+      { ...PROTO_BOHAIRIC, locator: "Proto-Bohairic John 1:18" },
     ],
     notes: [
       "The 132 entries include manuscript, supplement and lectionary states.",
@@ -1344,6 +1433,22 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             tone: "competing",
             reading: "θεός",
             witnesses: "P66 P75 01 03 04* 019 33",
+          },
+          {
+            label: "Coptic",
+            tone: "neutral",
+            reading: "reconstructed at the target",
+            witnesses: "sa10 sa40 sa103 sa117 sa139 pbo",
+            note:
+              "Target letters are mostly or entirely editorial reconstruction; proto-Bohairic has the phrase wholly inside restoration brackets.",
+          },
+          {
+            label: "Coptic",
+            tone: "neutral",
+            reading: "fragmentary, unassigned",
+            witnesses: "fa16",
+            note:
+              "Fayumic fa16 (GA 0260 / P.Berlin 5542) is fragmentary at the target and cannot be assigned cleanly.",
           },
           {
             label: "Deficient at the verse",
@@ -1405,6 +1510,17 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
       { ...VL_JOHN, locator: "John 3:13" },
       { ...SAHIDIC_JOHN, locator: "John 3:13" },
       INTF_LISTE,
+      ECM_JOHN_INTRO,
+      {
+        ...ECM_JOHN_INSTRUCTIONS,
+        locator: "Meaning of the state suffixes r * C S used in the John 3:13 roster",
+      },
+      {
+        ...VL_JOHN_REGISTER,
+        locator: "Identity and physical date of the VL sigla named at John 3:13",
+      },
+      { ...SAHIDIC_JOHN_XML, locator: "The 17 extant Sahidic John 3:13 witnesses" },
+      { ...PROTO_BOHAIRIC, locator: "Proto-Bohairic lacuna at John 3:1–32" },
     ],
     notes: ["GA 2575 omits the whole verse."],
     units: [
@@ -1418,6 +1534,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             tone: "support",
             witnesses:
               "02 07 011 017r 022 028 037 038 041 044 045 050 063r 0211 1 13 18 22 35 69 118 124 138 157 168 173 209 213 226 265 295 333 346 357 377 382 430 544 565 579*r 579C 597 732 788 792r 799 807 826 828 841 884 892 983 992 1009r 1029 1071 1079 1093 1128 1192 1210 1219 1230 1242 1253 1278 1319 1320 1321 1344 1424 1463 1546 1561 1571 1582 1654 1689 1788 1797 2106 2192 2193 2223 2372 2411 2561 2585 2615 2680 2713 2718 2766 2768 2786 2790 2886",
+            aggregates: "the selected lectionary states encoded in the IGNTP John XML",
           },
           {
             label: "Old Latin",
@@ -1425,6 +1542,8 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             reading: "qui est in caelo / caelis",
             witnesses:
               "VL3 VL4 VL6 VL7 VL8 VL9A VL10 VL11 VL11A VL13 VL14 VL15 VL22 VL27 VL29 VL30 VL32 VL33 VL35 VL47 VL48",
+            aggregates:
+              "all 23 collatable Vetus Latina John synopsis rows carry a final heavenly clause",
           },
           {
             label: "Greek manuscripts",
@@ -1453,7 +1572,15 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             label: "Coptic",
             tone: "competing",
             witnesses: "Sahidic fa6",
+            aggregates:
+              "all 17 extant Sahidic John XML witnesses, and the printed Sahidic critical text",
             note: "All extant Sahidic witnesses end the verse at “Son of Man”.",
+          },
+          {
+            label: "Coptic",
+            tone: "neutral",
+            witnesses: "proto-Bohairic",
+            note: "Lacunose throughout John 3:1–32.",
           },
           {
             label: "Whole verse absent",
@@ -1479,10 +1606,10 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
     unit: "Two independent units: 5:3b, “waiting for the moving of the water”, and the whole of verse 4, the angel explanation.",
     scope: JOHN_SCOPE,
     snapshot: {
-      greekSupport: "The enumerated remainder of the 236-document IGNTP John corpus",
+      greekSupport: "138 named clause-present states at 5:3b; 134 named angel-opening states at 5:4",
       greekAgainst:
         "10 named Greek states at 5:3b and 13 at verse 4 in the 236-document IGNTP John corpus",
-      supportCategory: "The enumerated remainder of the selected IGNTP John corpus",
+      supportCategory: "The named clause-present states in the selected IGNTP John corpus",
       mainEvidenceAgainst: ["P66", "P75", "Codex Sinaiticus (01)", "Codex Vaticanus (03)"],
     },
     sources: [
@@ -1491,6 +1618,27 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
       { ...SAHIDIC_JOHN, locator: "John 5:3–4" },
       INTF_LISTE,
       { ...NEWADVENT, locator: "Ambrose, De mysteriis 4.22; Chrysostom, Hom. in Ioann. 36" },
+      ECM_JOHN_INTRO,
+      {
+        ...ECM_JOHN_INSTRUCTIONS,
+        locator: "Meaning of the state suffixes * C S used at John 5:3–4",
+      },
+      {
+        ...VL_JOHN_REGISTER,
+        locator: "Identity and physical date of the VL sigla named at John 5:4",
+      },
+      { ...SAHIDIC_JOHN_XML, locator: "Raw Sahidic John 5:3 and 5:4 files" },
+      { ...PROTO_BOHAIRIC, locator: "Proto-Bohairic John 5:3–4; verse 4 unattested" },
+      {
+        label: "New Advent Fathers of the Church",
+        url: "https://www.newadvent.org/fathers/0321.htm",
+        locator: "Tertullian, De baptismo 5",
+      },
+      {
+        label: "New Advent Fathers of the Church",
+        url: "https://www.newadvent.org/fathers/34021.htm",
+        locator: "Ambrose, De Spiritu Sancto 1.88",
+      },
     ],
     notes: [
       "GA 02 preserves verse 4 and omits its opening ἄγγελος γὰρ κυρίου; 02C* supplies it.",
@@ -1502,15 +1650,29 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
         reading: "ἐκδεχομένων τὴν τοῦ ὕδατος κίνησιν",
         groups: [
           {
-            label: "Greek manuscripts",
+            label: "Greek clause-present states",
             tone: "support",
-            aggregates:
-              "the enumerated remainder of the 236-document corpus, with 04C2 long where 04* omits",
+            witnesses:
+              "02 04C2r 05 07* 07Cr 011 017 028 037 038*r 038Cb 041 044 045 063V 078 0211 0233 1 13 18 22 33 35 69 109 118 124 138 168 209 213 226 249 265 295 333 357 377 382r 397 430 544 565 579 597 732 792 799 807 826 828 841 865 884 892 983 992 994 1009 1010 1014 1029 1071 1079 1093 1128 1192 1210 1219 1230 1241 1242 1253 1278 1293 1319 1320 1321C 1344 1424 1463 1546 1561 1571r 1582 1654 1689 1788 1797 2106 2192 2193 2223 2372 2411 2561 2575 2585 2615 2680 2713 2718 2766 2768 2786 2790 2886 L5-S1W4D1 L17-S1W4D1r L32-S1W4D1 L60-S1W4D1r L141-S1W4D1 L252-S1W4D1 L253-S1W4D1 L329-S1W4D1 L335-S1W4D1 L387-S1W4D1 L425-S1W4D1 L638-S1W4D1 L640-S1W4D1 L663-S1W4D1 L704-S1W4D1 L735-S1W4D1 L770-S1W4D1 L847-S1W4D1 L1000-S1W4D1 L1073-S1W4D1 L1075-S1W4D1 L1076-S1W4D1 L1086-S1W4D1 L1091-S1W4D1 L1096-S1W4D1 L1100-S1W4D1 L1552-S1W4D1 L1692-S1W4D1 032S 173",
           },
           {
             label: "Greek manuscripts",
             tone: "competing",
             witnesses: "P66 P75 01 03 04* 019 029 0141 157 821",
+          },
+          {
+            label: "Coptic",
+            tone: "competing",
+            witnesses: "proto-Bohairic",
+            aggregates: "the ten raw Sahidic John 5:3 files",
+            note:
+              "The Sahidic 5:3 files and proto-Bohairic end with the sick-person list and have no 3b clause.",
+          },
+          {
+            label: "Deficient at John 5:3",
+            tone: "neutral",
+            witnesses:
+              "P2 P5 P6 P22 P28 P36 P39 P44 P45 P52 P55 P59 P60 P63 P76 P80 P84 P90 P93 P95 P106 P107 P108 P109 P119 P120 P121 P122 P128 05S 022 024 026 032 033 050 054 060 065 068 070 083 086 087 091 0109 0127 0145 0162 0210 0216 0217 0218 0234 0238 0256 0260 0264 0268 0290 0299 0301 0302 0309 118S 213S 317 333S 346 543 565S 788 869 892S 994S 1010S 1128S 1321* 1571S 1582S 2193S 2561S L141S L640S L704S L1000S L1076S L1077 L1082 L1091S L1692S2 L1692S",
           },
         ],
       },
@@ -1521,9 +1683,10 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
           "ἄγγελος γὰρ κυρίου κατὰ καιρὸν κατέβαινεν ἐν τῇ κολυμβήθρᾳ καὶ ἐτάρασσεν τὸ ὕδωρ…",
         groups: [
           {
-            label: "Greek manuscripts",
+            label: "Greek states with the angel opening",
             tone: "support",
-            aggregates: "the enumerated remainder of the 236-document corpus",
+            witnesses:
+              "02C* 04C2 07 011 017 028 037 038 041 044 045 063 078 0141 0211 0233 1 13 18 22 35 69 109 118 124 138 168 173 209 213 226 249 265 295 333 357 377 382 397 430 544 565 579 597 732 792 799 807 826 828 841 865 884 892 983 992 994 1009 1010 1014 1029 1071 1079 1093 1128 1192 1210 1219 1230 1241 1242 1253 1278 1293 1319 1320 1321C 1344 1424 1463 1546 1561 1571 1582 1654 1689 1788 1797 2106 2192 2193 2223 2372 2411 2561 2575 2585 2615 2680 2713 2766 2768 2786 2790 2886 L5-S1W4D1 L17-S1W4D1 L32-S1W4D1 L60-S1W4D1 L141-S1W4D1 L252-S1W4D1 L253-S1W4D1 L329-S1W4D1 L335-S1W4D1 L387-S1W4D1 L425-S1W4D1 L638-S1W4D1 L640-S1W4D1 L663-S1W4D1 L704-S1W4D1 L735-S1W4D1 L770-S1W4D1 L847-S1W4D1 L1000-S1W4D1 L1073-S1W4D1 L1075-S1W4D1 L1076-S1W4D1 L1086-S1W4D1 L1091-S1W4D1 L1096-S1W4D1 L1100-S1W4D1 L1552-S1W4D1 L1692-S1W4D1 019",
           },
           {
             label: "Old Latin",
@@ -1547,9 +1710,31 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             witnesses: "sa1",
           },
           {
+            label: "Greek manuscripts",
+            tone: "related",
+            reading: "verse 4 without its opening ἄγγελος γὰρ κυρίου",
+            witnesses: "02* 02C*",
+            note:
+              "02* preserves verse 4 but omits its opening ἄγγελος γὰρ κυρίου; 02C* supplies it. Two states of one codex.",
+          },
+          {
+            label: "Coptic",
+            tone: "neutral",
+            reading: "damaged at the point",
+            witnesses: "sa103 sa101",
+            note:
+              "sa103 is damaged and is not a second clean omission; sa101 carries damaged tail material from the sick-person list, not verse 4.",
+          },
+          {
             label: "Not transmitted in the Sahidic tradition",
             tone: "neutral",
             witnesses: "Sahidic proto-Bohairic",
+          },
+          {
+            label: "Deficient at John 5:4",
+            tone: "neutral",
+            witnesses:
+              "P2 P5 P6 P22 P28 P36 P39 P44 P45 P52 P55 P59 P60 P63 P76 P80 P84 P90 P93 P95 P106 P107 P108 P109 P119 P120 P121 P122 P128 05S 022 024 026 032 033 050 054 060 065 068 070 083 086 087 091 0109 0127 0145 0162 0210 0216 0217 0218 0234 0238 0256 0260 0264 0268 0290 0299 0301 0302 0309 118S 213S 317 333S 346 543 565S 788 869 892S 994S 1010S 1128S 1571S 1582S 2193S 2561S L141S L640S L704S L1000S L1076S L1077 L1082 L1091S L1692S2 L1692S",
           },
         ],
       },
@@ -1594,6 +1779,15 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
         url: "https://www.newadvent.org/fathers/0321.htm",
         transmission: "Latin",
       },
+      {
+        author: "Didymus the Blind",
+        work: "De Trinitate 2.14",
+        date: "Fourth century",
+        use: "Parallel tradition",
+        reading: "Related",
+        locator: "De Trinitate 2.14",
+        transmission: "Greek; the attribution of the work is disputed",
+      },
     ],
   },
   {
@@ -1615,6 +1809,17 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
       { ...SAHIDIC_JOHN, locator: "John 6:47" },
       KIRAZ,
       INTF_LISTE,
+      ECM_JOHN_INTRO,
+      {
+        ...ECM_JOHN_INSTRUCTIONS,
+        locator: "Meaning of the state suffixes r and S used at John 6:47",
+      },
+      {
+        ...VL_JOHN_REGISTER,
+        locator: "Identity and physical date of the VL sigla named at John 6:47",
+      },
+      { ...SAHIDIC_JOHN_XML, locator: "The 11 raw Sahidic John 6:47 verse files" },
+      { ...PROTO_BOHAIRIC, locator: "Proto-Bohairic John 6:47 reads ⲉⲣⲟⲓ" },
     ],
     notes: [
       "GA 04 and 091 are lacunose at this unit.",
@@ -1631,29 +1836,26 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             tone: "support",
             witnesses:
               "02 05 07 011 017 022 028 037 041 044 045 0141 0211 0233 1 13 18 22 33 35 69 109 118 124 138 157 168 173 209 213 226 249 265 295 333 357 377 382 397 430 543 544 565 579r 597 732 788 792 799 807 821 826 828 841 869 884 983 992 994 1009 1010 1014 1029 1079 1093 1128 1192 1210 1219 1230 1241 1242 1253 1278 1293 1319 1320 1321 1344 1424 1463 1546 1561 1571S 1582 1654 1689 1788 1797 2106 2192 2193 2223 2372 2411 2561 2575 2585 2615 2680 2713 2718 2766 2768 2786 2790 2886",
+            aggregates: "plus the selected lectionary entries encoded in the IGNTP John XML",
           },
           {
             label: "Old Latin",
             tone: "support",
             reading: "credit in me",
             witnesses:
-              "VL2 VL3 VL4 VL5 VL6 VL7 VL8 VL9A VL10 VL10A VL11A VL13 VL14 VL15 VL27 VL29 VL30 VL35 VL39 VL40 VL46 VL47 VL48",
+              "VL2 VL3 VL4 VL5 VL6 VL7 VL8 VL9A VL10 VL10A VL11A VL13 VL14 VL15 VL22 VL27 VL29 VL30 VL35 VL39 VL40 VL46 VL47 VL48",
           },
           {
             label: "Syriac and Coptic",
             tone: "support",
             witnesses: "Peshitta Harklean Sahidic cw1 proto-Bohairic",
+            aggregates:
+              "the printed Sahidic critical text and all 11 raw Sahidic John 6:47 files",
           },
           {
             label: "Greek manuscripts",
             tone: "competing",
             witnesses: "P66 P75 01 03 019 029 032 038 892 1071",
-          },
-          {
-            label: "Old Latin",
-            tone: "competing",
-            reading: "quia qui credit habet uitam aeternam",
-            witnesses: "VL22",
           },
           {
             label: "Syriac",
@@ -1691,6 +1893,23 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
         url: "https://www.augustinus.it/latino/connubi_adulterini/connubi_adulterini_2_libro.htm",
         locator: "De adulterinis coniugiis 2.6.7",
       },
+      {
+        label: "Schulz, Sahidic ostracon study of the Pericope Adulterae (2021)",
+        url: "https://doi.org/10.1515/9783110592153-003",
+        locator:
+          "British Museum ostracon EA 21424, John 8:9–11; Trismegistos date AD 400–899; Askeland's challenge to the identification",
+      },
+      ECM_JOHN_INTRO,
+      {
+        ...ECM_JOHN_INSTRUCTIONS,
+        locator:
+          "Meaning of the state suffixes * C S r V and the -1/-2 entry labels used at John 7:53",
+      },
+      {
+        ...VL_JOHN_REGISTER,
+        locator: "Identity and physical date of the VL sigla named at John 7:53",
+      },
+      { ...PROTO_BOHAIRIC, locator: "Proto-Bohairic marks John 7:53–8:11 deest" },
     ],
     notes: [
       "116 deficient entries plus 49 omitting at the standard location plus 71 present there make up the 236 selected documentary entries.",
@@ -1708,6 +1927,8 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
             tone: "support",
             witnesses:
               "05 07 011 017 028 041 045 0233 1 13 18 35 69-1 69-2C 109 118 124-1 124-2 138 173 209 226 226* 226C 265 346 357 377 382 543 544 579 597 788 792 807 826 828 884 892 983 992 994 1009 1010 1014 1071 1079 1093 1128-1 1219 1278 1293 1319 1320 1344 1463 1546 1561 1571S 1582 1654 1689 1788 1797 2193S 2223 2223r 2372 2561C2 2561C2V 2561C4 2575 2585 2615 2680 2713 2766 2786 2790 2886",
+            aggregates:
+              "71 documentary entries present at the standard location in the selected 236-document corpus",
           },
           {
             label: "Old Latin",
@@ -1730,6 +1951,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
           {
             label: "Relocated placements",
             tone: "related",
+            witnesses: "225 1128",
             aggregates:
               "Family 13 after Luke 21:38 · Family 1 and end-of-John forms · 225 and 1128 after John 7:36 · placements after John 8:12, 8:14 and 8:20 · Georgian placements",
           },
@@ -1811,6 +2033,15 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
         locator: "Historia ecclesiastica 3.39.17",
         url: "https://www.newadvent.org/fathers/250103.htm",
         transmission: "Reported by Eusebius",
+      },
+      {
+        author: "Apostolic Constitutions",
+        work: "Apostolic Constitutions 2.24.6",
+        date: "Later than the Didascalia Apostolorum",
+        use: "Derivative use",
+        reading: "Related",
+        locator: "Apostolic Constitutions 2.24.6",
+        transmission: "Literary descendant of the Didascalia form; not an independent early stream",
       },
     ],
   },
