@@ -1,0 +1,182 @@
+OLDEST & BEST — RESEARCH UPDATE CHANGE AND FINAL-QA RECORD
+Date: 2026-08-05
+Repository: C:\Users\ljohn\OneDrive\Desktop\oldest and best website
+Branch: evidence-audit-rebuild
+Research source of record: C:\Users\ljohn\Downloads\OLDESTANDBEST-MASTER-RESEARCH-EXTRACT.txt
+
+1. SCOPE OF THE UPDATE
+
+- The existing site design, layout, components, navigation, styling, and interactions were preserved.
+- The update changes evidence data only: witness rosters, witness dates, passage-specific sources, patristic records, and the way researched records reach the existing evidence tabs.
+- The dedicated Full Witness Information page remains the location for the source-scoped full rosters. Its 51 anchors correspond exactly to the 51 passage dossiers.
+- The ordinary passage pages retain their readable dated-witness tables. They now receive the researched Church Father records and the few missing passage-level version/Greek rows identified by the final sweep.
+- No file in audit-2026-08-04/ was changed.
+
+2. DATASET RESULT
+
+- 51 Full Witness records and 51 displayed passage dossiers; slug sets match exactly.
+- 66 separately defined textual units.
+- 453 source-scoped reading groups.
+- 5,430 printed roster tokens across those groups. This is a roster-entry count, not a claim of 5,430 distinct physical manuscripts.
+- 265 passage-specific source records, all with working source URLs encoded in the data.
+- 174 researched patristic records, all mapped to their passage dossiers; 273 total public patristic rows after merging with the site's already-existing rows and removing duplicates.
+- Every record has a reference, summary, exact unit, apparatus scope, source list, and at least one evidence group.
+- No empty evidence group, empty source record, duplicate passage slug, or unmatched Full Witness anchor remains.
+
+3. FILES CHANGED AND WHAT EACH FILE DOES
+
+Research update already committed as “changes pro” (8f956dd):
+
+- src/data/fullWitness/matthewMark.ts
+  Expanded/corrected Matthew and Mark source-scoped rosters, version states, source locators, and patristic records.
+- src/data/fullWitness/lukeJohn.ts
+  Expanded/corrected Luke and John rosters; added official IGNTP/ITSEE John corpus details, Vetus Latina states, Sahidic/proto-Bohairic states, corrected John 5 counts, and passage-specific sources.
+- src/data/fullWitness/acts.ts
+  Added the missing Acts patristic evidence recovered from the INTF records.
+- src/data/fullWitness/paul.ts
+  Added official Romans/Ephesians/COMPAUL evidence states, deficient states, and patristic/source records.
+- src/data/fullWitness/catholicRevelation.ts
+  Expanded 1 John and Revelation reading states and corrected the exact ECM row groupings.
+- src/data/witnessCatalog.ts
+  Added missing physical-date metadata for named Greek witnesses and corrected P64/P67 and P75 dating; preserved undated later-hand qualifications for 177, 221, 429, 636, and 808.
+- tsconfig.tsbuildinfo
+  Generated TypeScript build metadata changed in the earlier commit; no TypeScript configuration rule was changed.
+
+Final-sweep changes in this update:
+
+- src/data/fullWitness/index.ts
+  Maps every researched FatherRow into the existing passage Church Fathers data, with reading direction, relationship, work, date, locator, and source; deduplicates against existing rows. This also updates the global Fathers page, Research Desk counts/search text, and every other surface derived from displayedPassages.
+  Adds the related Syriac Peshitta state at Luke 24:6 and Sahidic ostracon EA 21424 at John 7:53–8:11 to the existing Related Evidence tab with dates and sources.
+  Adds the two exact Greek correctional witnesses for the full Acts 9:5–6 expansion (69C and 808Cf) to the Greek tab, with base-manuscript dates explicitly separated from the undated correcting hands.
+- src/data/wave2VersionWitnesses.ts
+  Corrects Matthew 19:16–17 so its two separate units display versional evidence independently. Supporting Latin, Syriac, and Coptic rows now appear in the existing support tabs for the unit they support; the same traditions' competing forms at the other unit remain under Competing/Related Evidence.
+- OLDESTANDBEST-RESEARCH-UPDATE-CHANGES-2026-08-05.txt
+  This exact change, QA, empty-state, and deployment record.
+
+No React component, page layout, CSS, Tailwind class, navigation component, or interaction code was changed.
+
+4. PASSAGE-BY-PASSAGE CHANGE RECORD
+
+MATTHEW
+
+1. Matthew 1:25 — added LaParola subvariant provenance, the British Library Curetonian record, and Willker's mae-1/mae-2 dating source; added the Bohairic short-form state.
+2. Matthew 5:22 — added LaParola and Curetonian sources; added Armenian/Georgian support and kept 032 in its explicit disputed-assignment state.
+3. Matthew 5:44 — corrected the snapshot; added Bohairic strands to the affected clause states and kept 04 separately lacunose.
+4. Matthew 6:13 — added Curetonian and mae sources; added the Syriac Diatessaron-descendant omission state and retained the fourth-century Megara ostracon separately.
+5. Matthew 17:21 — added LaParola's lectionary-253 record, Curetonian dating, and the Middle Egyptian mae-2 study.
+6. Matthew 18:11 — added LaParola, Curetonian, and mae sources; added the approximately 250 related Luke-expanded Greek forms and the associated Harklean/Bohairic/Ethiopic aggregate.
+7. Matthew 19:16–17 — corrected the snapshot and 028/28 siglum; split version evidence by verse. Matthew 19:16 now shows supporting Latin tradition, Syriac Sinaitic, Curetonian, Christian Palestinian Aramaic, a Bohairic strand, and mae-1. Matthew 19:17 now shows supporting Peshitta, Harklean, and Sahidic. Competing Old Latin, Syriac, Coptic, Georgian, and Ethiopic states remain attached to their correct unit, including named Old Latin a and d.
+8. Matthew 23:14 — added LaParola, Curetonian, and mae sources for the verse-presence/order and version evidence already displayed.
+9. Matthew 27:35 — added the Curetonian lacuna source and mae-1 identity/date source.
+
+MARK
+
+10. Mark 1:2 — added seven INTF patristic records: Origen, Pseudo-Athanasius, Serapion of Thmuis, Severian of Gabala, Titus of Bostra, Hesychius of Jerusalem, and Anastasius Sinaita.
+11. Mark 7:16 — checked against the master research; no data change required.
+12. Mark 9:29 — checked against the controlling deep-audit memo; no data change required.
+13. Mark 9:44, 46 — added five researched patristic records: two Basil records, two John Chrysostom groupings, and Pseudo-Isaiah material; they remain related to the repeated saying rather than being counted as independent proof of both verse locations.
+14. Mark 10:24 — checked against the current dECM unit; no data change required.
+15. Mark 11:26 — added the Pseudo-Anastasius parallel record.
+16. Mark 15:28 — added Anonymous Dialogus cum Iudaeis and Severian of Gabala records.
+17. Mark 16:9–20 — added Justin Martyr, Pseudo-Clement, Acts of Pilate, Asterius, Philostorgius, Nestorius, and Cyril of Alexandria records with their INTF locators and relationship classifications.
+
+LUKE
+
+18. Luke 2:14 — checked; no data change required. Its Latin/Coptic evidence is competing and its Syriac/harmony evidence is related, so the supporting-version tabs remain empty intentionally.
+19. Luke 2:33 — added the Vulgate-manuscript state to the related “his father and his mother” form.
+20. Luke 4:4 — checked; no data change required. The existing Greek and dated version evidence remains intact.
+21. Luke 9:55–56 — corrected the snapshot and kept the two additions separate; added omitted Bohairic/Diatessaron, P45, Codex Fuldensis, 579, 1675, eight named Old Latin witnesses, Curetonian, Peshitta, Harklean, Palestinian Syriac, Armenian, Gothic, Ethiopic, and Diatessaron-Arabic states to their exact units.
+22. Luke 11:2–4 — corrected the snapshot; added 038 to the address and will clauses, 07 to the deliverance clause, and Bezae's separate alternative-petition form; preserved Family 1/13/Maj and lectionary aggregates only where the source groups them.
+23. Luke 22:43–44 — added Gregory Nazianzen, John Chrysostom, and Athanasius records.
+24. Luke 23:17 — checked; no data change required.
+25. Luke 23:34 — added John Chrysostom's direct quotation with work locator.
+26. Luke 24:6 — the roster itself required no change; final sweep added the Peshitta's related form to the Related Evidence tab with its early-fifth-century tradition date and Willker source.
+27. Luke 24:40 — checked; no data change required.
+28. Luke 24:51 — checked; no data change required.
+29. Luke 24:52 — checked; no data change required.
+
+JOHN
+
+30. John 1:18 — added official IGNTP corpus/encoding sources, the Vetus Latina register, official Sahidic XML, and proto-Bohairic edition; added reconstructed/fragmentary Coptic states (sa10, sa40, sa103, sa117, sa139, pbo, and fa16) without counting them as clean support or opposition.
+31. John 3:13 — added official IGNTP scope/encoding, Vetus Latina, Sahidic XML, and proto-Bohairic sources; recorded all 23 collatable Vetus Latina rows with a heavenly clause, all 17 extant Sahidic XML witnesses without it, the selected lectionary states, and the proto-Bohairic lacuna separately.
+32. John 5:3b–4 — replaced compressed/vague groups with the official selected-corpus rosters. At 5:3b: 138 clause-present, 10 clause-omitting, and 92 deficient entries. At the verse-4 angel opening: 134 present, 13 omitted, and 91 deficient entries. Added separate 02 first-hand/corrected states, Sahidic/proto-Bohairic states, all relevant official sources, and Didymus with a locator.
+33. John 6:47 — added official IGNTP/Vetus Latina/Sahidic/proto-Bohairic sources, the selected lectionary aggregate, all 11 Sahidic files, and VL22; removed the wrongly classified competing Old Latin group after checking its actual form.
+34. John 7:53–8:11 — added official corpus/encoding/Vetus Latina/proto-Bohairic and ostracon sources; reconciled the 236 selected documents as 71 present at the standard location, 49 absent there, and 116 deficient; added named relocation states 225 and 1128, Apostolic Constitutions, and the related Sahidic ostracon EA 21424 row dated AD 400–899.
+
+ACTS
+
+35. Acts 8:37 — added the Irenaeus INTF record.
+36. Acts 9:5–6 — added seven INTF patristic records for the shorter/competing form; final sweep added 69C and 808Cf as the two named exact Greek correctional witnesses for the full expansion, with their correction-hand date limitation stated.
+37. Acts 20:28 — added INTF date metadata and nine patristic records: Chrysostom, Antiochus, John Damascene, Cyril of Alexandria, Ammonius, Pseudo-Didymus, Didymus the Blind, Pseudo-Athanasius, and Theodoret.
+38. Acts 28:29 — checked; no data change required.
+
+PAULINE LETTERS
+
+39. Romans 8:1 — added official positive/negative apparatus, transcription synopsis, COMPAUL, and ECM-project sources; separated Stuttgart Vulgate flesh-only text, Ambrosiaster/Pelagius lemma states, whole-verse deficiency, and manuscript 614's out-of-corpus status.
+40. Romans 14:10 — added the same official Romans source set; separated Stuttgart Vulgate, Ambrosiaster, Pelagius, and whole-verse-deficient states.
+41. Romans 16:24 — added official Romans/COMPAUL sources and direct-transcription locators; separated Stuttgart Vulgate omission and Pelagius's related lemma state.
+42. 1 Corinthians 15:47 — added COMPAUL/Pauline/ECM-project sources; separated the Stuttgart Vulgate, Ambrosiaster, and Pelagius short edition/lemma texts from the eleven COMPAUL manuscript rows.
+43. Ephesians 3:9 — added official apparatus/synopsis/ECM-project sources; separated nineteen whole-verse-deficient witnesses from the local noun lacuna and added Chrysostom's close quotation.
+44. Colossians 1:14 — added the ECM-project source and recorded that 614 and 630 have no rows in the cited official synopsis instead of treating corpus absence as a reading.
+45. 1 Timothy 3:16 — added the Chrysostom source and related Homily 11 record plus the ECM-project status source.
+
+CATHOLIC LETTERS AND REVELATION
+
+46. 1 John 4:3 — corrected the ECM source locator to the exact units and added Sahidic/Bohairic related non-λύει states.
+47. 1 John 5:7–8 — added INTF physical-date metadata and kept Speculum/Fuldensis-prologue material in a separate non-continuous Latin group rather than counting the Fuldensis biblical text as Comma support.
+48. Revelation 1:8 — added INTF dates and split six compressed attribution/article states into their exact ECM rows, including the wholly omitted attribution.
+49. Revelation 1:11 — added INTF dates and split the compressed related-insertion group into seven exact ECM reading rows and their named witnesses.
+50. Revelation 16:5 — added INTF dates and split the compressed competing evidence into the nine exact additional ECM rows; corrected P47 as extant in its own row. No source-scoped Greek manuscript carries the exact KJV future form, so the supporting Greek tab is intentionally empty.
+51. Revelation 22:19 — added INTF physical-date metadata. No source-scoped Greek manuscript carries the exact TR βίβλου form; 61's related marginal states and the competing ξύλου roster remain separate, so the supporting Greek tab is intentionally empty.
+
+5. EMPTY-STATE SWEEP
+
+- All 51 pages have nonempty summaries, KJV readings, variation descriptions, manuscript snapshots, timelines, sources, and Full Witness sections.
+- The existing evidence tabs intentionally remain visible for consistency. Where no passage-specific supporting witness is established for a category, the table displays the site's explanatory empty-state message rather than a fabricated witness.
+- Church Fathers is intentionally empty only where the master research contains no passage-specific patristic record: Luke 2:14, Luke 2:33, Luke 4:4, Luke 23:17, Luke 24:6, Luke 24:40, Luke 24:51, Luke 24:52, John 6:47, Romans 8:1, Romans 16:24, Colossians 1:14, Revelation 1:8, and Revelation 1:11.
+- Supporting Early Versions is intentionally empty for Luke 2:14, 1 Timothy 3:16, 1 John 4:3, and Revelation 1:11. Any researched competing or related versional evidence for those passages is shown under Competing/Related Evidence instead.
+- Luke 24:6's Peshitta and John 7:53–8:11's Sahidic ostracon are related evidence, not exact whole-unit supporting rows; the final sweep placed them in the Related Evidence tab.
+- Revelation 16:5 and Revelation 22:19 have no named exact supporting Greek manuscript in the cited ECM unit; their Greek support tables therefore remain empty while the full competing/related rosters remain visible.
+
+6. VALIDATION COMPLETED
+
+- npm test: PASS.
+  - Wave 2: 21 passages, 67 Greek rows, 46 version rows, 24 original Wave-2 father rows, exact KJV text, and mandatory correction traps checked.
+  - Derived output: all 51 dossiers checked for atomic witness labels, witness-specific dates, duplicate rows, and chronological order.
+- ESLint on both final-sweep data modules: PASS.
+- git diff --check: PASS.
+- Local HTTP route sweep: PASS — 60/60 URLs returned HTTP 200 with no application-error page (home, eight other main sections, and all 51 passage routes).
+- Structural source audit: PASS — 51/51 Full Witness records, 51/51 display records, 265 URL-bearing source rows, no empty units/groups, and no missing researched FatherRow in the derived passage data.
+- Production application compilation: PASS.
+- Final production type-check/deployment: BLOCKED by the separate audit-folder import described below.
+
+Local review URL: http://127.0.0.1:3010/
+
+7. VERCEL FAILURE DIAGNOSIS
+
+Vercel email:
+- Subject: Failed preview deployment on team “ljohnston1103's projects”
+- Project: contested-readings-evidence
+- Failed deployment: dpl_EE7LeABz6EdR5aMoRue2S7oir1LU
+- Failure email time: 2026-08-05 15:19:35 UTC
+
+The failure was reproduced locally with npm run build:
+
+1. Next.js creates the optimized production application successfully.
+2. Vercel then runs TypeScript validation.
+3. TypeScript stops at audit-2026-08-04/auditCorrections.ts:22 because it imports PatristicWitness and Witness from a nonexistent local ./types module.
+
+Exact error:
+Cannot find module './types' or its corresponding type declarations.
+
+The file's own header says it was written to be dropped into src/data/, where ./types would have resolved. Because it is currently stored in audit-2026-08-04/, its intended repository-relative type import is ../src/data/types.
+
+This deployment error predates and is independent of the witness-data changes. No TypeScript rule was weakened and no build error was hidden. The protected audit-2026-08-04/ folder was not modified during this assignment.
+
+Branch/deployment state:
+- origin/main is an ancestor of evidence-audit-rebuild, so the evidence branch can be brought forward without a content merge conflict.
+- Pushing evidence-audit-rebuild triggers a Vercel Preview deployment only.
+- The live Production deployment requires the completed commit on the production branch (currently main) or an explicit Vercel production deployment.
+- Vercel cannot deploy either successfully until the single audit-folder import is corrected or the audit-only TypeScript files are otherwise legitimately removed from the production compilation scope.
+
+Recommended minimal deployment repair: change only audit-2026-08-04/auditCorrections.ts line 22 from ./types to ../src/data/types, then rerun npm run build, push the tested commit, bring it onto main, and verify the production URL. This report does not perform that repair because the assignment explicitly prohibited modifying audit-2026-08-04/.
