@@ -19,7 +19,7 @@
  * already sourced row-by-row and checked out clean on the points sampled.
  */
 
-import type { PatristicWitness, Witness } from "./types";
+import type { PatristicWitness, Witness } from "../src/data/types";
 
 /* ------------------------------------------------------------------ */
 /* Source registry                                                     */

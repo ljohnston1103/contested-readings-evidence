@@ -10,7 +10,7 @@ Research source of record: C:\Users\ljohn\Downloads\OLDESTANDBEST-MASTER-RESEARC
 - The update changes evidence data only: witness rosters, witness dates, passage-specific sources, patristic records, and the way researched records reach the existing evidence tabs.
 - The dedicated Full Witness Information page remains the location for the source-scoped full rosters. Its 51 anchors correspond exactly to the 51 passage dossiers.
 - The ordinary passage pages retain their readable dated-witness tables. They now receive the researched Church Father records and the few missing passage-level version/Greek rows identified by the final sweep.
-- No file in audit-2026-08-04/ was changed.
+- One build-only import in audit-2026-08-04/auditCorrections.ts was corrected after the user explicitly authorized that exact deployment repair.
 
 2. DATASET RESULT
 
@@ -147,8 +147,7 @@ CATHOLIC LETTERS AND REVELATION
 - git diff --check: PASS.
 - Local HTTP route sweep: PASS — 60/60 URLs returned HTTP 200 with no application-error page (home, eight other main sections, and all 51 passage routes).
 - Structural source audit: PASS — 51/51 Full Witness records, 51/51 display records, 265 URL-bearing source rows, no empty units/groups, and no missing researched FatherRow in the derived passage data.
-- Production application compilation: PASS.
-- Final production type-check/deployment: BLOCKED by the separate audit-folder import described below.
+- Production application compilation and TypeScript validation: rerun after the authorized audit import correction; see the final deployment result below.
 
 Local review URL: http://127.0.0.1:3010/
 
@@ -171,12 +170,12 @@ Cannot find module './types' or its corresponding type declarations.
 
 The file's own header says it was written to be dropped into src/data/, where ./types would have resolved. Because it is currently stored in audit-2026-08-04/, its intended repository-relative type import is ../src/data/types.
 
-This deployment error predates and is independent of the witness-data changes. No TypeScript rule was weakened and no build error was hidden. The protected audit-2026-08-04/ folder was not modified during this assignment.
+This deployment error predated and was independent of the witness-data changes. No TypeScript rule was weakened and no build error was hidden. After explicit user authorization, only audit-2026-08-04/auditCorrections.ts line 22 was changed from ./types to ../src/data/types.
 
 Branch/deployment state:
 - origin/main is an ancestor of evidence-audit-rebuild, so the evidence branch can be brought forward without a content merge conflict.
 - Pushing evidence-audit-rebuild triggers a Vercel Preview deployment only.
 - The live Production deployment requires the completed commit on the production branch (currently main) or an explicit Vercel production deployment.
-- Vercel cannot deploy either successfully until the single audit-folder import is corrected or the audit-only TypeScript files are otherwise legitimately removed from the production compilation scope.
+- The single audit-folder import has now been corrected directly; the audit-only files were not excluded from compilation.
 
-Recommended minimal deployment repair: change only audit-2026-08-04/auditCorrections.ts line 22 from ./types to ../src/data/types, then rerun npm run build, push the tested commit, bring it onto main, and verify the production URL. This report does not perform that repair because the assignment explicitly prohibited modifying audit-2026-08-04/.
+Authorized deployment repair performed: audit-2026-08-04/auditCorrections.ts line 22 now imports ../src/data/types. The final production build, push, and live-site verification are recorded in the repository history and deployment handoff.
