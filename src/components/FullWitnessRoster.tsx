@@ -1,6 +1,7 @@
 import { Database, ListChecks, ScrollText } from "lucide-react";
 
 import { PatristicQuoteCard } from "@/components/PatristicQuoteCard";
+import { publicPatristicWitnesses } from "@/data/derived";
 import { fullWitnessBySlug, type WitnessGroup } from "@/data/fullWitness";
 import type { Passage } from "@/data/types";
 
@@ -25,6 +26,7 @@ const toneLabels: Record<WitnessGroup["tone"], string> = {
 export function FullWitnessRoster({ passage }: { passage: Passage }) {
   const entry = fullWitnessBySlug.get(passage.slug);
   if (!entry) return null;
+  const patristicWitnesses = publicPatristicWitnesses(passage);
 
   const snapshotRows = [
     ["Greek support in cited scope", entry.snapshot.greekSupport],
@@ -53,9 +55,11 @@ export function FullWitnessRoster({ passage }: { passage: Passage }) {
       <p className="mt-3 max-w-5xl text-sm leading-6 text-ink-600 dark:text-ink-100/70">
         This roster preserves every named or grouped state recovered in the governing
         sources, including exact readings, competing readings, corrections, related
-        forms, lacunae, versions, and aggregate traditions. A grouped tradition is not
-        counted as one manuscript, and a selected apparatus is not described as a
-        universal collation of every surviving copy.
+        forms, lacunae, versions, and aggregate traditions. When Maj or Byz appears
+        on the KJV side, it marks the numerically dominant Greek transmission at that
+        unit. The green Majority Text card above supplies the best available
+        passage-specific estimate. The grouped siglum is then retained so it is not
+        mistaken for one individual manuscript.
       </p>
 
       <div className="mt-5 rounded-2xl border border-archive-gold/25 bg-archive-gold/10 p-4">
@@ -148,7 +152,7 @@ export function FullWitnessRoster({ passage }: { passage: Passage }) {
         ))}
       </div>
 
-      {passage.patristicWitnesses.length ? (
+      {patristicWitnesses.length ? (
         <section
           className="mt-7"
           aria-labelledby={`${passage.slug}-complete-patristic-roster`}
@@ -165,10 +169,11 @@ export function FullWitnessRoster({ passage }: { passage: Passage }) {
             is not presented as an independently verified exact quotation.
           </p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {passage.patristicWitnesses.map((witness, index) => (
+            {patristicWitnesses.map((witness, index) => (
               <PatristicQuoteCard
                 key={`${passage.slug}-${witness.author ?? witness.source}-${witness.workSection ?? index}-${index}`}
                 witness={witness}
+                passageSlug={passage.slug}
               />
             ))}
           </div>

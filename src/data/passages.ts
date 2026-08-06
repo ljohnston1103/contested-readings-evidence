@@ -1757,7 +1757,7 @@ export const passages: Passage[] = [
       w("Family 1", "c. AD 1000s to 1300s", "Supports longer traditional wording", "greek-manuscript"),
       w("Family 13", "c. AD 1000s to 1400s", "Supports longer traditional wording", "greek-manuscript"),
       w("Minuscule 700", "c. AD 1000s", "Supports longer traditional wording", "greek-manuscript"),
-      w("Part of the Byzantine majority text", "AD 500–1500", "A large share of the roughly 5,000 later Byzantine Greek manuscripts carry the longer wording.", "summary"),
+      w("Larger Byzantine subgroup", "AD 500–1500", "Willker's apparatus assigns approximately 1,300 Greek manuscripts to the larger Byzantine subgroup carrying the fuller clause, compared with about 430 in the shorter subgroup.", "summary"),
       w("Part of the Greek lectionary tradition", "AD 800–1500", "Some of the roughly 2,300 catalogued Greek lectionaries (church service books) contain the longer wording.", "lectionary"),
     ],
     latinWitnesses: [
@@ -2654,7 +2654,7 @@ export const passages: Passage[] = [
       w("Codex Alexandrinus, A", "c. AD 400s", "Omits 'through his blood'", "greek-manuscript"),
       w("Codex Vaticanus, B", "c. AD 325 to 350", "Omits 'through his blood'", "greek-manuscript"),
       w("Codex Ephraemi Rescriptus, C", "c. AD 400s", "Omits 'through his blood'", "greek-manuscript"),
-      w("Most Greek manuscripts", "AD 300–1500", "The great majority of Greek copies — including the oldest codices and roughly 5,000 later Byzantine manuscripts — omit ‘through his blood.’", "summary"),
+      w("Most Greek manuscripts in the cited evidence", "AD 300–1500", "In the official direct-transcription synopsis, 150 present states do not carry the exact-position phrase, while 47 exact states and 11 related or partial states are displayed separately.", "summary"),
     ],
     timeline: [
       t("c. AD 325 to 360", "Vaticanus and Sinaiticus omit 'through his blood'", "greek-manuscript"),

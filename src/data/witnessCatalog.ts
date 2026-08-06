@@ -534,7 +534,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
     note:
-      "“Maj” is a passage-specific aggregate for the majority reading among the manuscripts represented at a given variation unit. Its denominator varies with the manuscripts that preserve and have been collated at that location; it is not one manuscript or a fixed universal total.",
+      "“Maj” identifies the reading carried by the numerical majority of surviving Greek witnesses at that variation unit. When Maj appears on the KJV side, the KJV wording is the dominant Greek reading, commonly represented by roughly 1,400 to 1,700 continuous-text manuscripts in the Gospels and by several hundred in Acts or the Epistles. The passage's Majority Text card gives the best available unit-specific estimate. Maj is an aggregate tradition, not one manuscript, and the exact denominator varies with lacunae and collation scope.",
   },
   {
     key: "Byz",
@@ -547,7 +547,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
     note:
-      "“Byz” is a passage-specific aggregate for the Byzantine reading represented at a given variation unit. Its denominator varies with the manuscripts that preserve and have been collated at that location; it is not one manuscript or a fixed universal total.",
+      "“Byz” identifies the dominant Byzantine reading preserved through the great bulk of later Greek transmission. When Byz appears on the KJV side, it normally represents well over one thousand Gospel manuscripts or several hundred manuscripts in Acts and the Epistles. The passage's Majority Text card gives the best available unit-specific estimate. Byz is a grouped transmission stream, not one manuscript, and its exact passage denominator varies.",
   },
   {
     key: "Maj/Byz",
@@ -560,7 +560,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
     note:
-      "A passage-specific combined majority/Byzantine aggregate. The manuscripts represented and the denominator vary by variation unit; this label is not one manuscript or a fixed universal count.",
+      "“Maj/Byz” identifies the numerical majority and dominant Byzantine transmission together. When it supports the KJV reading, the KJV form stands with the main Greek copying stream rather than with a small isolated group. Depending on the book and verse, this commonly means roughly 1,400 to 1,700 Gospel manuscripts or several hundred manuscripts in Acts and the Epistles. The passage's Majority Text card supplies the unit-specific estimate; Maj/Byz remains a grouped tradition rather than one manuscript.",
   },
   {
     key: "Lect",

@@ -83,7 +83,7 @@ const rowOverrides: Record<string, RowOverride> = {
         dateEnd: 1600,
         direction: "AGAINST_KJV",
         relationship: "related",
-        note: "Stands for the group of other surviving Greek manuscripts that omit the added clause — a group drawn from the roughly 5,800 catalogued copies, not one manuscript.",
+        note: "Stands for the remaining readable Greek witnesses at this unit that omit the added clause. It is an aggregate of passage-preserving witnesses, not one manuscript.",
         aggregate: true,
       },
     ],

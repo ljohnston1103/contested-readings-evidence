@@ -1034,7 +1034,7 @@ function earliestSupportFor(passage: Passage): EarliestSupport[] {
       {
         label: "Earliest patristic and secure Greek evidence catalogued here",
         statement:
-          "Early third century — Tertullian preserves both long and short forms, showing that the \"the Lord\" wording was already known.",
+          "Early third century — Tertullian's separate works are classified individually: On the Resurrection 51 and Against Marcion 5.10 support \"the Lord,\" while Against Marcion 5.9 carries the shorter form.",
         earliestGreek:
           "Fifth century — Codex Alexandrinus (A/02) is the earliest secure exact main-text witness in the displayed synopsis. Corrected states are not assigned the dates of their base codices.",
       },

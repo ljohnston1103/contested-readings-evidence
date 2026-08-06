@@ -57,6 +57,15 @@ const EXPECTED_SECURE_EARLIEST_GREEK = new Map([
   ["1-timothy-3-16", /Codex Athous Lavrensis/iu],
 ]);
 
+const PATRISTIC_DIRECTIONS = new Set(["FOR_KJV", "AGAINST_KJV", "MIXED"]);
+const FATHER_READING_LABELS = new Set([
+  "Supporting witness",
+  "Competing witness",
+  "Mixed witness",
+]);
+const GENERIC_PATRISTIC_SUMMARY =
+  /^(?:supporting witness|supports the kjv reading|competing witness|competing reading|mixed witness|related|uses (?:the )?(?:reading|verse|saying|passage)(?: pastorally)?|knows (?:the )?(?:reading|verse|saying|passage)|reflects (?:awareness of|material from) .+|includes material from .+|preserves related early testimony|patristic citation|debated verbal relationship)$/iu;
+
 function normalize(value) {
   return String(value ?? "")
     .normalize("NFKC")
@@ -200,6 +209,11 @@ function validateDerivedOutput(passages, options = {}) {
     add("dataset", "derived output", "displayedPassages is missing or empty");
     return issues;
   }
+
+  const publicPatristicBySlug = options.publicPatristicBySlug ?? {};
+  const majorityTextBySlug = options.majorityTextBySlug ?? {};
+  const nonMajorityKjvSlugs = new Set(options.nonMajorityKjvSlugs ?? []);
+  let publicMixedPatristicCount = 0;
 
   for (const passage of passages) {
     const passageContext = `${passage.reference} (${passage.slug})`;
@@ -446,6 +460,106 @@ function validateDerivedOutput(passages, options = {}) {
         date: row.date,
       };
     }
+
+    const publicPatristic = Array.isArray(publicPatristicBySlug[passage.slug])
+      ? publicPatristicBySlug[passage.slug]
+      : patristic;
+    for (let index = 0; index < publicPatristic.length; index += 1) {
+      const row = publicPatristic[index];
+      const context = `${passageContext} — public patristic row ${index + 1}`;
+      const reading = String(row.reading ?? "").trim();
+      const summary = String(row.quoteSummary ?? "").trim();
+      if (!PATRISTIC_DIRECTIONS.has(reading)) {
+        add(
+          "patristic-category",
+          context,
+          `uses "${reading || "blank"}" instead of FOR_KJV, AGAINST_KJV, or MIXED`,
+        );
+      }
+      if (!summary || GENERIC_PATRISTIC_SUMMARY.test(summary)) {
+        add(
+          "patristic-summary",
+          context,
+          `has an empty or mechanical public summary: "${summary}"`,
+        );
+      }
+      if (reading === "MIXED") publicMixedPatristicCount += 1;
+    }
+
+    const majorityEntries = Array.isArray(majorityTextBySlug[passage.slug])
+      ? majorityTextBySlug[passage.slug]
+      : [];
+    if (nonMajorityKjvSlugs.has(passage.slug) && majorityEntries.length > 0) {
+      add(
+        "majority-card",
+        passageContext,
+        "is classified as non-majority for the exact KJV unit but still has a Majority Text card",
+      );
+    }
+    for (let index = 0; index < majorityEntries.length; index += 1) {
+      const row = majorityEntries[index];
+      const context = `${passageContext} — Majority Text card ${index + 1}`;
+      for (const field of ["unit", "statement", "estimate", "basis"]) {
+        if (!String(row[field] ?? "").trim()) {
+          add("majority-card", context, `has a blank ${field} field`);
+        }
+      }
+      if (!/majority|dominant|outnumbers|larger byzantine subgroup/iu.test(String(row.statement ?? ""))) {
+        add(
+          "majority-card",
+          context,
+          "does not positively identify the numerical or dominant Greek standing",
+        );
+      }
+      if (!/\d|hundred|thousand/iu.test(String(row.estimate ?? ""))) {
+        add(
+          "majority-card",
+          context,
+          "does not provide a numerical estimate or count",
+        );
+      }
+    }
+  }
+
+  const majoritySlugs = new Set(Object.keys(majorityTextBySlug));
+  const passageSlugsForMajority = new Set(passages.map((passage) => passage.slug));
+  for (const slug of majoritySlugs) {
+    if (!passageSlugsForMajority.has(slug)) {
+      add("majority-card", slug, "has no matching passage dossier");
+    }
+    if (nonMajorityKjvSlugs.has(slug)) {
+      add("majority-card", slug, "appears in both majority and non-majority sets");
+    }
+  }
+  for (const slug of nonMajorityKjvSlugs) {
+    if (!passageSlugsForMajority.has(slug)) {
+      add("majority-card", slug, "non-majority set has no matching passage dossier");
+    }
+  }
+  if (majoritySlugs.size + nonMajorityKjvSlugs.size !== passages.length) {
+    add(
+      "majority-card",
+      "majority classification map",
+      `covers ${majoritySlugs.size + nonMajorityKjvSlugs.size} classifications for ${passages.length} passages`,
+    );
+  }
+  if (publicMixedPatristicCount > 12) {
+    add(
+      "patristic-category",
+      "public patristic dataset",
+      `contains ${publicMixedPatristicCount} mixed rows; mixed classification must remain rare`,
+    );
+  }
+  const commaRows = publicPatristicBySlug["1-john-5-7"] ?? [];
+  const cyprianRows = commaRows.filter((row) =>
+    /cyprian/iu.test(String(row.author ?? row.source ?? "")),
+  );
+  if (cyprianRows.length === 0 || cyprianRows.some((row) => row.reading !== "FOR_KJV")) {
+    add(
+      "patristic-category",
+      "1 John 5:7 — Cyprian",
+      "must be present and classified as a supporting witness",
+    );
   }
 
   const fullWitnessEntries = Array.isArray(options.fullWitnessEntries)
@@ -454,6 +568,7 @@ function validateDerivedOutput(passages, options = {}) {
   if (fullWitnessEntries.length > 0) {
     const passageSlugs = new Set(passages.map((passage) => passage.slug));
     const seenSlugs = new Set();
+    let mixedFatherRowCount = 0;
 
     for (let entryIndex = 0; entryIndex < fullWitnessEntries.length; entryIndex += 1) {
       const entry = fullWitnessEntries[entryIndex];
@@ -498,6 +613,14 @@ function validateDerivedOutput(passages, options = {}) {
             `${father.author} has no work locator`,
           );
         }
+        if (!FATHER_READING_LABELS.has(father.reading)) {
+          add(
+            "patristic-category",
+            fatherContext,
+            `uses "${father.reading}" instead of Supporting witness, Competing witness, or Mixed witness`,
+          );
+        }
+        if (father.reading === "Mixed witness") mixedFatherRowCount += 1;
         const key = normalize(
           `${father.author}|${father.work}|${father.locator}|${father.reading}`,
         );
@@ -529,6 +652,14 @@ function validateDerivedOutput(passages, options = {}) {
           groupKeys.add(key);
         }
       }
+    }
+
+    if (mixedFatherRowCount > 8) {
+      add(
+        "patristic-category",
+        "full witness father dataset",
+        `contains ${mixedFatherRowCount} Mixed witness rows; this category must remain rare`,
+      );
     }
 
     if (seenSlugs.size !== passageSlugs.size) {

@@ -1,3 +1,4 @@
+import { normalizePatristicWitnesses } from "../patristicCategory";
 import type {
   Passage,
   PatristicWitness,
@@ -122,18 +123,20 @@ function patristicRelationship(
 ): PatristicWitness["relationship"] {
   if (use === "Direct quotation") return "explicit_quote";
   if (use === "Close quotation") return "close_quote";
+  if (use === "Textual comment") return "textual_comment";
   if (use === "Manuscript report") return "manuscript_report";
+  if (use === "Allusion") return "allusion";
   if (use === "Parallel tradition") return "parallel_tradition";
-  if (use === "Derivative use") return "theological_parallel";
-  return "theological_parallel";
+  if (use === "Indirect report") return "indirect_report";
+  return "derivative_use";
 }
 
 function patristicReading(
   reading: FatherRow["reading"],
 ): PatristicWitness["reading"] {
-  if (reading === "Supports the KJV reading") return "FOR_KJV";
-  if (reading === "Competing reading") return "AGAINST_KJV";
-  return "RELATED_TO_KJV";
+  if (reading === "Supporting witness") return "FOR_KJV";
+  if (reading === "Competing witness") return "AGAINST_KJV";
+  return "MIXED";
 }
 
 function patristicFallbackSource(entry: FullWitnessEntry) {
@@ -156,7 +159,9 @@ function patristicRow(
     workSection: father.work,
     reading: patristicReading(father.reading),
     relationship: patristicRelationship(father.use),
-    quoteSummary: father.reading,
+    quoteSummary: `${father.use} in ${father.work}.${
+      father.transmission ? ` ${father.transmission}.` : ""
+    }`,
     sourceCitation: father.locator,
     sourceUrl: father.url ?? fallback?.url,
     lastVerified: "2026-08-05",
@@ -324,17 +329,18 @@ function mergePatristicRows(
     }
   }
 
-  if (entry.slug === "john-5-3b-4") {
-    return qualified.filter(
-      (row) =>
-        !(
-          patristicAuthorKey(row.author ?? row.source) === "ambrose" &&
-          row.workSection === "Apparatus-level attribution"
-        ),
-    );
-  }
+  const passageSpecific =
+    entry.slug === "john-5-3b-4"
+      ? qualified.filter(
+          (row) =>
+            !(
+              patristicAuthorKey(row.author ?? row.source) === "ambrose" &&
+              row.workSection === "Apparatus-level attribution"
+            ),
+        )
+      : qualified;
 
-  return qualified;
+  return normalizePatristicWitnesses(entry.slug, passageSpecific);
 }
 
 function mergeTextLists(

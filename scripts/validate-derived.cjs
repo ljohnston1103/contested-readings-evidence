@@ -61,15 +61,33 @@ for (const [label, expected] of [
   assert.equal(parsed.end, expected.end, `Wrong end for ${label}`);
 }
 
-const { buildManuscriptIndex, displayedPassages } = require(derivedPath);
+const {
+  buildManuscriptIndex,
+  displayedPassages,
+  publicPatristicWitnesses,
+} = require(derivedPath);
 const fullWitnessPath = path.resolve(
   __dirname,
   "../src/data/fullWitness/index.ts",
 );
 const { fullWitnessEntries } = require(fullWitnessPath);
+const majorityTextPath = path.resolve(
+  __dirname,
+  "../src/data/majorityText.ts",
+);
+const { majorityTextBySlug, nonMajorityKjvSlugs } = require(majorityTextPath);
+const publicPatristicBySlug = Object.fromEntries(
+  displayedPassages.map((passage) => [
+    passage.slug,
+    publicPatristicWitnesses(passage),
+  ]),
+);
 const issues = validateDerivedOutput(displayedPassages, {
   manuscriptProfiles: buildManuscriptIndex(),
   fullWitnessEntries,
+  publicPatristicBySlug,
+  majorityTextBySlug,
+  nonMajorityKjvSlugs: Array.from(nonMajorityKjvSlugs),
 });
 
 if (issues.length > 0) {
@@ -77,6 +95,6 @@ if (issues.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Derived evidence validation passed: ${displayedPassages.length} passage dossiers and ${fullWitnessEntries.length} full rosters checked for scope, atomic witness labels, witness-specific dates, corrected-hand dating, duplicate rows, source-book mismatches, and chronological order.`,
+    `Derived evidence validation passed: ${displayedPassages.length} passage dossiers and ${fullWitnessEntries.length} full rosters checked for source scope, Majority Text estimates, three-way patristic classification, Cyprian at 1 John 5:7, witness-specific dates, corrected-hand dating, duplicate rows, source-book mismatches, and chronological order.`,
   );
 }

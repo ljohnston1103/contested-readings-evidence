@@ -3,8 +3,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { MajorityTextStandingCard } from "@/components/MajorityTextStandingCard";
 import { Reveal } from "@/components/motion/Reveal";
-import { displayedPassages } from "@/data/derived";
+import { PatristicQuoteCard } from "@/components/PatristicQuoteCard";
+import { displayedPassages, publicPatristicWitnesses } from "@/data/derived";
 import { fullWitnessEntries, type WitnessGroup } from "@/data/fullWitness";
 
 export const metadata: Metadata = {
@@ -32,7 +34,10 @@ const toneLabels: Record<WitnessGroup["tone"], string> = {
 };
 
 const patristicRowsBySlug = new Map(
-  displayedPassages.map((passage) => [passage.slug, passage.patristicWitnesses]),
+  displayedPassages.map((passage) => [
+    passage.slug,
+    publicPatristicWitnesses(passage),
+  ]),
 );
 
 export default function FullWitnessInformationPage() {
@@ -49,11 +54,14 @@ export default function FullWitnessInformationPage() {
           Witness rosters for all 51 passages
         </h1>
         <p className="mt-4 max-w-4xl text-base leading-7 text-ink-700 dark:text-ink-100/75">
-          This page gathers the Greek manuscripts, Latin witnesses, ancient versions, lectionaries,
-          corrected states and Church Fathers recovered in the passage research. Each roster now identifies
-          its governing apparatus or research corpus. A count from a selected apparatus describes that cited
-          corpus and is not presented as a universal count of every surviving manuscript. Group sigla such as
-          Byz remain grouped when the cited source does not enumerate their individual members.
+          This page gathers the Greek manuscripts, Latin witnesses, ancient versions,
+          lectionaries, corrected states and Church Fathers recovered in the passage
+          research. When Maj or Byz supports the KJV reading, it identifies the
+          numerically dominant Greek transmission at that unit. In the Gospels this
+          often represents well over one thousand continuous-text manuscripts, while
+          Acts and the Epistles normally involve several hundred. Each green Majority
+          Text card gives the best available passage-specific estimate, followed by the
+          source scope and any necessary qualification.
         </p>
       </Reveal>
 
@@ -105,6 +113,8 @@ export default function FullWitnessInformationPage() {
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Disputed unit</p>
                 <p className="mt-2 leading-7 text-ink-800 dark:text-ink-100/85">{entry.unit}</p>
               </div>
+
+              <MajorityTextStandingCard slug={entry.slug} className="mt-5" />
 
               <dl className="mt-5 grid gap-3 md:grid-cols-2">
                 <div className="rounded-2xl border border-ink-100 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
@@ -200,35 +210,13 @@ export default function FullWitnessInformationPage() {
                     displayed separately. An apparatus-level attribution does not claim that the
                     exact work and section have been independently verified here.
                   </p>
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <div className="mt-4 grid gap-4 md:grid-cols-2">
                     {(patristicRowsBySlug.get(entry.slug) ?? []).map((father, index) => (
-                      <div key={`${father.author ?? father.source}-${father.workSection ?? index}-${index}`} className="rounded-2xl border border-ink-100 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-                        <p className="font-black text-ink-900 dark:text-white">{father.author ?? father.source} · {father.date}</p>
-                        {father.workSection ? (
-                          <p className="mt-1 text-sm font-semibold text-ink-700 dark:text-ink-100/75">{father.workSection}</p>
-                        ) : null}
-                        <p className="mt-2 text-sm leading-6 text-ink-600 dark:text-ink-100/65">
-                          {[
-                            father.relationship?.replaceAll("_", " "),
-                            father.reading,
-                            father.sourceCitation,
-                          ]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </p>
-                        <p className="mt-2 text-sm leading-6 text-ink-700 dark:text-ink-100/75">{father.quoteSummary}</p>
-                        {father.sourceUrl ? (
-                          <a
-                            href={father.sourceUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-3 inline-flex items-center gap-1.5 text-xs font-black text-archive-teal hover:underline dark:text-teal-200"
-                          >
-                            Open source
-                            <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                          </a>
-                        ) : null}
-                      </div>
+                      <PatristicQuoteCard
+                        key={`${entry.slug}-${father.author ?? father.source}-${father.workSection ?? index}-${index}`}
+                        witness={father}
+                        passageSlug={entry.slug}
+                      />
                     ))}
                   </div>
                 </section>

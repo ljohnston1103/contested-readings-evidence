@@ -271,6 +271,7 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
                     <PatristicQuoteCard
                       key={`${witness.source}-${witness.workSection ?? ""}-${witness.date}-${witnessIndex}`}
                       witness={witness}
+                      passageSlug={passage.slug}
                     />
                   ))}
                 </div>

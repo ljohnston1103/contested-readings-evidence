@@ -5,6 +5,10 @@ import {
 } from "./evidenceDirection";
 import { formatDateLabel, parseEvidenceDate } from "./evidenceDates";
 import { applyKjvForwardCorrections } from "./kjvForwardCorrections";
+import {
+  normalizePatristicWitnesses,
+  patristicCategoryFor,
+} from "./patristicCategory";
 import type { Passage, PatristicWitness, TimelineEvent, Witness } from "./types";
 import {
   greekWitnessCatalog,
@@ -124,7 +128,10 @@ export function dedupeWitnessRows(rows: Witness[]) {
 }
 
 export function publicPatristicWitnesses(passage: Passage) {
-  return passage.patristicWitnesses
+  return normalizePatristicWitnesses(
+    passage.slug,
+    passage.patristicWitnesses,
+  )
     .filter((witness) => {
       const name = normalize(witness.author ?? witness.source);
       const text = normalize(
@@ -613,17 +620,18 @@ export type FatherProfile = {
   passages: Array<{
     passage: Passage;
     witness: PatristicWitness;
-    role: "supports" | "opposes" | "related";
+    role: "supports" | "opposes" | "mixed";
   }>;
 };
 
 function patristicRole(
+  passage: Passage,
   witness: PatristicWitness,
 ): FatherProfile["passages"][number]["role"] {
-  const role = evidenceDirectionRole(witness.reading);
-  if (role === "opposes") return "opposes";
-  if (role === "supports") return "supports";
-  return "related";
+  const category = patristicCategoryFor(passage.slug, witness);
+  if (category === "competing") return "opposes";
+  if (category === "supporting") return "supports";
+  return "mixed";
 }
 
 export function buildFatherIndex(): FatherProfile[] {
@@ -644,7 +652,7 @@ export function buildFatherIndex(): FatherProfile[] {
       profile.passages.push({
         passage,
         witness,
-        role: patristicRole(witness),
+        role: patristicRole(passage, witness),
       });
       map.set(name, profile);
     }
@@ -1263,7 +1271,11 @@ export function buildFullTimeline(): FullTimelineEntry[] {
         witness.author ?? witness.source,
         witness.date,
         "patristic",
-        patristicRole(witness) === "opposes" ? "oppose" : "support",
+        patristicRole(passage, witness) === "opposes"
+          ? "oppose"
+          : patristicRole(passage, witness) === "mixed"
+            ? "milestone"
+            : "support",
         witness.quoteSummary,
         i,
         witness.dateStart,
@@ -1433,7 +1445,7 @@ export function buildWitnessConstellation(): ConstellationBranch[] {
       ),
       related: uniquePassages(
         father.passages
-          .filter((item) => item.role === "related")
+          .filter((item) => item.role === "mixed")
           .map((item) => item.passage),
       ),
     });

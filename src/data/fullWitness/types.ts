@@ -59,7 +59,8 @@ export type FatherRow = {
   work: string;
   date: string;
   use: FatherUse;
-  reading: "Supports the KJV reading" | "Competing reading" | "Related";
+  /** Directional category. Mixed is reserved for evidence that genuinely preserves both sides. */
+  reading: "Supporting witness" | "Competing witness" | "Mixed witness";
   locator: string;
   url?: string;
   /** Transmission language when the surviving evidence is a translation. */

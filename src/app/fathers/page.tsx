@@ -7,11 +7,33 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { buildFatherIndex } from "@/data/derived";
 import { formatDateLabel } from "@/data/evidenceDates";
+import { patristicEvidenceFormLabel } from "@/data/patristicCategory";
 
 export const metadata: Metadata = {
   title: "Church Fathers",
   description: "Early Christian writers cited as patristic evidence for contested readings.",
 };
+
+const roleStyles = {
+  supports:
+    "border-emerald-700/25 bg-emerald-50/75 hover:border-emerald-700/50 dark:border-emerald-300/20 dark:bg-emerald-300/[0.07]",
+  opposes:
+    "border-rose-700/25 bg-rose-50/75 hover:border-rose-700/50 dark:border-rose-300/20 dark:bg-rose-300/[0.07]",
+  mixed:
+    "border-amber-700/25 bg-amber-50/75 hover:border-amber-700/50 dark:border-amber-300/20 dark:bg-amber-300/[0.07]",
+} as const;
+
+const roleLabels = {
+  supports: "Supporting witness",
+  opposes: "Competing witness",
+  mixed: "Mixed witness",
+} as const;
+
+const roleAccentStyles = {
+  supports: "text-emerald-800 dark:text-emerald-200",
+  opposes: "text-rose-800 dark:text-rose-200",
+  mixed: "text-amber-800 dark:text-amber-200",
+} as const;
 
 export default function FathersPage() {
   const fathers = buildFatherIndex();
@@ -34,7 +56,10 @@ export default function FathersPage() {
           Patristic evidence, grouped by source.
         </h1>
         <p className="mt-5 text-lg leading-8 text-ink-700 dark:text-ink-100/75">
-          Each card shows where the available passage evidence connects a writer or early Christian source to a contested reading.
+          Every citation is classified as a Supporting witness, a Competing
+          witness, or, only where the same evidence cannot responsibly be placed
+          on one side, a Mixed witness. Green supports the KJV/TR reading, red
+          carries a competing reading, and tan marks the rare mixed cases.
         </p>
       </Reveal>
       </AmbientVideo>
@@ -62,30 +87,27 @@ export default function FathersPage() {
                 <Link
                   key={`${passage.id}-${witness.author ?? witness.source}-${witness.workSection ?? ""}`}
                   href={`/passages/${passage.slug}`}
-                  className="group/link flex items-start gap-3 rounded-3xl border border-ink-100 bg-ink-50/70 p-4 transition hover:-translate-y-0.5 hover:border-archive-gold/60 dark:border-white/10 dark:bg-white/5"
+                  className={`group/link flex items-start gap-3 rounded-3xl border p-4 transition hover:-translate-y-0.5 ${roleStyles[role]}`}
                 >
-                  <ScrollText className="mt-0.5 h-4 w-4 shrink-0 text-archive-teal transition group-hover/link:scale-110 dark:text-teal-200" aria-hidden="true" />
+                  <ScrollText className={`mt-0.5 h-4 w-4 shrink-0 transition group-hover/link:scale-110 ${roleAccentStyles[role]}`} aria-hidden="true" />
                   <span>
                     <p className="text-sm font-black text-ink-900 dark:text-white">
                       {passage.reference} · {passage.title}
                     </p>
-                    <p className="mt-1 text-xs font-bold leading-5 text-archive-teal dark:text-teal-200">
+                    <p className={`mt-1 text-xs font-bold leading-5 ${roleAccentStyles[role]}`}>
                       Date: {formatDateLabel(witness.date)}
                     </p>
-                    <p className="mt-1 text-xs font-extrabold uppercase tracking-[0.12em] text-ink-600 dark:text-ink-100/70">
-                      {role === "supports"
-                        ? "Supports KJV/TR"
-                        : role === "opposes"
-                          ? "Opposes KJV/TR"
-                          : "Related or mixed evidence"}
+                    <p className={`mt-1 text-xs font-extrabold uppercase tracking-[0.12em] ${roleAccentStyles[role]}`}>
+                      {roleLabels[role]}
                     </p>
-                    {(witness.workSection || witness.relationship) && (
-                      <p className="mt-1 text-xs font-bold text-archive-teal dark:text-teal-200">
-                        {[witness.workSection, witness.relationship?.replaceAll("_", " ")]
-                          .filter(Boolean)
-                          .join(" · ")}
+                    {witness.workSection ? (
+                      <p className="mt-1 text-xs font-bold text-ink-700 dark:text-ink-100/75">
+                        {witness.workSection}
                       </p>
-                    )}
+                    ) : null}
+                    <p className={`mt-1 text-xs font-bold ${roleAccentStyles[role]}`}>
+                      Citation type: {patristicEvidenceFormLabel(witness)}
+                    </p>
                     <p className="mt-2 line-clamp-3 text-sm leading-6 text-ink-600 dark:text-ink-100/70">
                       {witness.quoteSummary}
                     </p>

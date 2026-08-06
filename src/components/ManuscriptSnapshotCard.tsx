@@ -1,5 +1,7 @@
 import { BookOpen, Globe2, Landmark, Printer, ScrollText } from "lucide-react";
 
+import { MajorityTextStandingCard } from "@/components/MajorityTextStandingCard";
+import { publicPatristicWitnesses } from "@/data/derived";
 import type { Passage } from "@/data/types";
 
 type ManuscriptSnapshotCardProps = {
@@ -7,6 +9,7 @@ type ManuscriptSnapshotCardProps = {
 };
 
 export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps) {
+  const patristicWitnesses = publicPatristicWitnesses(passage);
   const categories = [
     {
       label: "Greek manuscripts",
@@ -22,7 +25,7 @@ export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps)
     },
     {
       label: "Church fathers",
-      present: passage.patristicWitnesses.length > 0,
+      present: patristicWitnesses.length > 0,
       icon: Landmark,
     },
     {
@@ -56,6 +59,8 @@ export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps)
         The sections below preserve each supporting, competing, and related
         record under its proper evidence type.
       </p>
+
+      <MajorityTextStandingCard slug={passage.slug} className="mt-5" />
 
       {passage.evidenceScope ? (
         <div className="mt-5 rounded-2xl border border-archive-teal/25 bg-archive-teal/[0.06] p-4 dark:border-teal-200/15 dark:bg-teal-200/[0.05]">
@@ -126,7 +131,7 @@ export function ManuscriptSnapshotCard({ passage }: ManuscriptSnapshotCardProps)
                   {label}
                 </p>
                 <p className="text-xs text-ink-500 dark:text-ink-100/55">
-                  {present ? "Represented" : "No supporting entry listed"}
+                  {present ? "Represented" : "No entry listed"}
                 </p>
               </div>
             </div>

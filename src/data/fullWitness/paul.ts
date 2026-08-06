@@ -118,8 +118,8 @@ export const paulWitnesses: FullWitnessEntry[] = [
       },
     ],
     fathers: [
-      { author: "Chrysostom", work: "Homily 25 on Romans", date: "c. AD 400", use: "Direct quotation", reading: "Supports the KJV reading", locator: "Romans 14:10", url: "https://www.newadvent.org/fathers/210225.htm" },
-      { author: "Polycarp", work: "Letter to the Philippians 6.2", date: "c. AD 110–140", use: "Parallel tradition", reading: "Related", locator: "Philippians 6.2" },
+      { author: "Chrysostom", work: "Homily 25 on Romans", date: "c. AD 400", use: "Direct quotation", reading: "Supporting witness", locator: "Romans 14:10", url: "https://www.newadvent.org/fathers/210225.htm" },
+      { author: "Polycarp", work: "Letter to the Philippians 6.2", date: "c. AD 110–140", use: "Parallel tradition", reading: "Supporting witness", locator: "Philippians 6.2" },
     ],
   },
   {
@@ -205,9 +205,9 @@ export const paulWitnesses: FullWitnessEntry[] = [
       },
     ],
     fathers: [
-      { author: "Tertullian", work: "On the Flesh of Christ 8", date: "c. AD 210", use: "Direct quotation", reading: "Supports the KJV reading", locator: "Chapter 8", url: "https://www.newadvent.org/fathers/0315.htm" },
-      { author: "Tertullian", work: "Against Marcion 5.10", date: "c. AD 207", use: "Direct quotation", reading: "Supports the KJV reading", locator: "Book 5, chapter 10", url: "https://www.newadvent.org/fathers/03125.htm" },
-      { author: "Tertullian", work: "On the Resurrection of the Flesh 49", date: "c. AD 210", use: "Direct quotation", reading: "Competing reading", locator: "Chapter 49", url: "https://www.newadvent.org/fathers/0316.htm" },
+      { author: "Tertullian", work: "On the Flesh of Christ 8", date: "c. AD 210", use: "Direct quotation", reading: "Supporting witness", locator: "Chapter 8", url: "https://www.newadvent.org/fathers/0315.htm" },
+      { author: "Tertullian", work: "Against Marcion 5.10", date: "c. AD 207", use: "Direct quotation", reading: "Supporting witness", locator: "Book 5, chapter 10", url: "https://www.newadvent.org/fathers/03125.htm" },
+      { author: "Tertullian", work: "On the Resurrection of the Flesh 49", date: "c. AD 210", use: "Direct quotation", reading: "Competing witness", locator: "Chapter 49", url: "https://www.newadvent.org/fathers/0316.htm" },
     ],
   },
   {
@@ -281,8 +281,8 @@ export const paulWitnesses: FullWitnessEntry[] = [
       },
     ],
     fathers: [
-      { author: "Chrysostom", work: "Homily 7 on Ephesians", date: "c. AD 400", use: "Textual comment", reading: "Related", locator: "Ephesians 3:9 exposition", url: "https://www.newadvent.org/fathers/230107.htm" },
-      { author: "Chrysostom", work: "Homily 7 on Ephesians", date: "c. AD 400", use: "Close quotation", reading: "Supports the KJV reading", locator: "Homily 7 on Ephesians, later exposition: “who created all things by Jesus Christ”", url: "https://www.newadvent.org/fathers/230107.htm", transmission: "Cited from the received English translation; the Greek edition is not collated here" },
+      { author: "Chrysostom", work: "Homily 7 on Ephesians", date: "c. AD 400", use: "Textual comment", reading: "Mixed witness", locator: "Ephesians 3:9 exposition", url: "https://www.newadvent.org/fathers/230107.htm" },
+      { author: "Chrysostom", work: "Homily 7 on Ephesians", date: "c. AD 400", use: "Close quotation", reading: "Supporting witness", locator: "Homily 7 on Ephesians, later exposition: “who created all things by Jesus Christ”", url: "https://www.newadvent.org/fathers/230107.htm", transmission: "Cited from the received English translation; the Greek edition is not collated here" },
     ],
   },
   {
@@ -375,18 +375,18 @@ export const paulWitnesses: FullWitnessEntry[] = [
         work: "Against Eunomius, Book II",
         date: "Late fourth century",
         use: "Close quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Book II.1: identifies 1 Timothy 3:16 as the mystery that God was manifested in the flesh",
         url: "https://www.newadvent.org/fathers/290102.htm",
       },
-      { author: "Chrysostom", work: "Homily 11 on 1 Timothy", date: "c. AD 400", use: "Close quotation", reading: "Related", locator: "Homily 11 on 1 Timothy, on 3:16", url: "https://www.newadvent.org/fathers/230611.htm", transmission: "The received English translation prints “God [He who] was manifest”; the underlying Greek edition is not collated here" },
+      { author: "Chrysostom", work: "Homily 11 on 1 Timothy", date: "c. AD 400", use: "Close quotation", reading: "Supporting witness", locator: "Homily 11 on 1 Timothy, on 3:16", url: "https://www.newadvent.org/fathers/230611.htm", transmission: "The received English translation prints “God [He who] was manifest”; the underlying Greek edition is not collated here" },
       {
         author: "Theodoret of Cyrus",
         work: "Eranistes, Dialogue I",
         date: "AD 447",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Dialogue I: “God was manifest in the flesh, justified in the spirit...”",
         url: "https://www.newadvent.org/fathers/27031.htm",

@@ -72,9 +72,9 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
       },
     ],
     fathers: [
-      { author: "Polycarp", work: "Letter to the Philippians 7.1", date: "c. AD 110–140", use: "Close quotation", reading: "Related", locator: "Philippians 7.1" },
-      { author: "Irenaeus", work: "Against Heresies 3.16.8", date: "c. AD 180", use: "Close quotation", reading: "Related", locator: "3.16.8", transmission: "Latin" },
-      { author: "Socrates", work: "Church History 7.32", date: "5th century", use: "Manuscript report", reading: "Related", locator: "7.32" },
+      { author: "Polycarp", work: "Letter to the Philippians 7.1", date: "c. AD 110–140", use: "Close quotation", reading: "Supporting witness", locator: "Philippians 7.1" },
+      { author: "Irenaeus", work: "Against Heresies 3.16.8", date: "c. AD 180", use: "Close quotation", reading: "Competing witness", locator: "3.16.8", transmission: "Latin" },
+      { author: "Socrates", work: "Church History 7.32", date: "5th century", use: "Manuscript report", reading: "Competing witness", locator: "7.32" },
     ],
   },
   {
@@ -186,8 +186,8 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         author: "Tertullian",
         work: "Against Praxeas 25",
         date: "c. AD 210–213",
-        use: "Allusion",
-        reading: "Related",
+        use: "Close quotation",
+        reading: "Supporting witness",
         locator: "Adversus Praxean 25",
         url: "https://www.newadvent.org/fathers/0317.htm",
       },
@@ -195,8 +195,8 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         author: "Cyprian",
         work: "On the Unity of the Church 6",
         date: "c. AD 251",
-        use: "Allusion",
-        reading: "Related",
+        use: "Direct quotation",
+        reading: "Supporting witness",
         locator: "De unitate ecclesiae 6",
         url: "https://www.newadvent.org/fathers/050701.htm",
       },
@@ -205,7 +205,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "Liber Apologeticus 1.4",
         date: "c. AD 380",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator: "CSEL 18, 6; Conti, Complete Works, p. 34",
       },
       {
@@ -213,7 +213,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "Expositio Fidei",
         date: "Late fourth century",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Explicit Latin Father, Word, and Spirit three-one form; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
       },
@@ -222,7 +222,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "Contra Varimadum",
         date: "c. AD 450",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Explicit heavenly-witness form; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
       },
@@ -231,7 +231,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "Confession of the African bishops",
         date: "AD 484",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Explicit heavenly-witness form preserved in the Vandal persecution account; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
       },
@@ -240,7 +240,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "Contra Arianos",
         date: "c. AD 527",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Explicit heavenly-witness citation; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
       },
@@ -249,7 +249,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "Contra Fabianum",
         date: "c. AD 527",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Explicit three-one form; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
       },
@@ -258,7 +258,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "De Trinitate ad Felicem",
         date: "c. AD 527",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Explicit heavenly-witness citation; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
       },
@@ -267,7 +267,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "Complexiones in Epistolis Apostolorum",
         date: "Sixth century",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Explicit Father, Son, and Spirit form; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
       },
@@ -276,7 +276,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "Testimonia Divinae Scripturae et Patrum",
         date: "Early seventh century",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Explicit heavenly-witness citation; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
       },
@@ -285,7 +285,7 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
         work: "Commentary on Revelation",
         date: "Mid-eighth century",
         use: "Direct quotation",
-        reading: "Supports the KJV reading",
+        reading: "Supporting witness",
         locator:
           "Explicit heavenly-witness citation; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
       },

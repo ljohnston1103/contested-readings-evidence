@@ -81,9 +81,13 @@ export type PatristicWitness = {
   relationship?:
     | "explicit_quote"
     | "close_quote"
-    | "parallel_tradition"
-    | "mixed_citation"
+    | "textual_comment"
     | "manuscript_report"
+    | "allusion"
+    | "parallel_tradition"
+    | "indirect_report"
+    | "derivative_use"
+    | "mixed_citation"
     | "theological_parallel";
   confidence?: string;
   sourceCitation?: string;
