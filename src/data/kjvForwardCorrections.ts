@@ -46,6 +46,10 @@ const olderConclusionBySlug = new Map(
   ]),
 );
 
+function cleanGeneratedCopy(value: string | undefined) {
+  return value?.replace(/\s*---\s*$/u, "").trim();
+}
+
 type LatinRepresentativeRow = Readonly<
   Pick<Witness, "witness" | "date" | "dateStart" | "dateEnd" | "note">
 >;
@@ -397,33 +401,33 @@ function normalizeWitnessDate(row: Witness): Witness {
   const contributionDate: PublicDate | undefined =
     normalizedName === "ga 429 margin"
       ? {
-          label: row.date,
+          label: "Addition after AD 1522",
           start: 1523,
-          end: 1900,
+          end: 2026,
         }
       : normalizedName === "ga 177 margin"
         ? {
-            label: row.date,
+            label: "Marginal addition c. AD 1785",
             start: 1785,
             end: 1785,
           }
         : normalizedName === "ga 221 margin"
           ? {
-              label: row.date,
+              label: "Addition after AD 1854",
               start: 1855,
-              end: 1900,
+              end: 2026,
             }
           : normalizedName === "ga 88 margin"
             ? {
-                label: row.date,
-                start: 1201,
-                end: 1900,
+                label: "Addition after AD 1100; exact hand date unknown",
+                start: 1101,
+                end: 2026,
               }
             : normalizedName === "ga 636 margin"
               ? {
-                  label: row.date,
+                  label: "Addition after AD 1400; exact hand date unknown",
                   start: 1401,
-                  end: 1500,
+                  end: 2026,
                 }
               : undefined;
   let replacement =
@@ -450,15 +454,26 @@ function normalizeWitnessDate(row: Witness): Witness {
         end: catalogEntry.dateEnd,
       }
     : undefined;
-  const range = catalogDate ?? contributionDate ?? replacement ?? existing;
+  const explicitDate = hasStructuredDate
+    ? {
+        label: row.date,
+        start: row.dateStart ?? row.dateEnd!,
+        end: row.dateEnd ?? row.dateStart!,
+      }
+    : undefined;
+  const range =
+    contributionDate ?? replacement ?? explicitDate ?? catalogDate ?? existing;
   const finalDate =
-    catalogDate?.label ??
     contributionDate?.label ??
     replacement?.label ??
+    explicitDate?.label ??
+    catalogDate?.label ??
     row.date;
   const dateUncertain =
     row.dateUncertain ??
-    ((normalizedName === "ga 88 margin" ||
+    ((normalizedName === "ga 429 margin" ||
+      normalizedName === "ga 221 margin" ||
+      normalizedName === "ga 88 margin" ||
       normalizedName === "ga 636 margin" ||
       /not independently dated|not separately dated|uncertain date/iu.test(
         finalDate,
@@ -471,8 +486,8 @@ function normalizeWitnessDate(row: Witness): Witness {
     ...row,
     witness: clarifiedWitness,
     date: finalDate,
-    dateStart: catalogDate?.start ?? row.dateStart ?? range?.start,
-    dateEnd: catalogDate?.end ?? row.dateEnd ?? range?.end,
+    dateStart: range?.start,
+    dateEnd: range?.end,
     dateSource:
       catalogEntry?.kind === "version-manuscript"
         ? catalogEntry.dateSource
@@ -771,6 +786,41 @@ function publicLegacyGreekName(
   return `${resolved.displayName} \u2014 ${publicSiglum}`;
 }
 
+function curatedGreekDateRange(
+  label: string,
+  resolved: ResolvedGreekWitness,
+  laterContribution: boolean,
+) {
+  const numeric = label.match(
+    /(?:c\.\s*)?AD\s*(\d{3,4})(?:\s*[–-]\s*(\d{2,4}))?/iu,
+  );
+  if (numeric?.[1]) {
+    const startYear = Number.parseInt(numeric[1], 10);
+    const abbreviatedEnd = numeric[2]
+      ? Number.parseInt(numeric[2], 10)
+      : startYear;
+    const magnitude = numeric[2] ? 10 ** numeric[2].length : 1;
+    const expandedEnd =
+      numeric[2] && abbreviatedEnd < startYear
+        ? Math.floor(startYear / magnitude) * magnitude + abbreviatedEnd
+        : abbreviatedEnd;
+    const after = /\bafter\b/iu.test(label);
+    return {
+      start: after ? startYear + 1 : startYear,
+      end: after ? 2026 : expandedEnd,
+    };
+  }
+
+  if (laterContribution) {
+    return {
+      start: (resolved.dateEnd ?? resolved.dateStart ?? 0) + 1,
+      end: 2026,
+    };
+  }
+
+  return parseEvidenceDate(label);
+}
+
 function normalizeLegacyGreekWitness(
   row: Witness,
   corpus: GreekCorpus,
@@ -794,6 +844,22 @@ function normalizeLegacyGreekWitness(
   const resolved = resolveGreekWitness(siglum.lookup, corpus);
   if (!resolved) return row;
 
+  const preserveExplicitContributionDate = Boolean(
+    row.dateSource &&
+      laterContributionIsUndated(resolved) &&
+      /\b(?:addition|added|after|later hand|correction)\b/iu.test(row.date),
+  );
+  const preserveCuratedCommaDate = /Comma Johanneum/iu.test(row.source ?? "");
+  const preserveCuratedDate =
+    preserveExplicitContributionDate || preserveCuratedCommaDate;
+  const explicitContributionRange = preserveCuratedDate
+    ? curatedGreekDateRange(
+        row.date,
+        resolved,
+        laterContributionIsUndated(resolved),
+      )
+    : undefined;
+
   const resolvedNote =
     resolved.qualifier === "margin" &&
     /\b(?:base-manuscript date|catalog date|not independently dated)\b/iu.test(
@@ -811,13 +877,21 @@ function normalizeLegacyGreekWitness(
   return {
     ...row,
     witness: publicLegacyGreekName(resolved, siglum.publicLabel),
-    date: resolved.date,
-    dateStart: resolved.dateStart,
-    dateEnd: resolved.dateEnd,
+    date: preserveCuratedDate ? row.date : resolved.date,
+    dateStart:
+      row.dateStart ??
+      explicitContributionRange?.start ??
+      resolved.dateStart,
+    dateEnd:
+      row.dateEnd ?? explicitContributionRange?.end ?? resolved.dateEnd,
     dateUncertain:
       row.dateUncertain ?? laterContributionIsUndated(resolved),
-    dateSource: resolved.dateSource,
-    dateSourceUrl: resolved.dateSourceUrl,
+    dateSource: preserveCuratedDate
+      ? row.dateSource
+      : resolved.dateSource,
+    dateSourceUrl: preserveCuratedDate
+      ? row.dateSourceUrl
+      : resolved.dateSourceUrl,
     note: joinPublicNotes(notes),
     aggregate: resolved.aggregate,
   };
@@ -907,6 +981,124 @@ function earliestSupportFor(passage: Passage): EarliestSupport[] {
   const curated = earliestBySlug.get(passage.slug);
   if (!curated) throw new Error(`Missing curated earliest support for ${passage.slug}`);
 
+  if (passage.slug === "matthew-5-22") {
+    return [
+      {
+        label: "Earliest secure Greek support catalogued here",
+        statement:
+          "Late fourth–early fifth century — Codex Bezae (D) contains εἰκῇ (\"without a cause\"). The Sinaiticus support belongs to a later correcting or marginal hand whose date is not independently established.",
+        earliestGreek:
+          "Late fourth–early fifth century — Codex Bezae (D).",
+      },
+    ];
+  }
+
+  if (passage.slug === "john-3-13") {
+    return [
+      {
+        label: "Earliest patristic and secure Greek evidence catalogued here",
+        statement:
+          "Early third century — Hippolytus knows the longer final clause; Novatian supplies additional mid-third-century Latin evidence.",
+        earliestGreek:
+          "Sixth century — Codex Petropolitanus Purpureus (N/022) is the earliest secure exact main-text witness in the displayed data. Codex Alexandrinus has the exact form in a later correcting hand whose date is not independently established.",
+      },
+    ];
+  }
+
+  if (passage.slug === "john-5-3b-4") {
+    return [
+      {
+        label: "Earliest literary and secure Greek evidence catalogued here",
+        statement:
+          "c. AD 200 — Tertullian preserves a related account of angelic activity and healing water. Fourth-century Old Latin evidence and later Greek evidence attest the complete verse.",
+        earliestGreek:
+          "Sixth century — Uncial 078 is the earliest secure named full-reading main-text witness in the displayed data. The A² and C³ readings are later corrections whose dates are not independently established.",
+      },
+    ];
+  }
+
+  if (passage.slug === "romans-14-10") {
+    return [
+      {
+        label: "Earliest related patristic and secure Greek evidence catalogued here",
+        statement:
+          "Early–mid second century — Polycarp has the related phrase \"judgment seat of Christ,\" although the exact Pauline source is uncertain.",
+        earliestGreek:
+          "Fifth century — Uncial 048 is the earliest secure exact main-text Χριστοῦ witness in the displayed synopsis. The Sinaiticus and Ephraemi support belongs to correcting hands whose dates are not independently established.",
+      },
+    ];
+  }
+
+  if (passage.slug === "1-corinthians-15-47") {
+    return [
+      {
+        label: "Earliest patristic and secure Greek evidence catalogued here",
+        statement:
+          "Early third century — Tertullian preserves both long and short forms, showing that the \"the Lord\" wording was already known.",
+        earliestGreek:
+          "Fifth century — Codex Alexandrinus (A/02) is the earliest secure exact main-text witness in the displayed synopsis. Corrected states are not assigned the dates of their base codices.",
+      },
+    ];
+  }
+
+  if (passage.slug === "matthew-17-21") {
+    return [
+      {
+        label: "Earliest exact Matthew-specific patristic citation",
+        statement:
+          "Mid-third century — Origen, Commentary on Matthew 13.7, directly quotes the verse with prayer and fasting.",
+        earliestGreek:
+          "Late fourth–early fifth century — Codex Bezae (D); fifth century — Codices Ephraemi (C) and Washingtonianus (W).",
+      },
+      {
+        label: "Related early fasting-and-prayer tradition",
+        statement:
+          "Late third or early fourth century — the Pseudo-Clementine First Epistle Concerning Virginity preserves related fasting-and-prayer language, but the wording can reflect Matthew 17:21, Mark 9:29, or a harmonized tradition and is not counted as an exact Matthew quotation.",
+      },
+    ];
+  }
+
+  if (passage.slug === "mark-9-29") {
+    return [
+      {
+        label: "Earliest exact patristic citation catalogued here",
+        statement:
+          "c. AD 370 — Basil of Caesarea, Homily on Fasting 1.9, directly quotes the prayer-and-fasting form.",
+        earliestGreek:
+          "Late fourth–early fifth century — Codex Bezae (D); fifth century — Codex Ephraemi (C). P45 is deficient at this unit and is not counted on either side.",
+      },
+    ];
+  }
+
+  if (passage.slug === "luke-2-14") {
+    return [
+      {
+        label: "Earliest exact patristic citation catalogued here",
+        statement:
+          "c. AD 248 — Origen directly quotes the nominative form in Against Celsus 1.60. His wider evidence remains mixed because other Origen citations are reported on both apparatus lines. Eusebius and Epiphanius provide further fourth-century nominative quotations.",
+        earliestGreek:
+          "Sixth century — Codex Zacynthius (040) is the earliest secure named main-text witness in the cited roster. Earlier nominative states in Sinaiticus, Vaticanus, and Ephraemi are correcting hands whose dates are not independently established here.",
+      },
+    ];
+  }
+
+  if (passage.slug === "acts-9-5-6") {
+    return [
+      {
+        label: "Complete Greek expansion",
+        statement:
+          "Two corrected Greek states, 69C and 808Cf, preserve the complete expansion. Their original hands contain the shorter text, and the dates of the correcting hands are not independently established.",
+        earliestGreek:
+          "No known first-hand continuous-text Greek manuscript contains the complete KJV expansion. GA 629 contains only the saying about kicking against the pricks.",
+      },
+      {
+        label: "Versional and literary evidence",
+        statement:
+          "Constituent wording occurs earlier in Latin, versional, and patristic transmission; those partial forms remain classified separately from the complete expansion.",
+      },
+    ];
+  }
+
   if (passage.slug === "matthew-19-16-17") {
     return [
       {
@@ -928,15 +1120,28 @@ function earliestSupportFor(passage: Passage): EarliestSupport[] {
       {
         label: "Unit 1 — “fellowship”",
         statement:
-          "Twelfth century — minuscule 2817; early printed period — Textus Receptus.",
-        earliestGreek: "Twelfth century — minuscule 2817.",
+          "Within the official 131-witness direct-transcription synopsis, corrected state 69C is the only κοινωνία state. Minuscule 2817, an eleventh- or twelfth-century Pauline manuscript outside that selected corpus, also reads κοινωνία.",
+        earliestGreek:
+          "Eleventh or twelfth century — minuscule 2817. The 69C correction is kept separate because the correcting hand is not independently dated.",
       },
       {
         label: "Unit 2 — “by Jesus Christ”",
         statement:
-          "Late fourth century — Chrysostom, mixed exposition; sixth century or later — Greek correction D²; AD 616 — Syriac Harklean.",
+          "The official selected synopsis contains 78 exact reading states for διὰ Ἰησοῦ Χριστοῦ. Chrysostom supplies mixed late-fourth-century exposition, and the Syriac Harklean attests the phrase in AD 616.",
         earliestGreek:
-          "Sixth century or later — D², a correcting hand rather than the original scribe.",
+          "The selected roster includes both first-hand and corrected states. No corrected hand is dated by simply assigning it the production date of its base manuscript.",
+      },
+    ];
+  }
+
+  if (passage.slug === "1-timothy-3-16") {
+    return [
+      {
+        label: "Patristic wording",
+        statement:
+          "Late fourth century — Gregory of Nyssa uses the wording “God was manifest in the flesh.” AD 447 — Theodoret directly quotes the same form in Eranistes.",
+        earliestGreek:
+          "Eighth–ninth century — Codex Athous Lavrensis (044) is the earliest secure exact main-text θεός witness in the displayed synopsis. The earlier θεός states 01C3, 02C, 04C3, and 06C2 are correcting hands whose dates are not independently established here.",
       },
     ];
   }
@@ -1015,11 +1220,16 @@ function earliestSupportFor(passage: Passage): EarliestSupport[] {
           "c. AD 380 — Priscillian, Liber Apologeticus 1, gives the Father, the Word, and the Spirit bearing witness in heaven and being one.",
       },
       {
-        label: "Earliest Latin biblical-text witness listed here",
+        label: "Earliest Latin Scripture-quotation witness listed here",
         statement:
-          "Fifth century — Codex Speculum (m) contains the Comma in its Latin Scripture quotations.",
+          "Fifth century — Codex Speculum (m) contains the Comma in a non-continuous collection of Latin Scripture quotations.",
         earliestGreek:
           "AD 1362–1363 — GA 629, Codex Ottobonianus, is the earliest dated Greek main-text witness listed here.",
+      },
+      {
+        label: "Earliest extant continuous Latin biblical witnesses listed here",
+        statement:
+          "Seventh century — the Catholic-Epistle leaves of the Fragmenta Frisingensia and the León Palimpsest contain Comma forms. Codex Fuldensis, copied in AD 546, omits the Comma in its biblical text; its prologue is separate literary evidence.",
       },
     ];
   }
@@ -1049,14 +1259,57 @@ function earliestSupportFor(passage: Passage): EarliestSupport[] {
 }
 
 function oneJohnFiveSevenRows(passage: Passage) {
+  const latinSource =
+    "Rodrigo B. Galiza and John W. Reeve, The Johannine Comma (1 John 5:7–8): The Status of Its Textual History and Theological Usage in English, Greek, and Latin";
+  const latinSourceUrl =
+    "https://digitalcommons.andrews.edu/auss/vol56/iss1/6/";
+  const greekSource =
+    "Elijah Hixson, The Greek Manuscripts of the Comma Johanneum";
+  const greekSourceUrl =
+    "https://evangelicaltextualcriticism.blogspot.com/2020/01/the-greek-manuscripts-of-comma.html";
+
   const latinManuscripts = corrections.oneJohnFiveSeven.latinManuscripts.map(
-    (row): Witness => ({
-      witness: row.evidence,
-      date: row.date,
-      note: row.relationship,
-      kind: "latin",
-      relationship: "versional",
-    }),
+    (row): Witness => {
+      const competing = isNegativeSupport({
+        witness: row.evidence,
+        date: row.date,
+        note: row.relationship,
+      });
+      const nonContinuous = /Codex Speculum/iu.test(row.evidence);
+      const marginalLatin = /Codex Sangallensis 63/iu.test(row.evidence);
+      const frisingensia = /Frisingensia Fragmenta/iu.test(row.evidence);
+      const date = frisingensia
+        ? "First half of the seventh century for the Catholic-Epistle replacement leaves"
+        : /Codex Demidovianus/iu.test(row.evidence)
+          ? "Second half of the thirteenth century"
+          : marginalLatin
+            ? "Ninth-century base manuscript; marginal addition not independently dated"
+            : row.date;
+      return {
+        witness: row.evidence,
+        date,
+        dateStart: frisingensia ? 601 : undefined,
+        dateEnd: frisingensia ? 650 : undefined,
+        note: row.relationship,
+        kind: "latin",
+        direction: competing
+          ? "AGAINST_KJV"
+          : nonContinuous || marginalLatin
+            ? "RELATED_TO_KJV"
+            : "FOR_KJV",
+        relationship: nonContinuous || marginalLatin ? "related" : "versional",
+        dateUncertain: marginalLatin,
+        source: latinSource,
+        sourceUrl: latinSourceUrl,
+        dateSource: /Frisingensia Fragmenta/iu.test(row.evidence)
+          ? "Vetus Latina manuscript register (ITSEE, University of Birmingham)"
+          : latinSource,
+        dateSourceUrl: /Frisingensia Fragmenta/iu.test(row.evidence)
+          ? "https://itseeweb.cal.bham.ac.uk/vetuslatina/NT-MSS/"
+          : latinSourceUrl,
+        lastVerified: "2026-08-05",
+      };
+    },
   );
   const supportingLatin = latinManuscripts.filter((row) => !isNegativeSupport(row));
   const latinConclusion: Witness = {
@@ -1064,11 +1317,31 @@ function oneJohnFiveSevenRows(passage: Passage) {
     date: "Fifth–thirteenth centuries among the named manuscript witnesses",
     dateStart: 401,
     dateEnd: 1300,
-    note: "The Latin tradition is divided, but the earliest named Latin witness containing a Comma form is the fifth-century Codex Speculum. The Freising fragments and León Palimpsest provide further early medieval support, followed by a broader later Vulgate reception.",
+    note: "The Latin tradition is divided. Codex Speculum is the earliest named non-continuous Latin Scripture-quotation witness. The seventh-century Catholic-Epistle leaves of the Fragmenta Frisingensia and the León Palimpsest are the earliest continuous Latin biblical witnesses listed here, followed by broader medieval Vulgate reception.",
     kind: "latin",
     direction: "FOR_KJV",
     relationship: "versional",
     aggregate: true,
+    source: latinSource,
+    sourceUrl: latinSourceUrl,
+    dateSource: latinSource,
+    dateSourceUrl: latinSourceUrl,
+    lastVerified: "2026-08-05",
+  };
+  const fuldensisPrologue: Witness = {
+    witness: "Codex Fuldensis prologue",
+    date: "AD 546 manuscript",
+    dateStart: 546,
+    dateEnd: 546,
+    note: "Discusses the disputed heavenly-witness clause, but is separate literary evidence. The biblical text of Codex Fuldensis omits the Comma.",
+    kind: "latin",
+    direction: "RELATED_TO_KJV",
+    relationship: "related",
+    source: latinSource,
+    sourceUrl: latinSourceUrl,
+    dateSource: latinSource,
+    dateSourceUrl: latinSourceUrl,
+    lastVerified: "2026-08-05",
   };
   const competingLatin = latinManuscripts.filter(isNegativeSupport).map((row) => ({
     ...row,
@@ -1081,25 +1354,81 @@ function oneJohnFiveSevenRows(passage: Passage) {
   );
 
   const greekSupportWitnesses = corrections.oneJohnFiveSeven.greekManuscripts.map(
-    (row): Witness => ({
-      witness: row.evidence,
-      date: row.date,
-      note: row.relationship,
-      kind: "greek-manuscript",
-      relationship: "exact",
-    }),
+    (row): Witness => {
+      const marginal = /margin/iu.test(row.evidence);
+      const marginalWitness = /GA 429 margin/iu.test(row.evidence)
+        ? "Minuscule 429 (GA 429) — 429mg"
+        : /GA 177 margin/iu.test(row.evidence)
+          ? "Minuscule 177 (GA 177) — 177mg"
+          : /GA 221 margin/iu.test(row.evidence)
+            ? "Minuscule 221 (GA 221) — 221mg"
+            : /GA 88 margin/iu.test(row.evidence)
+              ? "Minuscule 88 (GA 88) — 88mg"
+              : /GA 636 margin/iu.test(row.evidence)
+                ? "Minuscule 636 (GA 636) — 636mg"
+                : undefined;
+      const contributionDate = /GA 429 margin/iu.test(row.evidence)
+        ? { start: 1523, end: 2026, uncertain: true }
+        : /GA 177 margin/iu.test(row.evidence)
+          ? { start: 1785, end: 1785, uncertain: false }
+          : /GA 221 margin/iu.test(row.evidence)
+            ? { start: 1855, end: 2026, uncertain: true }
+            : /GA 88 margin/iu.test(row.evidence)
+              ? { start: 1101, end: 2026, uncertain: true }
+              : /GA 636 margin/iu.test(row.evidence)
+                ? { start: 1401, end: 2026, uncertain: true }
+                : undefined;
+      const publicDate = /GA 429 margin/iu.test(row.evidence)
+        ? "Addition after AD 1522"
+        : /GA 177 margin/iu.test(row.evidence)
+          ? "Marginal addition c. AD 1785"
+          : /GA 221 margin/iu.test(row.evidence)
+            ? "Addition after AD 1854"
+            : /GA 88 margin/iu.test(row.evidence)
+              ? "Addition after AD 1100; exact hand date unknown"
+              : /GA 636 margin/iu.test(row.evidence)
+                ? "Addition after AD 1400; exact hand date unknown"
+                : row.date;
+      return {
+        witness: marginalWitness ?? row.evidence,
+        date: publicDate,
+        dateStart: contributionDate?.start,
+        dateEnd: contributionDate?.end,
+        note: `${row.relationship}. The ten Greek presence witnesses preserve heterogeneous forms and are not ten identical copies of the final Textus Receptus wording.`,
+        kind: "greek-manuscript",
+        direction: marginal ? "RELATED_TO_KJV" : "FOR_KJV",
+        relationship: "related",
+        dateUncertain: contributionDate?.uncertain,
+        source: greekSource,
+        sourceUrl: greekSourceUrl,
+        dateSource: marginal
+          ? greekSource
+          : "INTF Kurzgefasste Liste / NTVMR manuscript metadata",
+        dateSourceUrl: marginal
+          ? greekSourceUrl
+          : "https://ntvmr.uni-muenster.de/liste",
+        lastVerified: "2026-08-05",
+      };
+    },
   );
 
   const patristicWitnesses = corrections.oneJohnFiveSeven.latinWriters.map(
-    (row): PatristicWitness => ({
-      source: row.evidence,
-      date: row.date,
-      quoteSummary: row.relationship,
-      reading: "FOR_KJV",
-      relationship: /related|debated/iu.test(row.relationship)
-        ? "theological_parallel"
-        : "explicit_quote",
-    }),
+    (row): PatristicWitness => {
+      const [author, ...workParts] = row.evidence.split(",");
+      const related = /related|debated/iu.test(row.relationship);
+      return {
+        source: author?.trim() || row.evidence,
+        author: author?.trim() || row.evidence,
+        workSection: workParts.join(",").trim() || undefined,
+        date: row.date,
+        quoteSummary: row.relationship,
+        reading: related ? "RELATED_TO_KJV" : "FOR_KJV",
+        relationship: related ? "theological_parallel" : "explicit_quote",
+        sourceCitation: row.evidence,
+        sourceUrl: latinSourceUrl,
+        lastVerified: "2026-08-05",
+      };
+    },
   );
 
   const reception = corrections.oneJohnFiveSeven.reception.map(
@@ -1109,6 +1438,12 @@ function oneJohnFiveSevenRows(passage: Passage) {
       note: row.relationship,
       kind: "printed",
       relationship: "printed",
+      direction: "FOR_KJV",
+      source: latinSource,
+      sourceUrl: latinSourceUrl,
+      dateSource: latinSource,
+      dateSourceUrl: latinSourceUrl,
+      lastVerified: "2026-08-05",
     }),
   );
   const inheritedPrinted = (passage.printedWitnesses ?? []).filter(
@@ -1127,7 +1462,7 @@ function oneJohnFiveSevenRows(passage: Passage) {
   return {
     ...passage,
     greekSupportWitnesses,
-    latinWitnesses: [latinConclusion, ...supportingLatin],
+    latinWitnesses: [latinConclusion, ...supportingLatin, fuldensisPrologue],
     versionalWitnesses: [],
     patristicWitnesses,
     printedWitnesses: [
@@ -1151,6 +1486,111 @@ function oneJohnFiveSevenRows(passage: Passage) {
       ...competingLatin,
       ...competingPrinted,
     ],
+  };
+}
+
+const genericPatristicLabels = new Set([
+  "clement of alexandria possible",
+  "later greek commentators",
+  "liturgical ecclesiastical use",
+  "related patristic references",
+  "later ecclesiastical use",
+]);
+
+function normalizeFactualKey(value: string | undefined) {
+  return (value ?? "")
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function applyPassageSpecificFactualCorrections(passage: Passage): Passage {
+  let patristicWitnesses = passage.patristicWitnesses.filter(
+    (witness) =>
+      !genericPatristicLabels.has(
+        normalizeFactualKey(witness.author ?? witness.source),
+      ),
+  );
+  let greekSupportWitnesses = passage.greekSupportWitnesses;
+  let timeline = passage.timeline;
+  let earliestPatristicYear = passage.earliestPatristicYear;
+
+  if (passage.slug === "matthew-17-21") {
+    patristicWitnesses = patristicWitnesses
+      .filter((witness) => {
+        const source = normalizeFactualKey(witness.author ?? witness.source);
+        if (source.startsWith("pseudo clement")) return false;
+        if (
+          source === "origen" &&
+          !normalizeFactualKey(witness.workSection).includes(
+            "commentary on matthew 13 7",
+          )
+        ) {
+          return false;
+        }
+        return true;
+      })
+      .concat({
+        source: "Pseudo-Clement",
+        author: "Pseudo-Clement",
+        date: "Late third or early fourth century",
+        dateStart: 250,
+        dateEnd: 325,
+        workSection: "First Epistle Concerning Virginity 12",
+        reading: "RELATED_TO_KJV",
+        relationship: "parallel_tradition",
+        quoteSummary:
+          "Preserves fasting-and-prayer wording that may reflect Matthew 17:21, Mark 9:29, or a harmonized tradition; it is not counted as an exact Matthew-specific quotation.",
+        sourceCitation: "Two Epistles on Virginity, Book I, chapter 12",
+        sourceUrl: "https://www.newadvent.org/fathers/0803.htm",
+        lastVerified: "2026-08-05",
+      });
+    timeline = timeline.map((event) =>
+      /Pseudo-Clement/iu.test(event.label)
+        ? {
+            ...event,
+            date: "Late third or early fourth century",
+            label:
+              "Pseudo-Clement preserves related fasting-and-prayer wording that may reflect Matthew, Mark, or a harmonized tradition",
+          }
+        : event,
+    );
+    earliestPatristicYear = 230;
+  }
+
+  if (passage.slug === "mark-9-29") {
+    greekSupportWitnesses = greekSupportWitnesses.filter(
+      (witness) => !/Papyrus 45|\bP45\b/iu.test(witness.witness),
+    );
+    timeline = timeline.filter(
+      (event) => !/\bP45\b|Papyrus 45/iu.test(`${event.date} ${event.label}`),
+    );
+  }
+
+  const seenPatristic = new Set<string>();
+  patristicWitnesses = patristicWitnesses.filter((witness) => {
+    const key = normalizeFactualKey(
+      [
+        witness.author ?? witness.source,
+        witness.workSection,
+        witness.sourceCitation,
+        witness.reading,
+      ]
+        .filter(Boolean)
+        .join(" | "),
+    );
+    if (!key || seenPatristic.has(key)) return false;
+    seenPatristic.add(key);
+    return true;
+  });
+
+  return {
+    ...passage,
+    patristicWitnesses,
+    greekSupportWitnesses,
+    timeline,
+    earliestPatristicYear,
   };
 }
 
@@ -1427,8 +1867,8 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
     ...sourcePassage,
     variantIssue: copy?.whyRetained ?? sourcePassage.variantIssue,
     shortSummary:
-      copy?.editorialConclusion ??
-      olderConclusionBySlug.get(sourcePassage.slug) ??
+      cleanGeneratedCopy(copy?.editorialConclusion) ??
+      cleanGeneratedCopy(olderConclusionBySlug.get(sourcePassage.slug)) ??
       withEditorialConclusion(sourcePassage),
     supportCategory:
       copy?.primarySupport ??
@@ -1448,6 +1888,7 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
   passage = applyLatinRepresentativeWitnesses(passage);
   passage = applyLukeTwentyThreeThirtyFourVersions(passage);
   passage = applyFullWitnessEntry(passage);
+  passage = applyPassageSpecificFactualCorrections(passage);
 
   const embeddedPrinted = [
     ...passage.greekSupportWitnesses,
@@ -1487,10 +1928,6 @@ export function applyKjvForwardCorrections(sourcePassage: Passage): Passage {
     ),
     manuscriptSnapshot: {
       ...passage.manuscriptSnapshot,
-      supportCategory:
-        copy?.primarySupport ??
-        olderCategoryBySlug.get(sourcePassage.slug) ??
-        passage.manuscriptSnapshot.supportCategory,
     },
   };
 }

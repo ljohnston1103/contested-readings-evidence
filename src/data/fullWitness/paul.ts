@@ -214,7 +214,7 @@ export const paulWitnesses: FullWitnessEntry[] = [
     slug: "ephesians-3-9",
     reference: "Ephesians 3:9",
     summary:
-      "The two variations are independent. At the first unit 69C alone reads κοινωνία against 111 οἰκονομία states. At the second unit 78 states contain διὰ Ἰησοῦ Χριστοῦ in the KJV order, 36 omit it and 0278 reverses the name order.",
+      "The two variations are independent. Within the official 131-witness Ephesians apparatus, 69C alone reads κοινωνία against 111 οἰκονομία states; minuscule 2817 is a separate later κοινωνία witness outside that selected corpus. At the second unit 78 states contain διὰ Ἰησοῦ Χριστοῦ in the KJV order, 36 omit it and 0278 reverses the name order.",
     unit: "Two units: κοινωνία versus οἰκονομία, and the independent phrase διὰ Ἰησοῦ Χριστοῦ.",
     scope:
       "The official Ephesians ECM-preparation apparatus: 131 selected witnesses, with hands, reversed order and whole-verse deficiencies preserved.",
@@ -228,11 +228,27 @@ export const paulWitnesses: FullWitnessEntry[] = [
       { label: "IGNTP/ITSEE Ephesians ECM-preparation apparatus", url: "https://itseeweb.cal.bham.ac.uk/epistulae/apparatus/ephesians/introduction.html" },
       { label: "IGNTP/ITSEE Ephesians apparatus conventions and instructions", url: "https://itseeweb.cal.bham.ac.uk/epistulae/apparatus/ephesians/instructions.html" },
       { label: "IGNTP/ITSEE Ephesians direct-transcription synopsis", url: "https://itseeweb.cal.bham.ac.uk/epistulae/synopsis/ephesians/index.html" },
+      {
+        label: "INTF manuscript workspace for GA 2817",
+        url: "https://ntvmr.uni-muenster.de/manuscript-workspace?docID=32817",
+        locator:
+          "GA 2817, Basel University Library A.N. III.11; manuscript evidence outside the 131-witness Ephesians apparatus",
+      },
+      {
+        label: "Jeff Riddle, image report on GA 2817 at Ephesians 3:9",
+        url: "https://www.jeffriddle.net/2019/11/minuscule-2817-on-ephesians-39.html",
+        locator:
+          "NTVMR images show κοινωνία in the running text and again in the catena; the report notes the eleventh-century INTF date",
+      },
       { label: "Chrysostom, Homily 7 on Ephesians", url: "https://www.newadvent.org/fathers/230107.htm" },
       PAUL_PORTAL,
       INTF_ECM,
     ],
-    notes: ["69* reads οἰκονομία and 69C reads κοινωνία.", "1505 omits διὰ Ἰησοῦ Χριστοῦ; 0278 has the phrase in reversed order."],
+    notes: [
+      "69* reads οἰκονομία and 69C reads κοινωνία.",
+      "Minuscule 2817 is a separate later κοινωνία witness reported outside this 131-witness selected apparatus corpus.",
+      "1505 omits διὰ Ἰησοῦ Χριστοῦ; 0278 has the phrase in reversed order.",
+    ],
     units: [
       {
         id: "noun",
@@ -240,6 +256,13 @@ export const paulWitnesses: FullWitnessEntry[] = [
         reading: "κοινωνία",
         groups: [
           { label: "κοινωνία", tone: "support", witnesses: "69C" },
+          {
+            label: "κοινωνία witness outside the selected apparatus",
+            tone: "support",
+            witnesses: "2817",
+            note:
+              "GA 2817 is not one of the 131 witness states in this apparatus. The current INTF metadata dates it to the eleventh century; some secondary catalogues say twelfth. It is reported separately with κοινωνία in the running text and catena.",
+          },
           { label: "οἰκονομία", tone: "competing", witnesses: "P46V 01 02 03 04 06 012 020 025 044 049 075 0150 1 6 33 35 38 61 69* 81 88 93 94V 104 181 218 256 263 326 330 365 383 398 424 436 442 451 459 462 467 606 629 636 664 665 915 1069 1108 1115 1127 1175 1241 1319 1398 1505 1573 1611 1617 1739 1751 1831 1834 1836 1837 1838 1877 1881 1893 1908 1910 1912 1918 1939 1962 1963 1985 1987 1991 1996 1999 2004 2011 2012 2127 2138 2180 2243 2344 2352 2400 2464 2492 2495 2516 2523 2544 2576 2805 2853 2865 L156 L169 L587 L809 L1159 L1178 L1188 L1440 L2010 L2058" },
           { label: "Lacunose at the noun", tone: "neutral", witnesses: "0278" },
           { label: "Whole-verse deficient", tone: "neutral", aggregates: "19 whole-verse deficient witnesses in the official Ephesians apparatus", note: "Held separate from 0278, which is lacunose only at the noun." },
@@ -301,7 +324,7 @@ export const paulWitnesses: FullWitnessEntry[] = [
     slug: "1-timothy-3-16",
     reference: "1 Timothy 3:16",
     summary:
-      "The official synopsis exposes 323 present manuscript and lectionary rows. Expanding corrected hands gives 297 exact θεός states, 11 ὃς states, one ὅ state, 14 related or partial states and five deficient states; 15 identifiers are absent from the verse.",
+      "The official synopsis exposes 323 present manuscript and lectionary rows. Expanding corrected hands gives 297 exact θεός states, 11 ὃς states, one ὅ state, 14 related or partial states and five deficient states; 15 identifiers are absent from the verse. Patristic use of θεός wording predates the surviving exact θεός manuscript states: Gregory of Nyssa closely cites the wording in the late fourth century, and Theodoret directly quotes the complete clause in a work written in AD 447.",
     unit: "The grammatical subject immediately before ἐφανερώθη: θεός, ὃς, ὅ and related or partially preserved forms.",
     scope: SYNOPSIS_SCOPE,
     snapshot: {
@@ -314,9 +337,23 @@ export const paulWitnesses: FullWitnessEntry[] = [
       { label: "IGNTP/ITSEE 1 Timothy direct-transcription synopsis", url: "https://itseeweb.cal.bham.ac.uk/epistulae/synopsis/1timothy/index.html" },
       PAUL_PORTAL,
       { label: "Chrysostom, Homily 11 on 1 Timothy", url: "https://www.newadvent.org/fathers/230611.htm" },
+      {
+        label: "Gregory of Nyssa, Against Eunomius, Book II",
+        url: "https://www.newadvent.org/fathers/290102.htm",
+        locator: "Book II.1, identification of 1 Timothy 3:16 as God manifested in the flesh",
+      },
+      {
+        label: "Theodoret of Cyrus, Eranistes, Dialogue I",
+        url: "https://www.newadvent.org/fathers/27031.htm",
+        locator: "Dialogue I, direct quotation of the complete 1 Timothy 3:16 clause",
+      },
       INTF_ECM,
     ],
-    notes: ["The early codices 01, 02, 04 and 06 preserve corrected hand changes at the subject.", "061 is supplied and related, not a clean fifth-century θεός witness."],
+    notes: [
+      "The early codices 01, 02, 04 and 06 preserve corrected hand changes at the subject; the codices' production dates must not be assigned automatically to their correcting hands.",
+      "061 is supplied and related, not a clean fifth-century θεός witness.",
+      "Gregory of Nyssa supplies a close late-fourth-century θεός citation; Theodoret's Eranistes, written in AD 447, directly quotes the full clause with θεός.",
+    ],
     units: [
       {
         id: "subject",
@@ -333,7 +370,27 @@ export const paulWitnesses: FullWitnessEntry[] = [
       },
     ],
     fathers: [
+      {
+        author: "Gregory of Nyssa",
+        work: "Against Eunomius, Book II",
+        date: "Late fourth century",
+        use: "Close quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Book II.1: identifies 1 Timothy 3:16 as the mystery that God was manifested in the flesh",
+        url: "https://www.newadvent.org/fathers/290102.htm",
+      },
       { author: "Chrysostom", work: "Homily 11 on 1 Timothy", date: "c. AD 400", use: "Close quotation", reading: "Related", locator: "Homily 11 on 1 Timothy, on 3:16", url: "https://www.newadvent.org/fathers/230611.htm", transmission: "The received English translation prints “God [He who] was manifest”; the underlying Greek edition is not collated here" },
+      {
+        author: "Theodoret of Cyrus",
+        work: "Eranistes, Dialogue I",
+        date: "AD 447",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Dialogue I: “God was manifest in the flesh, justified in the spirit...”",
+        url: "https://www.newadvent.org/fathers/27031.htm",
+      },
     ],
   },
 ];

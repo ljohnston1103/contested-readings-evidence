@@ -324,7 +324,7 @@ export const passages: Passage[] = [
       w("Old Church Slavonic", "AD 800–1500", "Contains the verse", "version"),
     ],
     patristicWitnesses: [
-      p("Pseudo-Clement, Letters on Virginity", "c. AD 100 to 200", "This kind goeth not out but by fasting and prayer.", "Early church"),
+      p("Pseudo-Clement, First Epistle Concerning Virginity 12", "Late third or early fourth century", "Preserves fasting-and-prayer wording that may reflect Matthew 17:21, Mark 9:29, or a harmonized tradition.", "Syriac transmission"),
       p("Clement of Alexandria, possible", "c. AD 150 to 215", "Possible witness to the reading", "Alexandria"),
       p("Origen", "c. AD 230", "Uses the prayer and fasting reading", "Alexandria / Caesarea"),
       p("Juvencus", "c. AD 330", "Uses the reading", "Spain"),
@@ -358,7 +358,7 @@ export const passages: Passage[] = [
       w("Part of the Georgian tradition", "c. AD 400s onward", "Omit the verse", "version"),
     ],
     timeline: [
-      t("c. AD 100 to 200", "Pseudo-Clement cites the fasting and prayer wording", "patristic"),
+      t("Late third or early fourth century", "Pseudo-Clement preserves related fasting-and-prayer wording that may reflect Matthew, Mark, or a harmonized tradition", "patristic"),
       t("c. AD 230", "Origen uses the prayer and fasting reading", "patristic"),
       t("c. AD 325 to 360", "Vaticanus and Sinaiticus omit the verse", "greek-manuscript"),
       t("c. AD 400s", "Codices C and D contain the verse", "greek-manuscript"),
@@ -1669,7 +1669,6 @@ export const passages: Passage[] = [
     },
     greekSupportWitnesses: [
       w("1,500+ Greek manuscripts", "AD 400s to 1500s", "Support 'prayer and fasting'", "summary"),
-      w("Papyrus 45 vid, P45", "c. AD 200s", "Supports 'prayer and fasting'", "greek-manuscript"),
       w("Codex Sinaiticus correction", "later correction", "Supports 'prayer and fasting'", "greek-manuscript"),
       w("Codex Alexandrinus, A", "c. AD 400s", "Supports 'prayer and fasting'", "greek-manuscript"),
       w("Codex Ephraemi Rescriptus, C", "c. AD 400s", "Supports 'prayer and fasting'", "greek-manuscript"),
@@ -1710,7 +1709,6 @@ export const passages: Passage[] = [
       w("One Old Latin witness", "c. AD 300s onward", "Omits 'and fasting'", "latin"),
     ],
     timeline: [
-      t("c. AD 200s", "P45 vid supports 'prayer and fasting'", "greek-manuscript"),
       t("c. AD 325 to 360", "Vaticanus and Sinaiticus first hand omit 'and fasting'", "greek-manuscript"),
       t("c. AD 400s", "Alexandrinus, Ephraemi, and Bezae support 'prayer and fasting'", "greek-manuscript"),
       t("AD 500s to 1500s", "Byzantine Majority and lectionaries support 'prayer and fasting'", "lectionary"),

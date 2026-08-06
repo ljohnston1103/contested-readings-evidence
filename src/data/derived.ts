@@ -576,6 +576,16 @@ function fatherBaseName(source: string) {
     "John Chrysostom": "John Chrysostom",
     Eusebius: "Eusebius of Caesarea",
     "Eusebius of Caesarea": "Eusebius of Caesarea",
+    Didymus: "Didymus the Blind",
+    "Didymus the Blind": "Didymus the Blind",
+    Epiphanius: "Epiphanius of Salamis",
+    "Epiphanius of Salamis": "Epiphanius of Salamis",
+    Polycarp: "Polycarp of Smyrna",
+    "Polycarp of Smyrna": "Polycarp of Smyrna",
+    Socrates: "Socrates Scholasticus",
+    "Socrates Scholasticus": "Socrates Scholasticus",
+    "Gregory Nazianzen": "Gregory of Nazianzus",
+    "Gregory of Nazianzus": "Gregory of Nazianzus",
     "Didache 8": "Didache",
     Diatessaron: "Tatian / Diatessaron",
     Tatian: "Tatian / Diatessaron",
@@ -1072,8 +1082,9 @@ export function hasTag(passage: Passage, tag: string) {
 /**
  * Extracts a {start, end} year range from a free-text date label such as
  * "c. AD 210", "AD 1362 to 1363", "AD 500s to 1500s", or "before AD 150".
- * A trailing "s" (e.g. "1300s") is treated as spanning that whole century-ish
- * decade block. Returns {0, 0} when no year can be found.
+ * A trailing "s" on a round hundred (e.g. "1300s") spans the century; a
+ * non-round label (e.g. "370s" or "1770s") spans the decade. Returns {0, 0}
+ * when no year can be found.
  */
 export function parseYearRange(dateLabel: string): { start: number; end: number } {
   return parseEvidenceDate(dateLabel) ?? { start: 0, end: 0 };

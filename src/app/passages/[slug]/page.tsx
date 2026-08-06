@@ -10,6 +10,7 @@ import {
   EditionsSection,
 } from "@/components/EditionsSection";
 import { EvidenceTabs } from "@/components/EvidenceTabs";
+import { FullWitnessRoster } from "@/components/FullWitnessRoster";
 import { ManuscriptSnapshotCard } from "@/components/ManuscriptSnapshotCard";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { NextPreviousPassageNav } from "@/components/NextPreviousPassageNav";
@@ -167,6 +168,10 @@ export default async function PassagePage({ params }: PassagePageProps) {
 
       <Reveal className="mt-8">
         <ManuscriptSnapshotCard passage={passage} />
+      </Reveal>
+
+      <Reveal className="mt-8">
+        <FullWitnessRoster passage={passage} />
       </Reveal>
 
       {passage.cautions?.length ? (

@@ -29,7 +29,7 @@ function mergeSourceLinks(
   entry: FullWitnessEntry,
 ) {
   const merged = [
-    ...(existing ?? []),
+    ...(existing ?? []).filter((source) => sourceBelongsToPassage(source.label, entry)),
     ...entry.sources.map((source) => ({
       label: source.label,
       url: source.url,
@@ -56,7 +56,12 @@ function mergeReferences(
       ? [{ label: "Open source", url: source.url }]
       : undefined,
   }));
-  const merged = [...(existing ?? []), ...additions];
+  const merged = [
+    ...(existing ?? []).filter((reference) =>
+      sourceBelongsToPassage(reference.citation, entry),
+    ),
+    ...additions,
+  ];
   const seen = new Set<string>();
   return merged.filter((reference) => {
     const key = reference.citation.toLowerCase();
@@ -64,6 +69,11 @@ function mergeReferences(
     seen.add(key);
     return true;
   });
+}
+
+function sourceBelongsToPassage(label: string, entry: FullWitnessEntry) {
+  if (entry.slug !== "1-john-5-7") return true;
+  return !/David Robert Palmer.*Revelation|Revelation apparatus/iu.test(label);
 }
 
 function sourceForVersionRow(entry: FullWitnessEntry, kind: string | undefined) {
@@ -153,30 +163,109 @@ function patristicRow(
   };
 }
 
-function alreadyHasPatristicRow(
+function patristicAuthorKey(value: string | undefined) {
+  const normalized = normalizedPatristicText(value)
+    .replace(/\b(?:reported|preserved) by .+$/u, "")
+    .trim();
+  if (/^didache(?:\s+\d.*)?$/u.test(normalized)) return "didache";
+  if (/^pseudo clement(?:\s+.*)?$/u.test(normalized)) return "pseudo clement";
+  if (/^(?:john )?chrysostom(?:\s+homily.*)?$/u.test(normalized)) {
+    return "chrysostom";
+  }
+  if (/^tertullian(?:\s+de baptismo.*)?$/u.test(normalized)) {
+    return "tertullian";
+  }
+  if (/^eusebius of caesarea$/u.test(normalized)) return "eusebius";
+  if (/^papias(?:\s+reported by eusebius)?$/u.test(normalized)) return "papias";
+  if (/^hegesippus(?:\s+preserved by eusebius)?$/u.test(normalized)) {
+    return "hegesippus";
+  }
+  if (
+    /^(?:carthaginian confession|council of carthage).*(?:under|presented under) huneric$/u.test(
+      normalized,
+    )
+  ) {
+    return "carthaginian confession under huneric";
+  }
+  if (/^didymus(?:\s+the blind)?$/u.test(normalized)) return "didymus";
+  if (/^ephrem syrus(?:\s+commentary.*)?$/u.test(normalized)) return "ephrem syrus";
+  return normalized;
+}
+
+function matchingPatristicRowIndex(
   existing: PatristicWitness[],
   father: FatherRow,
+  allFathers: FatherRow[],
 ) {
-  const author = normalizedPatristicText(father.author);
+  const author = patristicAuthorKey(father.author);
   const work = normalizedPatristicText(father.work);
   const locator = normalizedPatristicText(father.locator);
   const recordId = locator.match(/\bintf(?: record)?\s+(\d+)\b/iu)?.[1];
+  const reading = patristicReading(father.reading);
 
-  return existing.some((row) => {
+  const candidates = existing
+    .map((row, index) => ({ row, index }))
+    .filter(({ row }) => {
+      const rawAuthor = normalizedPatristicText(row.author ?? row.source);
+      const fatherAuthor = normalizedPatristicText(father.author);
+      const rowAuthor = patristicAuthorKey(row.author ?? row.source);
+      return (
+        (rowAuthor === author ||
+          rawAuthor === fatherAuthor ||
+          rawAuthor.startsWith(`${fatherAuthor} `)) &&
+        (!row.reading || row.reading === reading)
+      );
+    });
+
+  for (const { row, index } of candidates) {
     const text = normalizedPatristicText(
-      [
-        row.author,
-        row.source,
-        row.workSection,
-        row.sourceCitation,
-      ]
+      [row.author, row.source, row.workSection, row.sourceCitation]
         .filter(Boolean)
         .join(" "),
     );
-    if (!text.includes(author)) return false;
-    if (recordId && text.includes(`intf ${recordId}`)) return true;
-    return work.length >= 8 && text.includes(work);
-  });
+    if (recordId && text.includes(`intf ${recordId}`)) return index;
+    if (work.length >= 5 && text.includes(work)) return index;
+  }
+
+  const matchingFathers = allFathers.filter(
+    (candidate) =>
+      patristicAuthorKey(candidate.author) === author &&
+      patristicReading(candidate.reading) === reading,
+  );
+  if (candidates.length === 1 && matchingFathers.length === 1) {
+    return candidates[0].index;
+  }
+
+  return -1;
+}
+
+function patristicApparatusSource(entry: FullWitnessEntry) {
+  return (
+    entry.sources.find((source) =>
+      /INTF Patristic|Editio Critica|ECM|IGNTP|Willker|COMPAUL|Galiza|Palmer/iu.test(
+        source.label,
+      ),
+    ) ??
+    patristicFallbackSource(entry) ??
+    entry.sources[0]
+  );
+}
+
+function qualifyApparatusLevelPatristicRow(
+  row: PatristicWitness,
+  entry: FullWitnessEntry,
+): PatristicWitness {
+  if (row.workSection || row.sourceCitation || row.sourceUrl) return row;
+  const source = patristicApparatusSource(entry);
+  return {
+    ...row,
+    workSection: "Apparatus-level attribution",
+    sourceCitation: source
+      ? `${source.label}${source.locator ? `, ${source.locator}` : ""}; exact work and section are not separately identified in the current dossier`
+      : "Apparatus-level attribution; exact work and section are not separately identified in the current dossier",
+    sourceUrl: source?.url,
+    lastVerified: "2026-08-05",
+  };
 }
 
 function mergePatristicRows(
@@ -185,11 +274,80 @@ function mergePatristicRows(
 ) {
   const merged = [...existing];
   for (const father of entry.fathers) {
-    if (!alreadyHasPatristicRow(merged, father)) {
-      merged.push(patristicRow(father, entry));
+    const replacement = patristicRow(father, entry);
+    const existingIndex = matchingPatristicRowIndex(
+      merged,
+      father,
+      entry.fathers,
+    );
+    if (existingIndex < 0) {
+      merged.push(replacement);
+      continue;
+    }
+
+    const current = merged[existingIndex];
+    merged[existingIndex] = {
+      ...current,
+      ...replacement,
+      quoteSummary:
+        current.quoteSummary &&
+        !/^(?:supports the kjv reading|competing reading|related)$/iu.test(
+          current.quoteSummary,
+        )
+          ? current.quoteSummary
+          : replacement.quoteSummary,
+    };
+  }
+
+  const qualified = merged.map((row) =>
+    qualifyApparatusLevelPatristicRow(row, entry),
+  );
+
+  if (entry.slug === "acts-8-37") {
+    const apparatusIndex = qualified.findIndex(
+      (row) =>
+        patristicAuthorKey(row.author ?? row.source) === "irenaeus" &&
+        row.workSection === "Apparatus-level attribution" &&
+        /eunuch confessed/iu.test(row.quoteSummary),
+    );
+    const preciseIndex = qualified.findIndex(
+      (row) =>
+        patristicAuthorKey(row.author ?? row.source) === "irenaeus" &&
+        /Against Heresies 3\.12\.8/iu.test(row.workSection ?? ""),
+    );
+    if (apparatusIndex >= 0 && preciseIndex >= 0) {
+      qualified[preciseIndex] = {
+        ...qualified[preciseIndex],
+        quoteSummary: qualified[apparatusIndex].quoteSummary,
+      };
+      qualified.splice(apparatusIndex, 1);
     }
   }
-  return merged;
+
+  if (entry.slug === "john-5-3b-4") {
+    return qualified.filter(
+      (row) =>
+        !(
+          patristicAuthorKey(row.author ?? row.source) === "ambrose" &&
+          row.workSection === "Apparatus-level attribution"
+        ),
+    );
+  }
+
+  return qualified;
+}
+
+function mergeTextLists(
+  existing: string[] | undefined,
+  additions: string[] | undefined,
+) {
+  const seen = new Set<string>();
+  return [...(existing ?? []), ...(additions ?? [])].filter((item) => {
+    const key = normalizedPatristicText(item);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 const relatedVersionRowsBySlug: Readonly<Record<string, readonly Witness[]>> = {
@@ -268,6 +426,24 @@ const supportingGreekRowsBySlug: Readonly<Record<string, readonly Witness[]>> = 
   ],
 };
 
+function isUnsupportedLegacyUniversalTotal(row: Witness) {
+  const label = row.witness.trim();
+  const text = `${row.witness} ${row.note}`;
+  return (
+    /^(?:approximately|about|roughly)\b/iu.test(label) ||
+    /^\d[\d,]*(?:\.\d+)?(?:\+)?\s+(?:(?:principal|named)\s+)?(?:Greek\s+)?(?:manuscripts?|witnesses?|lectionaries)\b/iu.test(
+      label,
+    ) ||
+    /\broughly\s+\d[\d,]*\s+(?:later\s+)?(?:Greek\s+)?manuscripts?\b/iu.test(
+      text,
+    )
+  );
+}
+
+function removeUnsupportedLegacyUniversalTotals(rows: Witness[]) {
+  return rows.filter((row) => !isUnsupportedLegacyUniversalTotal(row));
+}
+
 function mergeWitnessRows(existing: Witness[], additions: readonly Witness[]) {
   const merged = [...existing];
   for (const addition of additions) {
@@ -296,11 +472,46 @@ function mergeWitnessRows(existing: Witness[], additions: readonly Witness[]) {
 export function applyFullWitnessEntry(passage: Passage): Passage {
   const entry = fullWitnessBySlug.get(passage.slug);
   if (!entry) return passage;
-  const sourcedRows = attachVersionReadingSources(passage, entry);
+  const cleanedPassage: Passage = {
+    ...passage,
+    greekSupportWitnesses: removeUnsupportedLegacyUniversalTotals(
+      passage.greekSupportWitnesses,
+    ),
+    latinWitnesses: removeUnsupportedLegacyUniversalTotals(
+      passage.latinWitnesses,
+    ),
+    versionalWitnesses: removeUnsupportedLegacyUniversalTotals(
+      passage.versionalWitnesses,
+    ),
+    evidenceAgainst: removeUnsupportedLegacyUniversalTotals(
+      passage.evidenceAgainst,
+    ),
+    printedWitnesses: removeUnsupportedLegacyUniversalTotals(
+      passage.printedWitnesses ?? [],
+    ),
+  };
+  const sourcedRows = attachVersionReadingSources(cleanedPassage, entry);
 
   return {
-    ...passage,
+    ...cleanedPassage,
     ...sourcedRows,
+    shortSummary: entry.summary,
+    disputedUnit: entry.unit,
+    supportCategory: entry.snapshot.supportCategory,
+    evidenceScope: entry.scope,
+    manuscriptSnapshot: {
+      greekSupport: entry.snapshot.greekSupport,
+      greekAgainst: entry.snapshot.greekAgainst,
+      supportCategory: entry.snapshot.supportCategory,
+      mainEvidenceAgainst: entry.snapshot.mainEvidenceAgainst,
+      ...(passage.manuscriptSnapshot.lectionarySupport
+        ? { lectionarySupport: passage.manuscriptSnapshot.lectionarySupport }
+        : {}),
+      ...(entry.snapshot.percentSupport
+        ? { percentSupport: entry.snapshot.percentSupport }
+        : {}),
+    },
+    cautions: mergeTextLists(passage.cautions, entry.notes),
     patristicWitnesses: mergePatristicRows(
       passage.patristicWitnesses,
       entry,
@@ -310,18 +521,18 @@ export function applyFullWitnessEntry(passage: Passage): Passage {
       relatedVersionRowsBySlug[passage.slug] ?? [],
     ),
     greekSupportWitnesses: mergeWitnessRows(
-      passage.greekSupportWitnesses,
+      cleanedPassage.greekSupportWitnesses,
       supportingGreekRowsBySlug[passage.slug] ?? [],
     ),
     sourceLinks: mergeSourceLinks(passage.sourceLinks, entry),
     references: mergeReferences(passage.references, entry),
     sources: Array.from(
       new Set([
-        ...passage.sources,
+        ...passage.sources.filter((source) => sourceBelongsToPassage(source, entry)),
         ...entry.sources.map((source) => source.label),
       ]),
     ),
-    lastVerified: "2026-08-04",
+    lastVerified: "2026-08-05",
   };
 }
 

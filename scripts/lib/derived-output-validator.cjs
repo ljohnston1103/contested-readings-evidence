@@ -43,6 +43,20 @@ const FAKE_ATOMIC_LABEL =
 const CONNECTIVE_FRAGMENT = /^(?:and|or|plus)\b/iu;
 const BARE_NUMBER = /^\d{1,5}$/u;
 
+const UNSUPPORTED_LEGACY_TOTAL =
+  /^(?:(?:approximately|about|roughly)\b|\d[\d,]*(?:\.\d+)?(?:\+)?\s+(?:(?:principal|named)\s+)?(?:Greek\s+)?(?:manuscripts?|witnesses?|lectionaries)\b)/iu;
+
+const EXPECTED_SECURE_EARLIEST_GREEK = new Map([
+  ["matthew-5-22", /Codex Bezae/iu],
+  ["john-3-13", /Codex Petropolitanus Purpureus/iu],
+  ["john-5-3b-4", /Uncial 078/iu],
+  ["romans-14-10", /Uncial 048/iu],
+  ["1-corinthians-15-47", /Codex Alexandrinus/iu],
+  ["luke-2-14", /Codex Zacynthius/iu],
+  ["ephesians-3-9", /minuscule 2817/iu],
+  ["1-timothy-3-16", /Codex Athous Lavrensis/iu],
+]);
+
 function normalize(value) {
   return String(value ?? "")
     .normalize("NFKC")
@@ -192,6 +206,67 @@ function validateDerivedOutput(passages, options = {}) {
     const rows = collectRows(passage);
     const seenRows = new Map();
 
+    if (!String(passage.evidenceScope ?? "").trim()) {
+      add(
+        "apparatus-scope",
+        passageContext,
+        "does not expose the governing apparatus or roster scope",
+      );
+    }
+
+    if (/---\s*$/u.test(String(passage.shortSummary ?? ""))) {
+      add(
+        "broken-content",
+        passageContext,
+        "short summary ends with a visible editorial artifact",
+      );
+    }
+
+    const expectedEarliest = EXPECTED_SECURE_EARLIEST_GREEK.get(passage.slug);
+    if (expectedEarliest) {
+      const earliestGreek = (passage.earliestSupport ?? [])
+        .map((entry) => entry.earliestGreek ?? "")
+        .join(" ");
+      if (!expectedEarliest.test(earliestGreek)) {
+        add(
+          "earliest-secure-witness",
+          passageContext,
+          `earliest Greek statement does not identify the expected secure main-text witness: "${earliestGreek}"`,
+        );
+      }
+    }
+
+    const percentage = String(
+      passage.manuscriptSnapshot?.percentSupport ?? "",
+    ).trim();
+    if (
+      percentage &&
+      !/\b(?:of|denominator|selected|cited|apparatus|witness(?:es)?|manuscript(?:s)?|collated)\b/iu.test(
+        percentage,
+      )
+    ) {
+      add(
+        "percentage-denominator",
+        passageContext,
+        `percentage lacks an accessible denominator or corpus statement: "${percentage}"`,
+      );
+    }
+
+    if (passage.slug === "1-john-5-7") {
+      const sourceText = [
+        ...(passage.sources ?? []),
+        ...(passage.sourceLinks ?? []).map((source) => source.label),
+        ...(passage.references ?? []).map((reference) => reference.citation),
+      ].join(" ");
+      if (/David Robert Palmer.*Revelation|Revelation apparatus/iu.test(sourceText)) {
+        add(
+          "source-book",
+          passageContext,
+          "contains a Revelation apparatus citation on the 1 John 5:7 dossier",
+        );
+      }
+    }
+
     for (const entry of rows) {
       const { listLabel, listKey, defaultRole, index, row } = entry;
       const rowContext = `${passageContext} — ${listLabel} row ${index + 1}`;
@@ -225,6 +300,14 @@ function validateDerivedOutput(passages, options = {}) {
           `"${witness}" is a bare numeric fragment outside a Greek manuscript list`,
         );
       }
+      if (UNSUPPORTED_LEGACY_TOTAL.test(witness)) {
+        add(
+          "unsupported-universal-total",
+          rowContext,
+          `"${witness}" presents a universal or percentage total without the selected-corpus denominator used by the current roster`,
+        );
+      }
+
       if (GENERIC_SPLIT_NOTE.test(note)) {
         add(
           "generic-filler",
@@ -246,6 +329,22 @@ function validateDerivedOutput(passages, options = {}) {
           "group-date",
           rowContext,
           `"${witness}" uses group/editorial prose instead of its own date: "${date}"`,
+        );
+      }
+
+      const handSpecific =
+        /\b(?:correction|corrector|corrected|margin|marginal|supplement)\b/iu.test(
+          `${witness} ${note}`,
+        ) && !/\bfirst hand\b/iu.test(`${witness} ${note}`);
+      const undatedContribution =
+        /\b(?:not independently dated|not separately dated|uncertain date|later hand of uncertain date|base manuscript)\b/iu.test(
+          `${date} ${note}`,
+        );
+      if (handSpecific && undatedContribution && !row.dateUncertain) {
+        add(
+          "corrector-date",
+          rowContext,
+          `"${witness}" describes an undated later contribution but is not marked dateUncertain`,
         );
       }
 
@@ -321,6 +420,17 @@ function validateDerivedOutput(passages, options = {}) {
       if (GENERIC_SPLIT_NOTE.test(String(row.quoteSummary ?? ""))) {
         add("generic-filler", context, "uses mechanical split-row filler");
       }
+      if (
+        !String(row.workSection ?? "").trim() &&
+        !String(row.sourceCitation ?? "").trim() &&
+        !String(row.sourceUrl ?? "").trim()
+      ) {
+        add(
+          "patristic-locator",
+          context,
+          `"${row.author ?? row.source ?? "Unnamed patristic witness"}" has no work, locator, or source link`,
+        );
+      }
       const start = parseDateStart(row);
       if (start === null) continue;
       if (previousPatristic && start < previousPatristic.start) {
@@ -335,6 +445,98 @@ function validateDerivedOutput(passages, options = {}) {
         witness: row.author ?? row.source,
         date: row.date,
       };
+    }
+  }
+
+  const fullWitnessEntries = Array.isArray(options.fullWitnessEntries)
+    ? options.fullWitnessEntries
+    : [];
+  if (fullWitnessEntries.length > 0) {
+    const passageSlugs = new Set(passages.map((passage) => passage.slug));
+    const seenSlugs = new Set();
+
+    for (let entryIndex = 0; entryIndex < fullWitnessEntries.length; entryIndex += 1) {
+      const entry = fullWitnessEntries[entryIndex];
+      const context = `${entry.reference} (${entry.slug}) full roster`;
+
+      if (seenSlugs.has(entry.slug)) {
+        add("full-roster", context, "duplicates a full-roster slug");
+      }
+      seenSlugs.add(entry.slug);
+
+      if (!passageSlugs.has(entry.slug)) {
+        add("full-roster", context, "has no matching passage dossier");
+      }
+      if (!String(entry.scope ?? "").trim()) {
+        add("apparatus-scope", context, "has a blank apparatus scope");
+      }
+      if (!Array.isArray(entry.units) || entry.units.length === 0) {
+        add("full-roster", context, "has no textual units");
+      }
+
+      if (entry.slug === "1-john-5-7") {
+        const sourceText = (entry.sources ?? [])
+          .map((source) => source.label)
+          .join(" ");
+        if (/David Robert Palmer.*Revelation|Revelation apparatus/iu.test(sourceText)) {
+          add(
+            "source-book",
+            context,
+            "contains a Revelation apparatus citation",
+          );
+        }
+      }
+
+      const fatherKeys = new Set();
+      for (let fatherIndex = 0; fatherIndex < (entry.fathers ?? []).length; fatherIndex += 1) {
+        const father = entry.fathers[fatherIndex];
+        const fatherContext = `${context} — father row ${fatherIndex + 1}`;
+        if (!String(father.locator ?? "").trim()) {
+          add(
+            "patristic-locator",
+            fatherContext,
+            `${father.author} has no work locator`,
+          );
+        }
+        const key = normalize(
+          `${father.author}|${father.work}|${father.locator}|${father.reading}`,
+        );
+        if (fatherKeys.has(key)) {
+          add(
+            "duplicate-father",
+            fatherContext,
+            `${father.author}, ${father.work} repeats an identical work and locator`,
+          );
+        }
+        fatherKeys.add(key);
+      }
+
+      for (const unit of entry.units ?? []) {
+        const groupKeys = new Set();
+        for (let groupIndex = 0; groupIndex < (unit.groups ?? []).length; groupIndex += 1) {
+          const group = unit.groups[groupIndex];
+          const groupContext = `${context} — ${unit.id} group ${groupIndex + 1}`;
+          const key = normalize(
+            `${group.label}|${group.tone}|${group.reading ?? ""}|${group.witnesses ?? ""}|${group.aggregates ?? ""}`,
+          );
+          if (groupKeys.has(key)) {
+            add(
+              "duplicate-group",
+              groupContext,
+              `duplicates the same label, tone, reading, and roster within ${unit.id}`,
+            );
+          }
+          groupKeys.add(key);
+        }
+      }
+    }
+
+    if (seenSlugs.size !== passageSlugs.size) {
+      add(
+        "full-roster",
+        "full witness dataset",
+        `contains ${seenSlugs.size} unique rosters for ${passageSlugs.size} passage dossiers`,
+      );
     }
   }
 

@@ -72,6 +72,10 @@ const INTF_LISTE_URL =
 const PALMER_REVELATION = "David Robert Palmer, Revelation apparatus";
 const PALMER_REVELATION_URL =
   "https://www.bibletranslation.ws/trans/revwgrk.pdf";
+const CLEMENTINE_VULGATE_1592 =
+  "Biblia Sacra Vulgatae Editionis, Rome 1592";
+const CLEMENTINE_VULGATE_1592_URL =
+  "https://archive.org/details/bub_gb_sIwgf1mnU0UC";
 const WILLKER_MATTHEW = "Wieland Willker, Textual Commentary on Matthew";
 const WILLKER_MATTHEW_URL =
   "https://www.willker.de/wie/TCG/TC-Matthew.pdf";
@@ -84,6 +88,14 @@ const VETUS_LATINA_REGISTER =
   "Vetus Latina manuscript register (ITSEE, University of Birmingham)";
 const VETUS_LATINA_REGISTER_URL =
   "https://itseeweb.cal.bham.ac.uk/vetuslatina/manuscripts/";
+const VETUS_LATINA_GOSPEL_REGISTER =
+  "Vetus Latina Gospel manuscript register (ITSEE, University of Birmingham)";
+const VETUS_LATINA_GOSPEL_REGISTER_URL =
+  "https://itseeweb.cal.bham.ac.uk/vetuslatina/GospelMSS/";
+const VETUS_LATINA_NT_REGISTER =
+  "Vetus Latina New Testament manuscript register (ITSEE, University of Birmingham)";
+const VETUS_LATINA_NT_REGISTER_URL =
+  "https://itseeweb.cal.bham.ac.uk/vetuslatina/NT-MSS/";
 const CNTR_MATTHEW_5_22 = "CNTR collation, Matthew 5:22";
 const CNTR_MATTHEW_5_22_URL =
   "https://greekcntr.org/collation/data/40005022.html";
@@ -100,6 +112,8 @@ export const canonicalSourceLabels: Record<string, string> = {
   [METZGER_EARLY_VERSIONS_URL]: METZGER_EARLY_VERSIONS,
   [HOUGHTON_LATIN_NT_URL]: HOUGHTON_LATIN_NT,
   [VETUS_LATINA_REGISTER_URL]: VETUS_LATINA_REGISTER,
+  [VETUS_LATINA_GOSPEL_REGISTER_URL]: VETUS_LATINA_GOSPEL_REGISTER,
+  [VETUS_LATINA_NT_REGISTER_URL]: VETUS_LATINA_NT_REGISTER,
   [CNTR_MATTHEW_5_22_URL]: CNTR_MATTHEW_5_22,
 };
 
@@ -445,11 +459,11 @@ const greekRows: readonly GreekRow[] = [
   ["2814", "Twelfth century", 1101, 1200],
   [
     "2817",
-    "Twelfth century",
-    1101,
-    1200,
+    "Eleventh century (INTF; some catalogues say twelfth)",
+    1001,
+    1100,
     undefined,
-    "Formerly numbered 7 in the Pauline corpus.",
+    "Formerly numbered 7 in the Pauline corpus. Scrivener and the current INTF metadata assign it to the eleventh century; some secondary catalogue descriptions retain a twelfth-century date.",
   ],
   ["2818", "Twelfth century", 1101, 1200],
   ["2846", "Twelfth century", 1101, 1200],
@@ -520,7 +534,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
     note:
-      "“Maj” means the majority of all surviving Greek New Testament manuscripts as one group — roughly 5,000 of the approximately 5,800 catalogued copies, most written from the sixth century onward — not one individual manuscript.",
+      "“Maj” is a passage-specific aggregate for the majority reading among the manuscripts represented at a given variation unit. Its denominator varies with the manuscripts that preserve and have been collated at that location; it is not one manuscript or a fixed universal total.",
   },
   {
     key: "Byz",
@@ -533,7 +547,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
     note:
-      "“Byz” means the Byzantine text found in the great majority of surviving Greek manuscripts — roughly 5,000 of the approximately 5,800 catalogued copies — considered as one group, not one individual manuscript.",
+      "“Byz” is a passage-specific aggregate for the Byzantine reading represented at a given variation unit. Its denominator varies with the manuscripts that preserve and have been collated at that location; it is not one manuscript or a fixed universal total.",
   },
   {
     key: "Maj/Byz",
@@ -546,7 +560,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
     note:
-      "The majority and Byzantine groups counted together — roughly 5,000 later Greek manuscripts — not one individual manuscript.",
+      "A passage-specific combined majority/Byzantine aggregate. The manuscripts represented and the denominator vary by variation unit; this label is not one manuscript or a fixed universal count.",
   },
   {
     key: "Lect",
@@ -559,7 +573,7 @@ const greekAggregateRows: readonly WitnessCatalogEntry[] = [
     dateSource: INTF_LISTE,
     dateSourceUrl: INTF_LISTE_URL,
     note:
-      "Not one manuscript but the whole body of Greek lectionaries — church service books that present Scripture readings for each day — of which about 2,300 are catalogued.",
+      "A passage-specific lectionary aggregate, not one manuscript. The exact number represented depends on the lectionaries that preserve and have been collated at the variation unit; the total number of catalogued lectionaries is not the denominator for every passage.",
   },
 ] as const;
 
@@ -936,32 +950,35 @@ const versionRows: readonly VersionRow[] = [
     "The principal Vulgate manuscript line used for later printed Latin Bibles.",
   ],
 
-  ["old-latin-a", "Old Latin a", "Fourth century", 301, 400, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-aur", "Old Latin aur", "Eighth century (c. AD 750–799)", 750, 799, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-b", "Old Latin b", "Late fourth–early fifth century", 375, 425, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-c", "Old Latin c", "Twelfth–thirteenth century", 1101, 1300, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-d", "Old Latin d", "Fifth century", 401, 500, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-e", "Old Latin e", "Fifth century", 401, 500, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-f", "Old Latin f", "Sixth century", 501, 600, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-ff1", "Old Latin ff1", "Eighth century", 701, 800, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-ff2", "Old Latin ff2", "Fifth century", 401, 500, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-g1", "Old Latin g1", "Eighth–ninth century", 701, 900, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-h", "Old Latin h", "Fifth century", 401, 500, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-k", "Old Latin k", "About AD 400", 375, 425, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-l", "Old Latin l", "Seventh–eighth century", 601, 800, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-q", "Old Latin q", "Sixth–seventh century", 501, 700, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-ar", "Old Latin ar (Book of Armagh)", "AD 807", 807, 807, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-gig", "Old Latin gig (Codex Gigas)", "Thirteenth century", 1201, 1300, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
-  ["old-latin-t", "Old Latin t", "Seventh–eleventh century", 601, 1100, "latin-manuscript", false, VETUS_LATINA_REGISTER, VETUS_LATINA_REGISTER_URL],
+  ["old-latin-a", "Old Latin a", "Second half of the fourth century", 350, 399, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-aur", "Old Latin aur", "About AD 775", 750, 799, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-b", "Old Latin b", "End of the fifth century", 475, 499, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-c", "Old Latin c", "Twelfth century", 1101, 1200, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-d", "Old Latin d", "About AD 400", 390, 420, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-e", "Old Latin e", "Fifth century", 401, 500, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-f", "Old Latin f", "Sixth century", 501, 600, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-ff1", "Old Latin ff1", "First half of the eighth century", 701, 750, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-ff2", "Old Latin ff2", "Fifth century", 401, 500, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-g1", "Old Latin g1", "About AD 810", 800, 820, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-h", "Old Latin h", "Late fifth to seventh century, by section", 475, 700, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL, "Matthew was copied at the end of the fifth century; Mark, Luke, and John were copied in the seventh century."],
+  ["old-latin-k", "Old Latin k", "Fourth century", 301, 400, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-l", "Old Latin l", "First half of the eighth century", 701, 750, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-q", "Old Latin q", "Sixth or seventh century", 501, 700, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
+  ["old-latin-n", "Fragmenta Sangallensia / Curiensia (it n, o, a² / VL 16)", "Fifth century; one seventh-century replacement leaf", 401, 700, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL, "The Gospel fragments are one manuscript complex under VL 16; one leaf is a seventh-century replacement."],
+  ["old-latin-vl64", "Fragmenta Frisingensia (VL 64)", "Sixth–seventh centuries, by section", 550, 650, "latin-manuscript", false, VETUS_LATINA_NT_REGISTER, VETUS_LATINA_NT_REGISTER_URL, "The Pauline leaves are from the second half of the sixth century; replacement leaves including parts of the Catholic Epistles are from the first half of the seventh century."],
+  ["old-latin-vl67", "Palimpsestus Legionensis (it l / VL 67)", "Seventh century", 601, 700, "latin-manuscript", false, VETUS_LATINA_NT_REGISTER, VETUS_LATINA_NT_REGISTER_URL],
+  ["old-latin-ar", "Book of Armagh (it ar / VL 61)", "AD 807–808", 807, 808, "latin-manuscript", false, VETUS_LATINA_NT_REGISTER, VETUS_LATINA_NT_REGISTER_URL],
+  ["old-latin-gig", "Old Latin gig (Codex Gigas)", "Thirteenth century", 1201, 1300, "latin-manuscript", false, VETUS_LATINA_NT_REGISTER, VETUS_LATINA_NT_REGISTER_URL],
+  ["old-latin-t", "Old Latin t", "Second half of the fifth century", 450, 499, "latin-manuscript", false, VETUS_LATINA_GOSPEL_REGISTER, VETUS_LATINA_GOSPEL_REGISTER_URL],
 
-  ["vulgate-am", "Vulgate am (Codex Amiatinus)", "About AD 700 (early eighth century)", 700, 716, "latin-manuscript", false, HOUGHTON_LATIN_NT, HOUGHTON_LATIN_NT_URL],
+  ["vulgate-am", "Codex Amiatinus (Vulgate am)", "About AD 700–716", 700, 716, "latin-manuscript", false, HOUGHTON_LATIN_NT, HOUGHTON_LATIN_NT_URL],
   ["vulgate-fu", "Vulgate fu (Codex Fuldensis)", "AD 541–546", 541, 546, "latin-manuscript", false, HOUGHTON_LATIN_NT, HOUGHTON_LATIN_NT_URL],
   ["vulgate-harl", "Vulgate harl (Revelation)", "Ninth century", 801, 900, "latin-manuscript", false, PALMER_REVELATION, PALMER_REVELATION_URL, "Palmer explicitly distinguishes this Revelation witness from the sixth-century Harleian Gospel manuscript."],
-  ["vulgate-dem", "Vulgate dem", "Thirteenth century", 1201, 1300, "latin-manuscript", false, HOUGHTON_LATIN_NT, HOUGHTON_LATIN_NT_URL],
+  ["vulgate-dem", "Codex Demidovianus (dem / VL 59)", "Second half of the thirteenth century", 1250, 1299, "latin-manuscript", false, VETUS_LATINA_NT_REGISTER, VETUS_LATINA_NT_REGISTER_URL, "The manuscript has been lost since the eighteenth century; its readings survive through earlier collations."],
   ["vulgate-lips4", "Vulgate Leipzig manuscript 4 (lips4)", "Seventh–fifteenth centuries (broad range; exact century uncertain)", 601, 1500, "latin-manuscript", false, PALMER_REVELATION, PALMER_REVELATION_URL, "Palmer identifies the Leipzig manuscript number but does not supply a narrower date."],
   ["vulgate-lips5", "Vulgate Leipzig manuscript 5 (lips5)", "Seventh–fifteenth centuries (broad range; exact century uncertain)", 601, 1500, "latin-manuscript", false, PALMER_REVELATION, PALMER_REVELATION_URL, "Palmer identifies the Leipzig manuscript number but does not supply a narrower date."],
   ["vulgate-lips6", "Vulgate Leipzig manuscript 6 (lips6)", "Seventh–fifteenth centuries (broad range; exact century uncertain)", 601, 1500, "latin-manuscript", false, PALMER_REVELATION, PALMER_REVELATION_URL, "Palmer identifies the Leipzig manuscript number but does not supply a narrower date."],
-  ["vulgate-cle", "Clementine Vulgate", "AD 1592", 1592, 1592, "printed-edition", false, PALMER_REVELATION, PALMER_REVELATION_URL],
+  ["vulgate-cle", "Clementine Vulgate", "AD 1592", 1592, 1592, "printed-edition", false, CLEMENTINE_VULGATE_1592, CLEMENTINE_VULGATE_1592_URL],
   ["vulgate-st", "Stuttgart Vulgate critical text", "AD 1969–2007 editions", 1969, 2007, "printed-edition", true, PALMER_REVELATION, PALMER_REVELATION_URL, "The modern scholarly printed edition of the Vulgate, published in revised editions across this span — not an ancient manuscript."],
   ["vulgate-ww", "Wordsworth–White Vulgate edition", "AD 1889–1954", 1889, 1954, "printed-edition", true, PALMER_REVELATION, PALMER_REVELATION_URL, "A scholarly printed edition of the Vulgate New Testament published in installments across this span — not an ancient manuscript."],
 
@@ -1070,7 +1087,24 @@ export const versionWitnessAliases: Readonly<Record<string, string>> =
     "old latin k": "old-latin-k",
     "old latin l": "old-latin-l",
     "old latin q": "old-latin-q",
+    "old latin n": "old-latin-n",
+    "old latin n — fragmenta sangallensia": "old-latin-n",
+    "old latin st. gallen, n": "old-latin-n",
+    "fragmenta sangallensia / curiensia (it n and it o / vl 16)": "old-latin-n",
+    "fragmenta sangallensia / curiensia (it n, o, a² / vl 16)": "old-latin-n",
+    "fragmenta sangallensia": "old-latin-n",
+    "fragmenta frisingensia (it r / vl 64)": "old-latin-vl64",
+    "frisingensia fragmenta (r/q)": "old-latin-vl64",
+    "fragmenta frisingensia": "old-latin-vl64",
+    "freising fragments": "old-latin-vl64",
+    "palimpsestus legionensis (it l / vl 67)": "old-latin-vl67",
+    "leon palimpsest (l)": "old-latin-vl67",
+    "león palimpsest (l)": "old-latin-vl67",
     "old latin ar": "old-latin-ar",
+    "old latin ar (book of armagh)": "old-latin-ar",
+    "old latin ar — book of armagh": "old-latin-ar",
+    "book of armagh": "old-latin-ar",
+    "book of armagh (it ar / vl 61)": "old-latin-ar",
     "old latin gig": "old-latin-gig",
     "old latin t": "old-latin-t",
     a: "old-latin-a",
@@ -1109,9 +1143,16 @@ export const versionWitnessAliases: Readonly<Record<string, string>> =
     itt: "old-latin-t",
 
     "vulgate am": "vulgate-am",
+    "vulgate am — codex amiatinus": "vulgate-am",
+    "vulgate am (codex amiatinus)": "vulgate-am",
+    "codex amiatinus": "vulgate-am",
     "vulgate fu": "vulgate-fu",
     "vulgate harl": "vulgate-harl",
     "vulgate dem": "vulgate-dem",
+    "vulgate dem — codex demidovianus": "vulgate-dem",
+    "old latin dem — codex demidovianus": "vulgate-dem",
+    "old latin dem": "vulgate-dem",
+    "codex demidovianus": "vulgate-dem",
     "vulgate lips4": "vulgate-lips4",
     "vulgate lips5": "vulgate-lips5",
     "vulgate lips6": "vulgate-lips6",

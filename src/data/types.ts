@@ -128,6 +128,8 @@ export type Passage = {
   variantType: string[];
   tags: string[];
   supportCategory: string;
+  /** Governing apparatus or corpus for public witness totals and rosters. */
+  evidenceScope?: string;
   shortSummary: string;
   supportScore?: number;
   oppositionScore?: number;

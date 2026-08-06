@@ -226,35 +226,35 @@ export function EvidenceTabs({ passage }: EvidenceTabsProps) {
 
           {activeTab === "Greek Manuscripts" && (
             <EvidenceTable
-              title="Greek manuscripts supporting the KJV reading"
+              title="Greek manuscript evidence for the KJV/TR side"
               rows={greekWitnesses}
             />
           )}
 
           {activeTab === "Early Versions" && (
             <EvidenceTable
-              title="Ancient versional witnesses supporting the KJV reading"
+              title="Ancient versional evidence for the KJV/TR side"
               rows={earlyVersions}
             />
           )}
 
           {activeTab === "Latin Witnesses" && (
             <EvidenceTable
-              title="Latin witnesses supporting the KJV reading"
+              title="Latin evidence for the KJV/TR side"
               rows={latin}
             />
           )}
 
           {activeTab === "Syriac Witnesses" && (
             <EvidenceTable
-              title="Syriac witnesses supporting the KJV reading"
+              title="Syriac evidence for the KJV/TR side"
               rows={syriac}
             />
           )}
 
           {activeTab === "Other Versions" && (
             <EvidenceTable
-              title="Other and mixed ancient versions supporting the KJV reading"
+              title="Other and mixed versional evidence for the KJV/TR side"
               rows={otherVersions}
             />
           )}

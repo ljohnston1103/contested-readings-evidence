@@ -12,6 +12,18 @@ const HIXSON = {
   label: "Elijah Hixson, The Greek Manuscripts of the Comma Johanneum",
   url: "https://evangelicaltextualcriticism.blogspot.com/2020/01/the-greek-manuscripts-of-comma.html",
 };
+const GALIZA_REEVE = {
+  label:
+    "Rodrigo B. Galiza and John W. Reeve, The Johannine Comma (1 John 5:7–8): The Status of Its Textual History and Theological Usage in English, Greek, and Latin",
+  url: "https://digitalcommons.andrews.edu/auss/vol56/iss1/6/",
+  locator: "Andrews University Seminary Studies 56.1 (2018): 63–89",
+};
+const VETUS_LATINA_NT = {
+  label: "Vetus Latina New Testament manuscript register (ITSEE, University of Birmingham)",
+  url: "https://itseeweb.cal.bham.ac.uk/vetuslatina/NT-MSS/",
+  locator:
+    "VL 64, Fragmenta Frisingensia, including the seventh-century Catholic-Epistle replacement leaves",
+};
 const INTF_LISTE = {
   label: "INTF Kurzgefasste Liste / NTVMR manuscript metadata",
   url: "https://ntvmr.uni-muenster.de/liste",
@@ -69,36 +81,214 @@ export const catholicRevelationWitnesses: FullWitnessEntry[] = [
     slug: "1-john-5-7",
     reference: "1 John 5:7–8",
     summary:
-      "Ten late Greek manuscripts contain a Comma form: five in the biblical text and five as later marginal variants. The overwhelming Greek transmission omits it. The reading has an earlier and broader Latin reception, beginning with related third-century usage and an explicit complete form in Priscillian.",
-    unit: "The heavenly-witness clause and its associated earthly-witness wording; distinct Greek Comma forms remain separate from the Latin and patristic evidence.",
-    scope: "The complete ten-artifact Greek presence roster verified against manuscript images, with named Latin and patristic evidence from the controlling audit.",
+      "Ten late Greek manuscripts contain a Comma form: five in the biblical text and five as later marginal variants. The forms are heterogeneous rather than ten identical copies of the final Textus Receptus wording. The overwhelming Greek transmission omits the clause. The reading has an earlier and broader Latin reception, beginning with related third-century usage, an explicit complete form in Priscillian, a fifth-century non-continuous Scripture-quotation witness, and seventh-century continuous Latin biblical witnesses.",
+    unit: "The heavenly-witness clause and its associated earthly-witness wording; distinct Greek Comma forms remain separate from the Latin biblical, non-continuous quotation, patristic and printed evidence.",
+    scope:
+      "The complete ten-artifact Greek presence roster verified against manuscript images and catalog records, together with the named Latin manuscript and literary witnesses represented in Galiza and Reeve and the official Vetus Latina manuscript register. Aggregate Greek and Vulgate statements are labeled as traditions rather than universal itemized counts.",
     snapshot: {
-      greekSupport: "10 presence artifacts: 5 main-text and 5 marginal",
+      greekSupport: "10 Greek presence artifacts: 5 main-text forms and 5 later marginal forms",
       greekAgainst: "The overwhelming Greek manuscript tradition",
-      supportCategory: "Late Greek presence witnesses with much earlier Latin and patristic reception",
-      mainEvidenceAgainst: ["Codex Sinaiticus", "Codex Vaticanus", "Codex Alexandrinus", "Codex Fuldensis (Latin text)"],
+      supportCategory:
+        "Late heterogeneous Greek presence witnesses with much earlier Latin literary and biblical reception",
+      mainEvidenceAgainst: [
+        "Codex Sinaiticus",
+        "Codex Vaticanus",
+        "Codex Alexandrinus",
+        "Codex Fuldensis (Latin biblical text)",
+      ],
     },
-    sources: [HIXSON, ECM_CATHOLIC, INTF_LISTE, { label: "Galiza and González, The Johannine Comma", url: "https://digitalcommons.andrews.edu/auss/vol56/iss1/6/" }],
-    notes: ["GA 635 does not contain the Comma.", "The ten Greek witnesses contain heterogeneous forms and are not ten exact final-TR copies."],
+    sources: [HIXSON, ECM_CATHOLIC, INTF_LISTE, GALIZA_REEVE, VETUS_LATINA_NT],
+    notes: [
+      "GA 635 does not contain the Comma.",
+      "The ten Greek witnesses contain heterogeneous forms and are not ten exact final-TR copies.",
+      "Codex Speculum is a non-continuous collection of biblical quotations. The Fragmenta Frisingensia and the León Palimpsest are the earliest continuous Latin biblical witnesses listed here.",
+      "Codex Fuldensis omits the Comma in its biblical text. Its prologue is separate literary evidence and is not counted as a biblical-text witness.",
+      "The three Fulgentius rows are separate works, not duplicate database records.",
+    ],
     units: [
       {
         id: "comma",
         label: "Comma Johanneum presence",
         reading: "The Father, the Word, and the Holy Ghost: and these three are one",
         groups: [
-          { label: "Comma form in the biblical text", tone: "support", witnesses: "629 61 918 2473 2318", note: "629: 1362–1363; 61: early sixteenth century; 918: probably 1573–1578; 2473: 1634; 2318: eighteenth-century commentary manuscript." },
-          { label: "Later marginal or variant additions", tone: "related", witnesses: "429mg 177mg 221mg 88mg 636mg", note: "429mg after 1522; 177mg after the 1770s; 221mg apparently after 1854; 88mg and 636mg later hands." },
-          { label: "Early major Greek omission witnesses", tone: "competing", witnesses: "01 A B 048 P L Ψ K 049 33 2464 056 0142 1739", aggregates: "Overwhelming Greek manuscript tradition" },
-          { label: "Latin biblical-text omissions", tone: "competing", witnesses: "Codex-Fuldensis Codex-Amiatinus" },
-          { label: "Non-continuous Latin evidence", tone: "related", witnesses: "Speculum Fuldensis-prologue", note: "Fuldensis omits the Comma in its biblical text; its prologue is separate literary evidence." },
-          { label: "Later medieval Latin reception", tone: "support", aggregates: "Later medieval Vulgate tradition" },
+          {
+            label: "Greek manuscripts with a Comma form in the biblical text",
+            tone: "related",
+            witnesses: "629 61 918 2473 2318",
+            note: "Presence roster, not five identical forms. 629: AD 1362–1363; 61: c. AD 1495–1521; 918: c. AD 1573–1578; 2473: AD 1634; 2318: eighteenth-century commentary manuscript.",
+          },
+          {
+            label: "Later Greek marginal or variant additions",
+            tone: "related",
+            witnesses: "429mg 177mg 221mg 88mg 636mg",
+            note: "429mg after AD 1522; 177mg c. AD 1785; 221mg after AD 1854; 88mg and 636mg are later hands of uncertain date and do not inherit the dates of their base manuscripts.",
+          },
+          {
+            label: "Early major Greek omission witnesses",
+            tone: "competing",
+            witnesses: "01 A B 048 P L Ψ K 049 33 2464 056 0142 1739",
+            aggregates: "Overwhelming Greek manuscript tradition",
+          },
+          {
+            label: "Earliest named non-continuous Latin Scripture-quotation witness",
+            tone: "related",
+            witnesses: "Codex-Speculum-(m)",
+            note: "Fifth century. Contains the Comma in a collection of Latin Scripture quotations, not in a continuous biblical codex.",
+          },
+          {
+            label: "Earliest named continuous Latin biblical witnesses",
+            tone: "support",
+            witnesses: "Fragmenta-Frisingensia-(VL64) León-Palimpsest-(l)",
+            note: "The Catholic-Epistle replacement leaves of VL 64 were copied in the first half of the seventh century, probably in Spain. The León Palimpsest is seventh century.",
+          },
+          {
+            label: "Further named medieval Latin biblical witnesses",
+            tone: "support",
+            witnesses:
+              "Codex-Wizanburgensis Codex-Theodulphianus Codex-Sangallensis-907 Codex-Cavensis Codex-Ulmensis Codex-Lemovicensis Codex-Vercellensis Codex-Complutensis-I Codex-Gothicus-Legionensis Codex-Toletanus Codex-Demidovianus",
+            note: "Wizanburgensis: eighth century, disputed; Theodulphianus and Sangallensis 907: eighth–ninth century; Cavensis, Ulmensis, Lemovicensis, and Vercellensis: ninth century; Complutensis I: AD 927; Gothicus Legionensis: AD 960; Toletanus: tenth century; Demidovianus: second half of the thirteenth century.",
+          },
+          {
+            label: "Latin marginal addition",
+            tone: "related",
+            witnesses: "Codex-Sangallensis-63-margin",
+            note: "Ninth-century base manuscript; the date of the marginal addition is not independently established.",
+          },
+          {
+            label: "Latin biblical-text omissions",
+            tone: "competing",
+            witnesses: "Codex-Fuldensis Codex-Amiatinus",
+            note: "Codex Fuldensis: AD 546. Codex Amiatinus: c. AD 700.",
+          },
+          {
+            label: "Separate literary evidence",
+            tone: "related",
+            witnesses: "Codex-Fuldensis-prologue",
+            note: "The prologue discusses the disputed clause, while the biblical text omits it.",
+          },
+          {
+            label: "Later medieval Latin reception",
+            tone: "support",
+            aggregates: "Later medieval Vulgate tradition",
+          },
+          {
+            label: "Printed Latin and received-text reception",
+            tone: "related",
+            witnesses:
+              "Complutensian-Polyglot Erasmus-1522 Stephanus-1550 Beza-editions Clementine-Vulgate-1592",
+            note: "Printed editions are reception-history witnesses and remain separate from manuscripts.",
+          },
         ],
       },
     ],
     fathers: [
-      { author: "Tertullian", work: "Against Praxeas 25", date: "c. AD 213", use: "Allusion", reading: "Related", locator: "Chapter 25", url: "https://www.newadvent.org/fathers/0317.htm" },
-      { author: "Cyprian", work: "On the Unity of the Church 6", date: "c. AD 251", use: "Allusion", reading: "Related", locator: "Chapter 6", url: "https://www.newadvent.org/fathers/050701.htm" },
-      { author: "Priscillian", work: "Liber Apologeticus 1.4", date: "c. AD 380", use: "Direct quotation", reading: "Supports the KJV reading", locator: "CSEL 18, 6; Conti, Complete Works, p. 34" },
+      {
+        author: "Tertullian",
+        work: "Against Praxeas 25",
+        date: "c. AD 210–213",
+        use: "Allusion",
+        reading: "Related",
+        locator: "Adversus Praxean 25",
+        url: "https://www.newadvent.org/fathers/0317.htm",
+      },
+      {
+        author: "Cyprian",
+        work: "On the Unity of the Church 6",
+        date: "c. AD 251",
+        use: "Allusion",
+        reading: "Related",
+        locator: "De unitate ecclesiae 6",
+        url: "https://www.newadvent.org/fathers/050701.htm",
+      },
+      {
+        author: "Priscillian",
+        work: "Liber Apologeticus 1.4",
+        date: "c. AD 380",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator: "CSEL 18, 6; Conti, Complete Works, p. 34",
+      },
+      {
+        author: "Expositio Fidei",
+        work: "Expositio Fidei",
+        date: "Late fourth century",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Explicit Latin Father, Word, and Spirit three-one form; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
+      },
+      {
+        author: "Contra Varimadum",
+        work: "Contra Varimadum",
+        date: "c. AD 450",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Explicit heavenly-witness form; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
+      },
+      {
+        author: "Carthaginian confession under Huneric",
+        work: "Confession of the African bishops",
+        date: "AD 484",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Explicit heavenly-witness form preserved in the Vandal persecution account; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
+      },
+      {
+        author: "Fulgentius of Ruspe",
+        work: "Contra Arianos",
+        date: "c. AD 527",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Explicit heavenly-witness citation; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
+      },
+      {
+        author: "Fulgentius of Ruspe",
+        work: "Contra Fabianum",
+        date: "c. AD 527",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Explicit three-one form; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
+      },
+      {
+        author: "Fulgentius of Ruspe",
+        work: "De Trinitate ad Felicem",
+        date: "c. AD 527",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Explicit heavenly-witness citation; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
+      },
+      {
+        author: "Cassiodorus",
+        work: "Complexiones in Epistolis Apostolorum",
+        date: "Sixth century",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Explicit Father, Son, and Spirit form; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
+      },
+      {
+        author: "Isidore of Seville",
+        work: "Testimonia Divinae Scripturae et Patrum",
+        date: "Early seventh century",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Explicit heavenly-witness citation; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
+      },
+      {
+        author: "Ambrose Ansbert",
+        work: "Commentary on Revelation",
+        date: "Mid-eighth century",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Explicit heavenly-witness citation; Galiza and Reeve, AUSS 56.1 (2018): 63–89",
+      },
     ],
   },
   {

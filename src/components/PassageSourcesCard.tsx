@@ -54,6 +54,16 @@ export function PassageSourcesCard({ passage }: PassageSourcesCardProps) {
           ? " Complete citations appear in the References section at the end of the page."
           : ""}
       </p>
+      {passage.evidenceScope ? (
+        <div className="mt-4 rounded-2xl border border-archive-gold/25 bg-archive-gold/10 p-4">
+          <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-ink-500 dark:text-ink-100/55">
+            Governing apparatus and count scope
+          </p>
+          <p className="mt-2 text-sm leading-6 text-ink-700 dark:text-ink-100/75">
+            {passage.evidenceScope}
+          </p>
+        </div>
+      ) : null}
       <ul className="mt-4 flex flex-wrap gap-2">
         {sources.map((source) => (
           <li key={source.label}>

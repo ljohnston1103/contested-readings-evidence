@@ -784,7 +784,12 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
       {
         label: "New Advent Fathers of the Church",
         url: "https://www.newadvent.org/fathers/",
-        locator: "Origen, Comm. in Matt. 13.7; Chrysostom, Hom. in Matt. 57.4",
+        locator: "Pseudo-Clement, First Epistle Concerning Virginity 12; Origen, Comm. in Matt. 13.7; Chrysostom, Hom. in Matt. 57.4",
+      },
+      {
+        label: "Beth Mardutho, Gorgias Encyclopedic Dictionary of the Syriac Heritage",
+        url: "https://gedsh.bethmardutho.org/Clement-of-Rome-and-Pseudo-Clementine-literature",
+        locator: "Dates the two Pseudo-Clementine letters on virginity to the late third or early fourth century",
       },
       {
         label: "Wieland Willker, study of Middle Egyptian mae-2 (Schøyen MS 2650)",
@@ -798,7 +803,7 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
       },
     ],
     notes: [
-      "The supporting uncial is Greek Θ (Theta, GA 038) in the correction of 01 only; Θ itself omits.",
+      "Do not confuse the correction of Sinaiticus (01C), which carries a related long form, with Codex Koridethi (Θ / GA 038), which omits the verse.",
       "mae-1 (Codex Scheide) contains the verse and mae-2 (Schøyen MS 2650) omits it.",
       "Lectionary 253, dated 1020, omits the verse.",
     ],
@@ -850,6 +855,17 @@ export const matthewMarkWitnesses: FullWitnessEntry[] = [
       },
     ],
     fathers: [
+      {
+        author: "Pseudo-Clement",
+        work: "First Epistle Concerning Virginity 12",
+        date: "Late third or early fourth century",
+        use: "Parallel tradition",
+        reading: "Related",
+        locator:
+          "Book I, chapter 12: ‘This kind goes not out but by fasting and prayer’; the wording may reflect Matthew 17:21, Mark 9:29, or harmonization",
+        url: "https://www.newadvent.org/fathers/0803.htm",
+        transmission: "Surviving Syriac transmission",
+      },
       {
         author: "Origen",
         work: "Commentary on Matthew 13.7",

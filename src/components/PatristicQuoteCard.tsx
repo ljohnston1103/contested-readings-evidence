@@ -7,6 +7,9 @@ type PatristicQuoteCardProps = {
 };
 
 function relationshipLabel(witness: PatristicWitness) {
+  if (witness.workSection === "Apparatus-level attribution") {
+    return "Apparatus-level attribution";
+  }
   const directionalRole = evidenceDirectionRole(witness.reading);
   if (directionalRole === "opposes") return "Competing witness";
   if (directionalRole === "supports") return "Supporting witness";

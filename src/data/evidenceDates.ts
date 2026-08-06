@@ -56,6 +56,10 @@ export function parseEvidenceDate(label: string): EvidenceDateRange | undefined 
   const value = label
     .normalize("NFKC")
     .replace(/[‐‑‒–—−]/g, "-")
+    .replace(/\b(?:at\s+)?the\s+end\s+of\s+the\s+/gi, "late ")
+    .replace(/\bend\s+of\s+the\s+/gi, "late ")
+    .replace(/\b(?:at\s+)?the\s+beginning\s+of\s+the\s+/gi, "early ")
+    .replace(/\bbeginning\s+of\s+the\s+/gi, "early ")
     .replace(/\s+/g, " ")
     .trim();
   if (!value) return undefined;
@@ -151,7 +155,12 @@ export function parseEvidenceDate(label: string): EvidenceDateRange | undefined 
 
   const ranges = numericTokens.map((match) => {
     const start = Number.parseInt(match[1], 10);
-    let end = match[2] ? start + 99 : start;
+    // A round-hundred label such as “400s” or “1300s” denotes a century,
+    // while a non-round label such as “370s” or “1770s” denotes a decade.
+    // Treating every trailing-s label as a century previously turned “370s”
+    // into AD 370–469 and inflated author and work date ranges throughout the
+    // Fathers index.
+    let end = match[2] ? start + (start % 100 === 0 ? 99 : 9) : start;
     if (match[3]) {
       const abbreviated = Number.parseInt(match[3], 10);
       const magnitude = 10 ** match[3].length;

@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal } from "@/components/motion/Reveal";
+import { displayedPassages } from "@/data/derived";
 import { fullWitnessEntries, type WitnessGroup } from "@/data/fullWitness";
 
 export const metadata: Metadata = {
@@ -30,6 +31,10 @@ const toneLabels: Record<WitnessGroup["tone"], string> = {
   neutral: "Non-directional evidence",
 };
 
+const patristicRowsBySlug = new Map(
+  displayedPassages.map((passage) => [passage.slug, passage.patristicWitnesses]),
+);
+
 export default function FullWitnessInformationPage() {
   return (
     <div id="top" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -44,9 +49,11 @@ export default function FullWitnessInformationPage() {
           Witness rosters for all 51 passages
         </h1>
         <p className="mt-4 max-w-4xl text-base leading-7 text-ink-700 dark:text-ink-100/75">
-          This page gathers the verified Greek manuscripts, Latin witnesses, ancient versions, lectionaries,
-          corrected states and Church Fathers recovered in the passage research. Group sigla such as Byz remain
-          grouped when the cited source does not enumerate their individual members.
+          This page gathers the Greek manuscripts, Latin witnesses, ancient versions, lectionaries,
+          corrected states and Church Fathers recovered in the passage research. Each roster now identifies
+          its governing apparatus or research corpus. A count from a selected apparatus describes that cited
+          corpus and is not presented as a universal count of every surviving manuscript. Group sigla such as
+          Byz remain grouped when the cited source does not enumerate their individual members.
         </p>
       </Reveal>
 
@@ -90,10 +97,66 @@ export default function FullWitnessInformationPage() {
               </div>
 
               <p className="mt-4 max-w-5xl leading-7 text-ink-700 dark:text-ink-100/75">{entry.summary}</p>
+              <div className="mt-5 rounded-2xl border border-archive-teal/25 bg-archive-teal/[0.06] p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Apparatus and roster scope</p>
+                <p className="mt-2 leading-7 text-ink-800 dark:text-ink-100/85">{entry.scope}</p>
+              </div>
               <div className="mt-5 rounded-2xl border border-archive-gold/25 bg-archive-gold/10 p-4">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-ink-500 dark:text-ink-100/60">Disputed unit</p>
                 <p className="mt-2 leading-7 text-ink-800 dark:text-ink-100/85">{entry.unit}</p>
               </div>
+
+              <dl className="mt-5 grid gap-3 md:grid-cols-2">
+                <div className="rounded-2xl border border-ink-100 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+                  <dt className="text-[0.68rem] font-black uppercase tracking-[0.15em] text-ink-500 dark:text-ink-100/55">Greek support in cited scope</dt>
+                  <dd className="mt-2 text-sm font-bold leading-6 text-ink-900 dark:text-white">{entry.snapshot.greekSupport}</dd>
+                </div>
+                <div className="rounded-2xl border border-ink-100 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+                  <dt className="text-[0.68rem] font-black uppercase tracking-[0.15em] text-ink-500 dark:text-ink-100/55">Greek competing evidence in cited scope</dt>
+                  <dd className="mt-2 text-sm font-bold leading-6 text-ink-900 dark:text-white">{entry.snapshot.greekAgainst}</dd>
+                </div>
+                <div className="rounded-2xl border border-ink-100 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+                  <dt className="text-[0.68rem] font-black uppercase tracking-[0.15em] text-ink-500 dark:text-ink-100/55">Evidence classification</dt>
+                  <dd className="mt-2 text-sm font-bold leading-6 text-ink-900 dark:text-white">{entry.snapshot.supportCategory}</dd>
+                </div>
+                {entry.snapshot.percentSupport ? (
+                  <div className="rounded-2xl border border-ink-100 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+                    <dt className="text-[0.68rem] font-black uppercase tracking-[0.15em] text-ink-500 dark:text-ink-100/55">Percentage and denominator</dt>
+                    <dd className="mt-2 text-sm font-bold leading-6 text-ink-900 dark:text-white">{entry.snapshot.percentSupport}</dd>
+                  </div>
+                ) : null}
+              </dl>
+
+
+              {entry.snapshot.mainEvidenceAgainst.length ? (
+                <div className="mt-5 rounded-2xl border border-rose-700/15 bg-rose-50/50 p-4 dark:border-rose-300/15 dark:bg-rose-300/[0.04]">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-800 dark:text-rose-200">
+                    Principal competing witnesses named in the snapshot
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {entry.snapshot.mainEvidenceAgainst.map((witness) => (
+                      <span key={witness} className="rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold text-ink-700 dark:bg-white/10 dark:text-ink-100/75">
+                        {witness}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {entry.notes?.length ? (
+                <div className="mt-5 rounded-2xl border border-amber-700/15 bg-amber-50/60 p-4 dark:border-archive-gold/20 dark:bg-archive-gold/[0.05]">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800 dark:text-archive-gold">
+                    Factual distinctions
+                  </p>
+                  <ul className="mt-3 grid gap-2">
+                    {entry.notes.map((note, index) => (
+                      <li key={`${entry.slug}-note-${index}`} className="text-sm leading-6 text-ink-700 dark:text-ink-100/75">
+                        {note}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
 
               <div className="mt-6 grid gap-6">
                 {entry.units.map((unit) => (
@@ -129,15 +192,42 @@ export default function FullWitnessInformationPage() {
                 ))}
               </div>
 
-              {entry.fathers.length ? (
+              {(patristicRowsBySlug.get(entry.slug)?.length ?? 0) > 0 ? (
                 <section className="mt-7" aria-labelledby={`${entry.slug}-fathers`}>
                   <h3 id={`${entry.slug}-fathers`} className="font-display text-2xl font-black text-ink-900 dark:text-white">Church Fathers and literary witnesses</h3>
+                  <p className="mt-2 max-w-4xl text-sm leading-6 text-ink-600 dark:text-ink-100/65">
+                    Precisely located citations and additional apparatus-level attributions are
+                    displayed separately. An apparatus-level attribution does not claim that the
+                    exact work and section have been independently verified here.
+                  </p>
                   <div className="mt-4 grid gap-3 md:grid-cols-2">
-                    {entry.fathers.map((father, index) => (
-                      <div key={`${father.author}-${father.work}-${index}`} className="rounded-2xl border border-ink-100 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-                        <p className="font-black text-ink-900 dark:text-white">{father.author} · {father.date}</p>
-                        <p className="mt-1 text-sm font-semibold text-ink-700 dark:text-ink-100/75">{father.work}</p>
-                        <p className="mt-2 text-sm leading-6 text-ink-600 dark:text-ink-100/65">{father.use} · {father.reading} · {father.locator}</p>
+                    {(patristicRowsBySlug.get(entry.slug) ?? []).map((father, index) => (
+                      <div key={`${father.author ?? father.source}-${father.workSection ?? index}-${index}`} className="rounded-2xl border border-ink-100 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+                        <p className="font-black text-ink-900 dark:text-white">{father.author ?? father.source} · {father.date}</p>
+                        {father.workSection ? (
+                          <p className="mt-1 text-sm font-semibold text-ink-700 dark:text-ink-100/75">{father.workSection}</p>
+                        ) : null}
+                        <p className="mt-2 text-sm leading-6 text-ink-600 dark:text-ink-100/65">
+                          {[
+                            father.relationship?.replaceAll("_", " "),
+                            father.reading,
+                            father.sourceCitation,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-ink-700 dark:text-ink-100/75">{father.quoteSummary}</p>
+                        {father.sourceUrl ? (
+                          <a
+                            href={father.sourceUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-3 inline-flex items-center gap-1.5 text-xs font-black text-archive-teal hover:underline dark:text-teal-200"
+                          >
+                            Open source
+                            <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                          </a>
+                        ) : null}
                       </div>
                     ))}
                   </div>

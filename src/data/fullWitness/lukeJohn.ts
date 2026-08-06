@@ -93,6 +93,36 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
       IGNTP_LUKE,
       INTF_LISTE,
       VETUS_LATINA,
+      {
+        label: "Irenaeus, Against Heresies 3.10.3",
+        url: "https://www.newadvent.org/fathers/0103310.htm",
+        locator:
+          "Latin transmission: the angelic hymn is quoted with the genitive sense, ‘to men of good will’",
+      },
+      {
+        label: "Origen, Against Celsus 1.60",
+        url: "https://www.newadvent.org/fathers/04161.htm",
+        locator:
+          "Direct quotation of the angelic hymn with the nominative sense, ‘good-will towards men’",
+      },
+      {
+        label: "Eusebius of Caesarea, Demonstratio Evangelica 7.2.8",
+        url: "https://catholiclibrary.org/library/view?chunk.id=00000369&docId=Fathers-Synchronized-EN%2FEusebius_Caesariensis__Demonstratio_evangelica.en.html",
+        locator:
+          "Book 7, chapter 2, section 8; direct quotation of Luke 2:14 with nominative εὐδοκία",
+      },
+      {
+        label: "Epiphanius, Panarion 30.29.4",
+        url: "https://www.orcuttchristian.org/Panarion%20Epiphanius%20COMPLETE.pdf",
+        locator:
+          "Book I, section 30.29.4, printed p. 157; direct quotation with the nominative sense, ‘good-will among men’",
+      },
+    ],
+    notes: [
+      "Irenaeus supplies a second-century competing citation in Latin transmission: ‘to men of good will.’",
+      "Origen directly quotes the nominative form in Against Celsus 1.60, but Willker reports other Origen citations on both apparatus lines; his wider evidence therefore remains mixed.",
+      "Eusebius quotes the full Lukan context in Demonstratio Evangelica 7.2.5–10 and gives the nominative form at 7.2.8.",
+      "Epiphanius gives the nominative sense in Panarion 30.29.4.",
     ],
     units: [
       {
@@ -134,7 +164,59 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
         ],
       },
     ],
-    fathers: [],
+    fathers: [
+      {
+        author: "Irenaeus",
+        work: "Against Heresies 3.10.3",
+        date: "c. AD 180",
+        use: "Direct quotation",
+        reading: "Competing reading",
+        locator:
+          "Adversus haereses 3.10.3: the surviving Latin has hominibus bonae voluntatis, ‘to men of good will’",
+        url: "https://www.newadvent.org/fathers/0103310.htm",
+        transmission: "Latin transmission",
+      },
+      {
+        author: "Origen",
+        work: "Against Celsus 1.60",
+        date: "c. AD 248",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Contra Celsum 1.60: ‘Glory to God in the highest, and on earth peace, good-will towards men’",
+        url: "https://www.newadvent.org/fathers/04161.htm",
+      },
+      {
+        author: "Origen",
+        work: "Additional Luke 2:14 citations reported in the apparatus",
+        date: "Third century",
+        use: "Indirect report",
+        reading: "Related",
+        locator:
+          "Willker, Luke, TVU 18, PDF pp. 30–31; other Origen citations are reported on both reading lines",
+        url: WILLKER_LUKE.url,
+      },
+      {
+        author: "Eusebius of Caesarea",
+        work: "Demonstratio Evangelica 7.2.8",
+        date: "c. AD 312–318",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Book 7, chapter 2, section 8: δόξα ἐν ὑψίστοις θεῷ ... ἐν ἀνθρώποις εὐδοκία",
+        url: "https://catholiclibrary.org/library/view?chunk.id=00000369&docId=Fathers-Synchronized-EN%2FEusebius_Caesariensis__Demonstratio_evangelica.en.html",
+      },
+      {
+        author: "Epiphanius of Salamis",
+        work: "Panarion 30.29.4",
+        date: "c. AD 374–377",
+        use: "Direct quotation",
+        reading: "Supports the KJV reading",
+        locator:
+          "Panarion 30.29.4, printed p. 157: ‘Glory to God in the highest, and on earth peace, good-will among men’",
+        url: "https://www.orcuttchristian.org/Panarion%20Epiphanius%20COMPLETE.pdf",
+      },
+    ],
   },
   {
     slug: "luke-2-33",
@@ -1063,7 +1145,7 @@ export const lukeJohnWitnesses: FullWitnessEntry[] = [
       {
         author: "Hegesippus",
         work: "Reported in Eusebius, Ecclesiastical History 2.23",
-        date: "Second century",
+        date: "c. AD 175–189",
         use: "Parallel tradition",
         reading: "Related",
         locator: "Historia ecclesiastica 2.23",
