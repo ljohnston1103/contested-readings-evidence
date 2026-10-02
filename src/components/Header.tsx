@@ -169,7 +169,7 @@ export function Header() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.28, ease: [0.21, 0.47, 0.32, 0.98] }}
-              className="overflow-hidden xl:hidden"
+              className="max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain xl:hidden"
             >
               <div className="flex flex-col gap-1.5 px-4 pb-4">
                 {navItems.map((item, index) => {

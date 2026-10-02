@@ -44,6 +44,11 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
     return passages.filter((passage) => passageSearchText(passage).includes(needle)).slice(0, 8);
   }, [passages, query]);
 
+  useEffect(() => {
+    if (!open) return;
+    dialogRef.current?.querySelector<HTMLElement>('[role="option"][aria-selected="true"]')?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex, open, results]);
+
   const go = useCallback(
     (href: string) => {
       onClose();
@@ -115,7 +120,7 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-24 sm:pt-32"
+          className="fixed inset-0 z-[100] flex items-start justify-center p-3 sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -131,7 +136,7 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Search the evidence database"
-            className="relative w-full max-w-2xl overflow-hidden rounded-[2rem] border border-ink-200 bg-white shadow-card dark:border-white/10 dark:bg-archive-navy"
+            className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-[2rem] border border-ink-200 bg-white shadow-card dark:border-white/10 dark:bg-archive-navy"
             initial={{ opacity: 0, y: -16, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -16, scale: 0.98 }}
@@ -155,7 +160,7 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-700 dark:text-ink-100/50 dark:hover:bg-white/10 dark:hover:text-white"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-700 dark:text-ink-100/50 dark:hover:bg-white/10 dark:hover:text-white"
                 aria-label="Close search"
               >
                 <X className="h-4 w-4" />
@@ -165,7 +170,7 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
               id="search-results"
               role="listbox"
               aria-label="Passage search results"
-              className="max-h-[55vh] overflow-y-auto p-2"
+              className="max-h-[45dvh] overflow-y-auto overscroll-contain p-2"
             >
               {results.length ? (
                 results.map((passage, index) => (
