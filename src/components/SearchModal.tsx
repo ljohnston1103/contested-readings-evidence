@@ -74,6 +74,7 @@ export function SearchModal({ passages, open, onClose }: SearchModalProps) {
       }
       if (event.key === "Enter") {
         if (event.target instanceof HTMLButtonElement) return;
+        event.preventDefault();
         const target = results[activeIndex];
         if (target) go(`/passages/${target.slug}`);
       }
